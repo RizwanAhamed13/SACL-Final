@@ -15,7 +15,7 @@ const ImpactTest = () => {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     id: null,
-    dateOfInspection: '', partName: '', dateCode: '',
+    dateOfInspection: new Date().toISOString().split('T')[0], partName: '', dateCode: '',
     specification: '', testType: '',
     observedValue1: '', observedValue2: '', observedValue3: '',
     remarks: '', checkedBy: '', verifiedBy: '', 

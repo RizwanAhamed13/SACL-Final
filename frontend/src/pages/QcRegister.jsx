@@ -15,7 +15,7 @@ const QcRegister = () => {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     id: null, // for editing
-    heatCode: '', date: '', dateCode: '', disa: '', partName: '', qtyMoulds: '',
+    heatCode: '', date: new Date().toISOString().split('T')[0], dateCode: '', disa: '', partName: '', qtyMoulds: '',
     compositionC: '', compositionSi: '', compositionMn: '', compositionP: '', compositionS: '',
     compositionMgFl: '', compositionCu: '', compositionCr: '',
     fcNoHeatNo: '', conNo: '', tappingTime: '', tappingWtKgs: '', pouringTemp: '', timeOfPouring: '', streamInnoculant: '', ppCode: '',

@@ -15,7 +15,7 @@ const MicroTensile = () => {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     id: null,
-    dateOfInspection: '', item: '', dateCode: '',
+    dateOfInspection: new Date().toISOString().split('T')[0], item: '', dateCode: '',
     barDiaMm: '', gaugeLengthMm: '', yieldStrength05: '',
     maxLoadKn: '', yieldLoadKn: '', tensileStrength: '', yieldStrength02: '', elongationPercent: '',
     remarks: '', testedBy: '', verifiedBy: '', 
