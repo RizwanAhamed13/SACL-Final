@@ -21,7 +21,7 @@ const QcRegister = () => {
     fcNoHeatNo: '', conNo: '', tappingTime: '', tappingWtKgs: '', pouringTemp: '', timeOfPouring: '', streamInnoculant: '', ppCode: '',
     treatmentNo: '', mgKgs: '', resMgConvertorPercent: '', recMgPercent: '',
     correctiveC: '', correctiveSi: '', correctiveMn: '', correctiveS: '', correctiveCr: '', correctiveCu: '', correctiveSn: '',
-    remarks: '', shiftChemist: '', shiftInchargeQc: '', 
+    remarks: '',
     status: 'QC_ENTRY', hofApprovedBy: '', hodApprovedBy: '', createdBy: ''
   });
 
@@ -111,7 +111,7 @@ const QcRegister = () => {
         fcNoHeatNo: '', conNo: '', tappingTime: '', tappingWtKgs: '', pouringTemp: '', timeOfPouring: '', streamInnoculant: '', ppCode: '',
         treatmentNo: '', mgKgs: '', resMgConvertorPercent: '', recMgPercent: '',
         correctiveC: '', correctiveSi: '', correctiveMn: '', correctiveS: '', correctiveCr: '', correctiveCu: '', correctiveSn: '',
-        remarks: '', shiftChemist: '', shiftInchargeQc: '', status: 'QC_ENTRY', hofApprovedBy: '', hodApprovedBy: ''
+        remarks: '', status: 'QC_ENTRY', hofApprovedBy: '', hodApprovedBy: ''
       });
       fetchRecords();
     } catch (err) {
@@ -259,9 +259,7 @@ const QcRegister = () => {
                     <label className="form-label">Remarks</label>
                     <textarea name="remarks" value={formData.remarks} onChange={handleChange} className="form-control" rows="2" placeholder="Any observations..."></textarea>
                   </div>
-                  <div className="form-row form-row-3">
-                    <div className="form-group"><label className="form-label">Shift Chemist</label><input type="text" name="shiftChemist" value={formData.shiftChemist} onChange={handleChange} className="form-control" placeholder="Name" /></div>
-                    <div className="form-group"><label className="form-label">Shift Incharge (QC)</label><input type="text" name="shiftInchargeQc" value={formData.shiftInchargeQc} onChange={handleChange} className="form-control" placeholder="Name" /></div>
+                  <div className="form-row form-row-1">
                     <div className="form-group">
                       <label className="form-label">Status</label>
                       <div className={`status-badge status-${(formData.status || 'QC_ENTRY').toLowerCase()}`} style={{ padding: '0.6rem', textAlign: 'center', width: '100%', borderRadius: '8px' }}>

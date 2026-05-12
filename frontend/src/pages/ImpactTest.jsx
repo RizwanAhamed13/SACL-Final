@@ -18,7 +18,7 @@ const ImpactTest = () => {
     dateOfInspection: new Date().toISOString().split('T')[0], partName: '', dateCode: '',
     specification: '', testType: '',
     observedValue1: '', observedValue2: '', observedValue3: '',
-    remarks: '', checkedBy: '', verifiedBy: '', 
+    remarks: '',
     status: 'QC_ENTRY', hofApprovedBy: '', hodApprovedBy: '', createdBy: ''
   });
 
@@ -105,7 +105,7 @@ const ImpactTest = () => {
         id: null, dateOfInspection: '', partName: '', dateCode: '',
         specification: '', testType: '',
         observedValue1: '', observedValue2: '', observedValue3: '',
-        remarks: '', checkedBy: '', verifiedBy: '', status: 'QC_ENTRY', hofApprovedBy: '', hodApprovedBy: ''
+        remarks: '', status: 'QC_ENTRY', hofApprovedBy: '', hodApprovedBy: ''
       });
       fetchRecords();
     } catch (err) {
@@ -210,9 +210,7 @@ const ImpactTest = () => {
                     <label className="form-label">Remarks</label>
                     <textarea name="remarks" value={formData.remarks} onChange={handleChange} className="form-control" rows="2" placeholder="Any observations..."></textarea>
                   </div>
-                  <div className="form-row form-row-3">
-                    <div className="form-group"><label className="form-label">Checked By</label><input type="text" name="checkedBy" value={formData.checkedBy} onChange={handleChange} className="form-control" placeholder="Name" /></div>
-                    <div className="form-group"><label className="form-label">Verified By</label><input type="text" name="verifiedBy" value={formData.verifiedBy} onChange={handleChange} className="form-control" placeholder="Name" /></div>
+                  <div className="form-row form-row-1">
                     <div className="form-group">
                       <label className="form-label">Status</label>
                       <div className={`status-badge status-${(formData.status || 'QC_ENTRY').toLowerCase()}`} style={{ padding: '0.6rem', textAlign: 'center', width: '100%', borderRadius: '8px' }}>

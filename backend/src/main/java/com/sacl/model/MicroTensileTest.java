@@ -31,8 +31,6 @@ public class MicroTensileTest {
     @Column(columnDefinition = "TEXT")
     private String remarks;
 
-    private String testedBy;
-    private String verifiedBy;
     private String approvedBy;
     
     private String hofApprovedBy;

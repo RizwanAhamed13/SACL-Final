@@ -18,7 +18,7 @@ const MicroTensile = () => {
     dateOfInspection: new Date().toISOString().split('T')[0], item: '', dateCode: '',
     barDiaMm: '', gaugeLengthMm: '', yieldStrength05: '',
     maxLoadKn: '', yieldLoadKn: '', tensileStrength: '', yieldStrength02: '', elongationPercent: '',
-    remarks: '', testedBy: '', verifiedBy: '', 
+    remarks: '',
     status: 'QC_ENTRY', hofApprovedBy: '', hodApprovedBy: '', createdBy: ''
   });
 
@@ -105,7 +105,7 @@ const MicroTensile = () => {
         id: null, dateOfInspection: '', item: '', dateCode: '',
         barDiaMm: '', gaugeLengthMm: '', yieldStrength05: '',
         maxLoadKn: '', yieldLoadKn: '', tensileStrength: '', yieldStrength02: '', elongationPercent: '',
-        remarks: '', testedBy: '', verifiedBy: '', status: 'QC_ENTRY', hofApprovedBy: '', hodApprovedBy: ''
+        remarks: '', status: 'QC_ENTRY', hofApprovedBy: '', hodApprovedBy: ''
       });
       fetchRecords();
     } catch (err) {
@@ -221,9 +221,7 @@ const MicroTensile = () => {
                     <label className="form-label">Remarks</label>
                     <textarea name="remarks" value={formData.remarks} onChange={handleChange} className="form-control" rows="2" placeholder="Any observations..."></textarea>
                   </div>
-                  <div className="form-row">
-                    <div className="form-group"><label className="form-label">Tested By</label><input type="text" name="testedBy" value={formData.testedBy} onChange={handleChange} className="form-control" placeholder="Name" /></div>
-                    <div className="form-group"><label className="form-label">Verified By</label><input type="text" name="verifiedBy" value={formData.verifiedBy} onChange={handleChange} className="form-control" placeholder="Name" /></div>
+                  <div className="form-row form-row-1">
                     <div className="form-group">
                       <label className="form-label">Status</label>
                       <div className={`status-badge status-${(formData.status || 'QC_ENTRY').toLowerCase()}`} style={{ padding: '0.6rem', textAlign: 'center', width: '100%', borderRadius: '8px' }}>

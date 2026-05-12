@@ -31,8 +31,6 @@ public class MicroStructureAnalysis {
     @Column(columnDefinition = "TEXT")
     private String remarks;
 
-    private String checkedBy;
-    private String verifiedBy;
     private String approvedBy;
     
     private String hofApprovedBy;

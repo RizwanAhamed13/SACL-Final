@@ -57,8 +57,6 @@ public class QcRegister {
     @Column(columnDefinition = "TEXT")
     private String remarks;
 
-    private String shiftChemist;
-    private String shiftInchargeQc;
     private String hodQc;
     
     private String hofApprovedBy;
