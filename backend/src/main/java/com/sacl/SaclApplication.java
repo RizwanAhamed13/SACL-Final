@@ -15,27 +15,27 @@ public class SaclApplication {
     }
 
     @Bean
-    public CommandLineRunner initAdmin(UserRepository userRepository) {
+    public CommandLineRunner initAdmin(UserRepository userRepository, org.springframework.security.crypto.password.PasswordEncoder passwordEncoder) {
         return args -> {
-            System.out.println("Checking and reactivating all Admin users...");
-            userRepository.findAll().forEach(user -> {
-                if (user.getRole() != null && user.getRole().equalsIgnoreCase("Admin")) {
+            if (userRepository.count() == 0 || userRepository.findByUsername("admin").isEmpty()) {
+                User admin = new User();
+                admin.setUsername("admin");
+                admin.setPassword(passwordEncoder.encode("admin"));
+                admin.setFullName("Administrator");
+                admin.setEmail("admin@example.com");
+                admin.setRole("ADMIN");
+                admin.setActive(true);
+                userRepository.save(admin);
+                System.out.println("Default admin user created with username 'admin' and password 'admin'");
+            } else {
+                userRepository.findByUsername("admin").ifPresent(user -> {
                     if (user.getActive() == null || !user.getActive()) {
                         user.setActive(true);
                         userRepository.save(user);
-                        System.out.println("User '" + user.getUsername() + "' with Admin role has been reactivated.");
+                        System.out.println("User 'admin' has been reactivated.");
                     }
-                }
-            });
-
-            // Also ensure 'admin' user is active just in case
-            userRepository.findByUsername("admin").ifPresent(user -> {
-                if (user.getActive() == null || !user.getActive()) {
-                    user.setActive(true);
-                    userRepository.save(user);
-                    System.out.println("User 'admin' has been reactivated.");
-                }
-            });
+                });
+            }
         };
     }
 }
