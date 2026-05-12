@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SACL Quality Management System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+  <div class="app-container">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <div class="logo-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+              <path d="M4.93 4.93a10 10 0 0 0 0 14.14" />
+            </svg>
+          </div>
+          <div class="logo-text">
+            <span class="logo-title" style="color:var(--color-text-primary)">SACL</span>
+            <span class="logo-subtitle">Quality System</span>
+          </div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-title">Main</div>
+          <a href="index.html" class="nav-link active">
+            <svg class="nav-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7" />
+              <rect x="14" y="3" width="7" height="7" />
+              <rect x="3" y="14" width="7" height="7" />
+              <rect x="14" y="14" width="7" height="7" />
+            </svg>
+            Dashboard
+          </a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">Quality Forms</div>
+          <a href="forms/qc-register.html" class="nav-link">
+            <svg class="nav-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+              <polyline points="10 9 9 9 8 9" />
+            </svg>
+            QC Register
+          </a>
+          <a href="forms/micro-structure.html" class="nav-link">
+            <svg class="nav-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            Micro Structure
+          </a>
+          <a href="forms/micro-tensile.html" class="nav-link">
+            <svg class="nav-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+            </svg>
+            Tensile Test
+          </a>
+          <a href="forms/impact-test.html" class="nav-link">
+            <svg class="nav-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+            </svg>
+            Impact Test
+          </a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">Administration</div>
+          <a href="forms/part-names.html" class="nav-link">
+            <svg class="nav-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="7" width="20" height="14" rx="2" />
+              <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+            </svg>
+            Part Names
+          </a>
+          <a href="forms/user-management.html" class="nav-link">
+            <svg class="nav-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            User Management
+          </a>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <div class="main-content">
+      <header class="header">
+        <div style="display:flex;align-items:center;gap:.75rem">
+          <button class="sidebar-toggle" onclick="toggleSidebar()" title="Toggle sidebar">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
+          <span class="header-title">Dashboard</span>
+        </div>
+        <div class="header-actions">
+          <div class="header-user">SACL Quality System</div>
+        </div>
+      </header>
+
+      <main class="content-area">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Quality Management</h1>
+            <p class="page-subtitle">Overview of all quality inspection records</p>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">QC Register Entries</div>
+            <div class="stat-value" id="statQC">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Micro Structure Records</div>
+            <div class="stat-value" id="statMS">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Tensile Test Reports</div>
+            <div class="stat-value" id="statMT">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Impact Test Reports</div>
+            <div class="stat-value" id="statIT">—</div>
+          </div>
+        </div>
+
+        <!-- Quick links -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Quality Forms</h2>
+          </div>
+          <div class="card-body">
+            <div class="quick-links">
+              <a href="forms/qc-register.html" class="quick-link">
+                <svg class="quick-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                </svg>
+                <div class="quick-link-title">QC Register</div>
+                <div class="quick-link-desc">QF/08/FBQ-03 · Rev.02</div>
+              </a>
+              <a href="forms/micro-structure.html" class="quick-link">
+                <svg class="quick-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <div class="quick-link-title">Micro Structure</div>
+                <div class="quick-link-desc">QF/08/FYQ-13 · Rev.01</div>
+              </a>
+              <a href="forms/micro-tensile.html" class="quick-link">
+                <svg class="quick-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                </svg>
+                <div class="quick-link-title">Micro Tensile Test</div>
+                <div class="quick-link-desc">QF/08/FYQ-12 · Rev.01</div>
+              </a>
+              <a href="forms/impact-test.html" class="quick-link">
+                <svg class="quick-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                </svg>
+                <div class="quick-link-title">Impact Test</div>
+                <div class="quick-link-desc">QF/08/FYQ-19 · Rev.01</div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="footer">SACL Quality Management System &copy; 2026</footer>
+    </div>
+  </div>
+
+  <div id="sidebarOverlay" class="sidebar-overlay" onclick="closeMobileSidebar()"></div>
+  <script src="js/api.js"></script>
+  <script>
+    initSidebar();
+
+  </script>
+  <script>
+    (async () => {
+      try {
+        const [qc, ms, mt, it] = await Promise.all([
+          apiGet(API.QC_REGISTER), apiGet(API.MICRO_STRUCTURE),
+          apiGet(API.MICRO_TENSILE), apiGet(API.IMPACT_TEST),
+        ]);
+        document.getElementById('statQC').textContent = qc.length;
+        document.getElementById('statMS').textContent = ms.length;
+        document.getElementById('statMT').textContent = mt.length;
+        document.getElementById('statIT').textContent = it.length;
+      } catch (_) { }
+    })();
+  </script>
+</body>
+
+</html>

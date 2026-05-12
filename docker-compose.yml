@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sacl-db
+    restart: always
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "YourStrong!Pass123"
+      MSSQL_PID: "Express"
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+
+  backend:
+    build: ./backend
+    container_name: sacl-backend
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:sqlserver://db:1433;databaseName=sacl_quality;encrypt=true;trustServerCertificate=true;
+      SPRING_DATASOURCE_USERNAME: sa
+      SPRING_DATASOURCE_PASSWORD: YourStrong!Pass123
+    depends_on:
+      - db
+
+  frontend:
+    build: 
+      context: ./frontend
+      args:
+        - VITE_API_BASE_URL= # Relative to the domain when using Nginx proxy
+    container_name: sacl-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  mssql_data:

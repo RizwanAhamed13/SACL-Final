@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Micro Tensile Test — SACL</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+<div class="app-container">
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <div class="logo-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        </div>
+        <div class="logo-text">
+          <span class="logo-title" style="color:var(--color-text-primary)">SACL</span>
+          <span class="logo-subtitle">Quality System</span>
+        </div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Main</div>
+        <a href="../index.html" class="nav-link">
+          <svg class="nav-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Quality Forms</div>
+        <a href="qc-register.html" class="nav-link">
+          <svg class="nav-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          QC Register
+        </a>
+        <a href="micro-structure.html" class="nav-link">
+          <svg class="nav-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Micro Structure
+        </a>
+        <a href="micro-tensile.html" class="nav-link active">
+          <svg class="nav-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Tensile Test
+        </a>
+        <a href="impact-test.html" class="nav-link">
+          <svg class="nav-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Impact Test
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Administration</div>
+        <a href="part-names.html" class="nav-link">
+          <svg class="nav-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+          Part Names
+        </a>
+        <a href="user-management.html" class="nav-link">
+          <svg class="nav-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          User Management
+        </a>
+      </div>
+    </nav>
+  </aside>
+
+  <div class="main-content">
+    <header class="header">
+      <div style="display:flex;align-items:center;gap:.75rem">
+        <button class="sidebar-toggle" onclick="toggleSidebar()" title="Toggle sidebar">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <span class="header-title">Micro Tensile Test Report</span>
+      </div>
+      <div class="header-actions"><div class="header-user">QF/08/FYQ-12 · Rev.01</div></div>
+    </header>
+
+    <main class="content-area">
+      <div class="breadcrumb">
+        <a href="../index.html" class="breadcrumb-item">Home</a>
+        <span class="breadcrumb-item active">Tensile Test</span>
+      </div>
+
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Micro Tensile Test Report</h1>
+          <p class="page-subtitle">Bar dia, gauge length, max/yield load, tensile strength, elongation — DISA I/II/III/IV</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-primary" onclick="openForm()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Test
+          </button>
+        </div>
+      </div>
+
+      <!-- Form Panel -->
+      <div class="form-panel" id="formPanel">
+        <div class="card mb-3">
+          <div class="card-header">
+            <h2 class="card-title">Add Tensile Test</h2>
+            <button class="btn btn-secondary btn-sm" onclick="closeForm()">Cancel</button>
+          </div>
+          <div class="card-body">
+            <form id="mtForm" novalidate>
+
+              <div class="form-section">
+                <div class="form-section-title">Test Reference</div>
+                <div class="form-row form-row-3">
+                  <div class="form-group">
+                    <label class="form-label required">Date of Inspection</label>
+                    <input type="date" name="dateOfInspection" class="form-control" required />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Item / Part Name</label>
+                    <input type="text" name="item" class="form-control" placeholder="Type or select part name" list="partNameList" autocomplete="off" />
+                    <datalist id="partNameList"></datalist>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Date Code &amp; Heat Code</label>
+                    <input type="text" name="dateCode" class="form-control" placeholder="e.g. 6D08-41" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-section">
+                <div class="form-section-title">Specimen Data</div>
+                <div class="form-row form-row-3">
+                  <div class="form-group">
+                    <label class="form-label">Bar Dia <span style="color:var(--color-text-secondary);font-weight:400">(mm, 5±0.06)</span></label>
+                    <input type="number" step="0.01" name="barDiaMm" class="form-control" placeholder="e.g. 5.00" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Gauge Length Lo <span style="color:var(--color-text-secondary);font-weight:400">(mm)</span></label>
+                    <input type="number" step="0.1" name="gaugeLengthMm" class="form-control" placeholder="e.g. 25" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Final Length Li <span style="color:var(--color-text-secondary);font-weight:400">(mm)</span></label>
+                    <input type="number" step="0.1" name="yieldStrength05" class="form-control" placeholder="e.g. 27.5" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-section">
+                <div class="form-section-title">Test Results</div>
+                <div class="form-row form-row-3">
+                  <div class="form-group">
+                    <label class="form-label">Max Load <span style="color:var(--color-text-secondary);font-weight:400">(KN)</span></label>
+                    <input type="number" step="0.1" name="maxLoadKn" class="form-control" placeholder="e.g. 10.5" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Yield Load <span style="color:var(--color-text-secondary);font-weight:400">(KN)</span></label>
+                    <input type="number" step="0.1" name="yieldLoadKn" class="form-control" placeholder="e.g. 7.2" />
+                  </div>
+                </div>
+                <div class="form-row form-row-3">
+                  <div class="form-group">
+                    <label class="form-label">Tensile Strength / UTS <span style="color:var(--color-text-secondary);font-weight:400">(Kg/mm² or MPa, ≥500)</span></label>
+                    <input type="number" step="0.1" name="tensileStrength" class="form-control" placeholder="e.g. 540" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Yield Strength @0.2% <span style="color:var(--color-text-secondary);font-weight:400">(Kg/mm² or MPa, ≥320)</span></label>
+                    <input type="number" step="0.1" name="yieldStrength02" class="form-control" placeholder="e.g. 350" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Elongation % <span style="color:var(--color-text-secondary);font-weight:400">(≥10)</span></label>
+                    <input type="number" step="0.1" name="elongationPercent" class="form-control" placeholder="e.g. 14" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-section">
+                <div class="form-section-title">Approval</div>
+                <div class="form-group">
+                  <label class="form-label">Remarks</label>
+                  <textarea name="remarks" class="form-control" rows="2" placeholder="Any observations..."></textarea>
+                </div>
+                <div class="form-row">
+                  <div class="form-group"><label class="form-label">Tested By</label><input type="text" name="testedBy" class="form-control" placeholder="Name" /></div>
+                  <div class="form-group"><label class="form-label">Verified By</label><input type="text" name="verifiedBy" class="form-control" placeholder="Name" /></div>
+                  <div class="form-group"><label class="form-label">Approved By</label><input type="text" name="approvedBy" class="form-control" placeholder="Name" /></div>
+                </div>
+              </div>
+
+              <div class="card-footer" style="margin:0 -1.5rem -1.5rem;border-radius:0 0 var(--radius-xl) var(--radius-xl)">
+                <div style="display:flex;gap:1rem">
+                  <button type="button" class="btn btn-secondary" onclick="document.getElementById('mtForm').reset()">Clear</button>
+                  <button type="button" class="btn btn-primary" onclick="submitMT()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    Save Test
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Records Table -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Tensile Test Records</h2>
+          <span id="recordCount" class="badge badge-secondary">0 records</span>
+        </div>
+        <div class="card-body" style="padding:0">
+          <div class="table-container" style="border:none">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Inspection Date</th>
+                  <th>Item / Part</th>
+                  <th>Date/Heat Code</th>
+                  <th>Bar Dia (mm)</th>
+                  <th>Gauge Length (mm)</th>
+                  <th>Max Load (KN)</th>
+                  <th>Yield Load (KN)</th>
+                  <th>UTS (MPa)</th>
+                  <th>YS @0.2% (MPa)</th>
+                  <th>Elongation %</th>
+                  <th>Tested By</th>
+                </tr>
+              </thead>
+              <tbody id="recordsBody">
+                <tr><td colspan="11" class="text-center text-muted" style="padding:2rem">No records found. Click "Add Test" to get started.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer class="footer">SACL Quality Management System &copy; 2024</footer>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+  <div id="sidebarOverlay" class="sidebar-overlay" onclick="closeMobileSidebar()"></div>
+
+<script src="../js/api.js"></script>
+<script>
+  initSidebar();
+
+  loadPartNameOptions('partNameList');
+  function submitMT() { handleFormSubmit('mtForm', API.MICRO_TENSILE, 'Tensile Test record saved!', loadRecords); }
+
+  async function loadRecords() {
+    try {
+      const data = await apiGet(API.MICRO_TENSILE);
+      const tbody = document.getElementById('recordsBody');
+      document.getElementById('recordCount').textContent = data.length + ' records';
+      if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="11" class="text-center text-muted" style="padding:2rem">No records found.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.map(r => `
+        <tr>
+          <td>${fmtDate(r.dateOfInspection)}</td>
+          <td><strong>${dash(r.item)}</strong></td>
+          <td>${dash(r.dateCode)}</td>
+          <td>${dash(r.barDiaMm)}</td>
+          <td>${dash(r.gaugeLengthMm)}</td>
+          <td>${dash(r.maxLoadKn)}</td>
+          <td>${dash(r.yieldLoadKn)}</td>
+          <td>${dash(r.tensileStrength)}</td>
+          <td>${dash(r.yieldStrength02)}</td>
+          <td>${dash(r.elongationPercent)}</td>
+          <td>${dash(r.testedBy)}</td>
+        </tr>`).join('');
+    } catch (e) { console.warn('Backend not available:', e.message); }
+  }
+
+  loadRecords();
+</script>
+</body>
+</html>
