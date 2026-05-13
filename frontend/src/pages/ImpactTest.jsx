@@ -24,6 +24,8 @@ const ImpactTest = () => {
 
   const [loading, setLoading] = useState(true);
   const [rejectModal, setRejectModal] = useState({ isOpen: false, record: null });
+  const [thresholds, setThresholds] = useState(null);
+  const [errors, setErrors] = useState({});
 
   const fetchRecords = async () => {
     try {
@@ -41,8 +43,47 @@ const ImpactTest = () => {
     fetchRecords();
   }, []);
 
+  const fetchThresholds = async (partName, currentData = formData) => {
+    if (!partName) {
+      setThresholds(null);
+      setErrors({});
+      return;
+    }
+    try {
+      const res = await axios.get(`/api/part-names/name/${encodeURIComponent(partName)}`);
+      setThresholds(res.data);
+      if (res.data) validateAll(currentData, res.data);
+    } catch (err) {
+      console.error("Failed to fetch thresholds", err);
+    }
+  };
+
+  const isOutOfRange = (val, min, max) => {
+    if (val === undefined || val === null || val === '') return false;
+    const num = parseFloat(val);
+    if (isNaN(num)) return false;
+    if (min !== null && min !== undefined && num < min) return true;
+    if (max !== null && max !== undefined && num > max) return true;
+    return false;
+  };
+
+  const validateAll = (data, ts) => {
+    const newErrors = {};
+    if (!ts) return;
+    const minSpec = ts.impactMinSpec;
+    const maxSpec = ts.impactMaxSpec;
+    if (isOutOfRange(data.observedValue1, minSpec, maxSpec)) newErrors.observedValue1 = true;
+    if (isOutOfRange(data.observedValue2, minSpec, maxSpec)) newErrors.observedValue2 = true;
+    if (isOutOfRange(data.observedValue3, minSpec, maxSpec)) newErrors.observedValue3 = true;
+    setErrors(newErrors);
+  };
+
   const openEdit = (record) => {
     setFormData({
+      ...record,
+      dateOfInspection: record.dateOfInspection ? record.dateOfInspection.split('T')[0] : ''
+    });
+    fetchThresholds(record.partName, {
       ...record,
       dateOfInspection: record.dateOfInspection ? record.dateOfInspection.split('T')[0] : ''
     });
@@ -81,37 +122,48 @@ const ImpactTest = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const nextData = { ...formData, [name]: value };
+    setFormData(nextData);
+    if (thresholds) validateAll(nextData, thresholds);
   };
 
   const handlePartNameChange = (val) => {
-    setFormData(prev => ({ ...prev, partName: val }));
+    const nextData = { ...formData, partName: val };
+    setFormData(nextData);
+    fetchThresholds(val, nextData);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const dataToSave = { 
-      ...formData,
-      createdBy: formData.id ? formData.createdBy : (user?.fullName || user?.username)
-    };
+    if (Object.keys(errors).length > 0) {
+      return toast.error("Please correct values out of engineering range!");
+    }
     try {
       if (formData.id) {
-        await axios.put(`/api/impact-test/${formData.id}`, dataToSave);
+        await axios.put(`/api/impact-test/${formData.id}`, formData);
+        toast.success('Updated successfully');
       } else {
-        await axios.post('/api/impact-test', dataToSave);
+        await axios.post('/api/impact-test', { ...formData, createdBy: user.fullName || user.username });
+        toast.success('Added successfully');
       }
       setShowForm(false);
       setFormData({
-        id: null, dateOfInspection: '', partName: '', dateCode: '',
-        specification: '', testType: '',
+        dateOfInspection: '', partName: '', dateCode: '', heatCode: '',
         observedValue1: '', observedValue2: '', observedValue3: '',
-        remarks: '', status: 'QC_ENTRY', hofApprovedBy: '', hodApprovedBy: ''
+        status: 'QC_ENTRY', hofApprovedBy: '', hodApprovedBy: ''
       });
+      setErrors({});
       fetchRecords();
     } catch (err) {
-      console.error(err);
-      toast.error('Failed to save record');
+      toast.error('Submission failed');
     }
+  };
+
+  const renderThreshold = (min, max) => {
+    if (min !== null && min !== undefined && max !== null && max !== undefined && min !== '' && max !== '') return `(${min}–${max})`;
+    if (max !== null && max !== undefined && max !== '') return `(Max ${max})`;
+    if (min !== null && min !== undefined && min !== '') return `(${min} Min)`;
+    return '(—)';
   };
 
   const dash = (val) => val || '—';
@@ -125,8 +177,8 @@ const ImpactTest = () => {
 
       <div className="page-header">
         <div>
-          <h1 className="page-title">Impact Test Report</h1>
-          <p className="page-subtitle">Charpy impact energy at room temperature and sub-zero conditions per specification</p>
+          <h1 className="page-title">Charpy Impact Test Report</h1>
+          <p className="page-subtitle">Impact energy absorption (Joules) for V-notch specimens</p>
         </div>
         <div className="page-actions">
           {(user?.role?.toUpperCase()?.includes('QC') || user?.role?.toUpperCase()?.includes('ADMIN')) && (
@@ -145,7 +197,7 @@ const ImpactTest = () => {
         <div className="form-panel" style={{ display: 'block' }}>
           <div className="card mb-3">
             <div className="card-header">
-              <h2 className="card-title">Add Impact Test</h2>
+              <h2 className="card-title">Add Impact Test Report</h2>
               <button className="btn btn-secondary btn-sm" onClick={() => setShowForm(false)}>Cancel</button>
             </div>
             <div className="card-body">
@@ -153,7 +205,7 @@ const ImpactTest = () => {
 
                 <div className="form-section">
                   <div className="form-section-title">Test Reference</div>
-                  <div className="form-row form-row-3">
+                  <div className="form-row form-row-4">
                     <div className="form-group">
                       <label className="form-label required">Date of Inspection</label>
                       <input type="date" name="dateOfInspection" value={formData.dateOfInspection} onChange={handleChange} className="form-control" required />
@@ -163,18 +215,8 @@ const ImpactTest = () => {
                       <PartNameSelect value={formData.partName} onChange={handlePartNameChange} />
                     </div>
                     <div className="form-group">
-                      <label className="form-label">Date Code</label>
-                      <input type="text" name="dateCode" value={formData.dateCode} onChange={handleChange} className="form-control" placeholder="e.g. 6D08" />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="form-section">
-                  <div className="form-section-title">Test Results</div>
-                  <div className="form-row form-row-4">
-                    <div className="form-group">
-                      <label className="form-label">Specification <span style={{color:'var(--color-text-secondary)', fontWeight:400}}>(J/cm²)</span></label>
-                      <input type="text" name="specification" value={formData.specification} onChange={handleChange} className="form-control" placeholder="e.g. 60J/Cm²(min)" />
+                      <label className="form-label">Heat Code / Date Code</label>
+                      <input type="text" name="dateCode" value={formData.dateCode} onChange={handleChange} className="form-control" placeholder="e.g. 5D03-45" />
                     </div>
                     <div className="form-group">
                       <label className="form-label">Test Type</label>
@@ -188,18 +230,25 @@ const ImpactTest = () => {
                       </select>
                     </div>
                   </div>
+                </div>
+
+                <div className="form-section">
+                  <div className="form-section-title">Test Results (Joules)</div>
                   <div className="form-row form-row-3">
                     <div className="form-group">
-                      <label className="form-label">Observed Value 1 <span style={{color:'var(--color-text-secondary)', fontWeight:400}}>(J/cm²)</span></label>
-                      <input type="number" step="0.1" name="observedValue1" value={formData.observedValue1} onChange={handleChange} className="form-control" placeholder="e.g. 85" />
+                      <label className="form-label">Observed Value 1 <span style={{color: errors.observedValue1 ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.impactMinSpec, thresholds.impactMaxSpec) : '(12 Min)'}</span></label>
+                      <input type="number" step="0.1" name="observedValue1" value={formData.observedValue1} onChange={handleChange} className="form-control" style={errors.observedValue1 ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 14.5" />
+                      {errors.observedValue1 && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
                     </div>
                     <div className="form-group">
-                      <label className="form-label">Observed Value 2 <span style={{color:'var(--color-text-secondary)', fontWeight:400}}>(J/cm²)</span></label>
-                      <input type="number" step="0.1" name="observedValue2" value={formData.observedValue2} onChange={handleChange} className="form-control" placeholder="e.g. 90" />
+                      <label className="form-label">Observed Value 2 <span style={{color: errors.observedValue2 ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.impactMinSpec, thresholds.impactMaxSpec) : '(12 Min)'}</span></label>
+                      <input type="number" step="0.1" name="observedValue2" value={formData.observedValue2} onChange={handleChange} className="form-control" style={errors.observedValue2 ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 13.8" />
+                      {errors.observedValue2 && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
                     </div>
                     <div className="form-group">
-                      <label className="form-label">Observed Value 3 <span style={{color:'var(--color-text-secondary)', fontWeight:400}}>(J/cm²)</span></label>
-                      <input type="number" step="0.1" name="observedValue3" value={formData.observedValue3} onChange={handleChange} className="form-control" placeholder="e.g. 110" />
+                      <label className="form-label">Observed Value 3 <span style={{color: errors.observedValue3 ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.impactMinSpec, thresholds.impactMaxSpec) : '(12 Min)'}</span></label>
+                      <input type="number" step="0.1" name="observedValue3" value={formData.observedValue3} onChange={handleChange} className="form-control" style={errors.observedValue3 ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 15.2" />
+                      {errors.observedValue3 && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
                     </div>
                   </div>
                 </div>
@@ -225,11 +274,11 @@ const ImpactTest = () => {
                 <div className="card-footer" style={{ margin: '0 -1.5rem -1.5rem', borderRadius: '0 0 var(--radius-xl) var(--radius-xl)' }}>
                   <div style={{ display: 'flex', gap: '1rem' }}>
                     <button type="button" className="btn btn-secondary" onClick={() => setFormData(prev => ({ ...Object.keys(prev).reduce((acc, key) => ({ ...acc, [key]: '' }), {}), approvedBy: user?.fullName || user?.username || '' }))}>Clear</button>
-                    <button type="submit" className="btn btn-primary">
+                    <button type="submit" className="btn btn-primary" disabled={Object.keys(errors).length > 0}>
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="20 6 9 17 4 12" />
                       </svg>
-                      Save Record
+                      {Object.keys(errors).length > 0 ? 'Fix Errors to Save' : 'Save Record'}
                     </button>
 
                     {formData.id && user?.role?.toUpperCase()?.includes('HOF') && (formData.status || 'QC_ENTRY') === 'QC_ENTRY' && (

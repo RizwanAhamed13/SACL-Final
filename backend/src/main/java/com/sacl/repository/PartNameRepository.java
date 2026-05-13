@@ -6,5 +6,6 @@ import java.util.List;
 
 public interface PartNameRepository extends JpaRepository<PartName, Long> {
     boolean existsByName(String name);
+    PartName findByName(String name);
     List<PartName> findByActiveTrueOrderByNameAsc();
 }

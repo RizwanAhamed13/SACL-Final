@@ -24,6 +24,8 @@ const MicroStructure = () => {
 
   const [loading, setLoading] = useState(true);
   const [rejectModal, setRejectModal] = useState({ isOpen: false, record: null });
+  const [thresholds, setThresholds] = useState(null);
+  const [errors, setErrors] = useState({});
 
   const fetchRecords = async () => {
     try {
@@ -41,8 +43,47 @@ const MicroStructure = () => {
     fetchRecords();
   }, []);
 
+  const fetchThresholds = async (partName, currentData = formData) => {
+    if (!partName) {
+      setThresholds(null);
+      setErrors({});
+      return;
+    }
+    try {
+      const res = await axios.get(`/api/part-names/name/${encodeURIComponent(partName)}`);
+      setThresholds(res.data);
+      if (res.data) validateAll(currentData, res.data);
+    } catch (err) {
+      console.error("Failed to fetch thresholds", err);
+    }
+  };
+
+  const isOutOfRange = (val, min, max) => {
+    if (val === undefined || val === null || val === '') return false;
+    const num = parseFloat(val);
+    if (isNaN(num)) return false;
+    if (min !== null && min !== undefined && num < min) return true;
+    if (max !== null && max !== undefined && num > max) return true;
+    return false;
+  };
+
+  const validateAll = (data, ts) => {
+    const newErrors = {};
+    if (!ts) return;
+    if (isOutOfRange(data.nodularityPercent, ts.microMinNodularity, ts.microMaxNodularity)) newErrors.nodularityPercent = true;
+    if (isOutOfRange(data.countNosPerMm2, ts.microMinCount, ts.microMaxCount)) newErrors.countNosPerMm2 = true;
+    if (isOutOfRange(data.ferritePercent, ts.microMinFerrite, ts.microMaxFerrite)) newErrors.ferritePercent = true;
+    if (isOutOfRange(data.pearlitePercent, ts.microMinPearlite, ts.microMaxPearlite)) newErrors.pearlitePercent = true;
+    if (isOutOfRange(data.carbidePercent, ts.microMinCarbide, ts.microMaxCarbide)) newErrors.carbidePercent = true;
+    setErrors(newErrors);
+  };
+
   const openEdit = (record) => {
     setFormData({
+      ...record,
+      inspectionDate: record.inspectionDate ? record.inspectionDate.split('T')[0] : ''
+    });
+    fetchThresholds(record.partName, {
       ...record,
       inspectionDate: record.inspectionDate ? record.inspectionDate.split('T')[0] : ''
     });
@@ -81,37 +122,49 @@ const MicroStructure = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const nextData = { ...formData, [name]: value };
+    setFormData(nextData);
+    if (thresholds) validateAll(nextData, thresholds);
   };
 
   const handlePartNameChange = (val) => {
-    setFormData(prev => ({ ...prev, partName: val }));
+    const nextData = { ...formData, partName: val };
+    setFormData(nextData);
+    fetchThresholds(val, nextData);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const dataToSave = { 
-      ...formData,
-      createdBy: formData.id ? formData.createdBy : (user?.fullName || user?.username)
-    };
+    if (Object.keys(errors).length > 0) {
+      return toast.error("Please correct values out of engineering range!");
+    }
     try {
       if (formData.id) {
-        await axios.put(`/api/micro-structure/${formData.id}`, dataToSave);
+        await axios.put(`/api/micro-structure/${formData.id}`, formData);
+        toast.success('Updated successfully');
       } else {
-        await axios.post('/api/micro-structure', dataToSave);
+        await axios.post('/api/micro-structure', { ...formData, createdBy: user.fullName || user.username });
+        toast.success('Added successfully');
       }
       setShowForm(false);
       setFormData({
-        id: null, inspectionDate: '', partName: '', disa: '', dateCode: '',
-        nodularityPercent: '', graphiteType: '', countNosPerMm2: '', size: '',
+        inspectionDate: '', partName: '', heatCode: '',
+        nodularityPercent: '', countNosPerMm2: '', size: '',
         ferritePercent: '', pearlitePercent: '', carbidePercent: '',
-        remarks: '', status: 'QC_ENTRY', hofApprovedBy: '', hodApprovedBy: ''
+        status: 'QC_ENTRY', hofApprovedBy: '', hodApprovedBy: ''
       });
+      setErrors({});
       fetchRecords();
     } catch (err) {
-      console.error(err);
-      toast.error('Failed to save record');
+      toast.error('Submission failed');
     }
+  };
+
+  const renderThreshold = (min, max) => {
+    if (min !== null && min !== undefined && max !== null && max !== undefined && min !== '' && max !== '') return `(${min}–${max})`;
+    if (max !== null && max !== undefined && max !== '') return `(Max ${max})`;
+    if (min !== null && min !== undefined && min !== '') return `(${min} Min)`;
+    return '(—)';
   };
 
   const dash = (val) => val || '—';
@@ -120,13 +173,13 @@ const MicroStructure = () => {
     <>
       <div className="breadcrumb">
         <NavLink to="/" className="breadcrumb-item">Home</NavLink>
-        <span className="breadcrumb-item active">Micro Structure Analysis</span>
+        <span className="breadcrumb-item active">Micro Structure</span>
       </div>
 
       <div className="page-header">
         <div>
-          <h1 className="page-title">Micro Structure Analysis Register</h1>
-          <p className="page-subtitle">Nodularity, graphite type, ferrite/pearlite/carbide — DISA I/II/III/IV</p>
+          <h1 className="page-title">Micro Structure Analysis</h1>
+          <p className="page-subtitle">Nodularity, nodule count, matrix composition, and carbide percentage</p>
         </div>
         <div className="page-actions">
           {(user?.role?.toUpperCase()?.includes('QC') || user?.role?.toUpperCase()?.includes('ADMIN')) && (
@@ -145,7 +198,7 @@ const MicroStructure = () => {
         <div className="form-panel" style={{ display: 'block' }}>
           <div className="card mb-3">
             <div className="card-header">
-              <h2 className="card-title">Add Microstructure Analysis</h2>
+              <h2 className="card-title">Add Analysis Report</h2>
               <button className="btn btn-secondary btn-sm" onClick={() => setShowForm(false)}>Cancel</button>
             </div>
             <div className="card-body">
@@ -153,7 +206,7 @@ const MicroStructure = () => {
 
                 <div className="form-section">
                   <div className="form-section-title">Analysis Reference</div>
-                  <div className="form-row form-row-4">
+                  <div className="form-row form-row-3">
                     <div className="form-group">
                       <label className="form-label required">Inspection Date</label>
                       <input type="date" name="inspectionDate" value={formData.inspectionDate} onChange={handleChange} className="form-control" required />
@@ -163,59 +216,49 @@ const MicroStructure = () => {
                       <PartNameSelect value={formData.partName} onChange={handlePartNameChange} />
                     </div>
                     <div className="form-group">
-                      <label className="form-label">DISA Line</label>
-                      <select name="disa" value={formData.disa} onChange={handleChange} className="form-control">
-                        <option value="">Select</option>
-                        <option>DISA I</option><option>DISA II</option><option>DISA III</option><option>DISA IV</option>
-                      </select>
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label">Date Code &amp; Heat Code</label>
-                      <input type="text" name="dateCode" value={formData.dateCode} onChange={handleChange} className="form-control" placeholder="e.g. 6D08-41" />
+                      <label className="form-label">Heat Code / Date Code</label>
+                      <input type="text" name="heatCode" value={formData.heatCode} onChange={handleChange} className="form-control" placeholder="e.g. 5D03-45" />
                     </div>
                   </div>
                 </div>
 
                 <div className="form-section">
                   <div className="form-section-title">Nodule Analysis</div>
-                  <div className="form-row form-row-4">
+                  <div className="form-row form-row-3">
                     <div className="form-group">
-                      <label className="form-label">Nodularity % <span style={{color:'var(--color-text-secondary)', fontWeight:400}}>(80% Min)</span></label>
-                      <input type="number" step="0.1" name="nodularityPercent" value={formData.nodularityPercent} onChange={handleChange} className="form-control" placeholder="e.g. 90" />
+                      <label className="form-label">Nodularity % <span style={{color: errors.nodularityPercent ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.microMinNodularity, thresholds.microMaxNodularity) : '(85 Min)'}</span></label>
+                      <input type="number" name="nodularityPercent" value={formData.nodularityPercent} onChange={handleChange} className="form-control" style={errors.nodularityPercent ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 90" />
+                      {errors.nodularityPercent && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
                     </div>
                     <div className="form-group">
-                      <label className="form-label">Graphite Type</label>
-                      <select name="graphiteType" value={formData.graphiteType} onChange={handleChange} className="form-control">
-                        <option value="">Select</option>
-                        <option>Type I</option><option>Type II</option><option>Type III</option>
-                        <option>Type IV</option><option>Type V</option><option>Type VI</option>
-                      </select>
+                      <label className="form-label">Count <span style={{color: errors.countNosPerMm2 ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>(Nos/mm²) {thresholds ? renderThreshold(thresholds.microMinCount, thresholds.microMaxCount) : '(150 Min)'}</span></label>
+                      <input type="number" name="countNosPerMm2" value={formData.countNosPerMm2} onChange={handleChange} className="form-control" style={errors.countNosPerMm2 ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 200" />
+                      {errors.countNosPerMm2 && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
                     </div>
                     <div className="form-group">
-                      <label className="form-label">Count <span style={{color:'var(--color-text-secondary)', fontWeight:400}}>(Nos/mm², 70 Min)</span></label>
-                      <input type="number" step="1" name="countNosPerMm2" value={formData.countNosPerMm2} onChange={handleChange} className="form-control" placeholder="e.g. 150" />
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label">Nodule Size</label>
-                      <input type="text" name="size" value={formData.size} onChange={handleChange} className="form-control" placeholder="e.g. 6-7" />
+                      <label className="form-label">Size <span style={{color:'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? `(${thresholds.microSize || '—'})` : '(6-7)'}</span></label>
+                      <input type="text" name="size" value={formData.size} onChange={handleChange} className="form-control" placeholder="e.g. 6" />
                     </div>
                   </div>
                 </div>
 
                 <div className="form-section">
-                  <div className="form-section-title">Matrix Composition</div>
+                  <div className="form-section-title">Matrix Composition (%)</div>
                   <div className="form-row form-row-3">
                     <div className="form-group">
-                      <label className="form-label">Ferrite % <span style={{color:'var(--color-text-secondary)', fontWeight:400}}>(50% Max)</span></label>
-                      <input type="number" step="0.1" name="ferritePercent" value={formData.ferritePercent} onChange={handleChange} className="form-control" placeholder="e.g. 60" />
+                      <label className="form-label">Ferrite % <span style={{color: errors.ferritePercent ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.microMinFerrite, thresholds.microMaxFerrite) : '(Max 10)'}</span></label>
+                      <input type="number" name="ferritePercent" value={formData.ferritePercent} onChange={handleChange} className="form-control" style={errors.ferritePercent ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 5" />
+                      {errors.ferritePercent && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
                     </div>
                     <div className="form-group">
-                      <label className="form-label">Pearlite % <span style={{color:'var(--color-text-secondary)', fontWeight:400}}>(10–40)</span></label>
-                      <input type="number" step="0.1" name="pearlitePercent" value={formData.pearlitePercent} onChange={handleChange} className="form-control" placeholder="e.g. 35" />
+                      <label className="form-label">Pearlite % <span style={{color: errors.pearlitePercent ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.microMinPearlite, thresholds.microMaxPearlite) : '(90 Min)'}</span></label>
+                      <input type="number" name="pearlitePercent" value={formData.pearlitePercent} onChange={handleChange} className="form-control" style={errors.pearlitePercent ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 95" />
+                      {errors.pearlitePercent && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
                     </div>
                     <div className="form-group">
-                      <label className="form-label">Carbide % <span style={{color:'var(--color-text-secondary)', fontWeight:400}}>(Nil)</span></label>
-                      <input type="number" step="0.1" name="carbidePercent" value={formData.carbidePercent} onChange={handleChange} className="form-control" placeholder="e.g. 0" />
+                      <label className="form-label">Carbide % <span style={{color: errors.carbidePercent ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.microMinCarbide, thresholds.microMaxCarbide) : '(Max 1)'}</span></label>
+                      <input type="number" name="carbidePercent" value={formData.carbidePercent} onChange={handleChange} className="form-control" style={errors.carbidePercent ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 0.5" />
+                      {errors.carbidePercent && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
                     </div>
                   </div>
                 </div>
@@ -241,11 +284,11 @@ const MicroStructure = () => {
                 <div className="card-footer" style={{ margin: '0 -1.5rem -1.5rem', borderRadius: '0 0 var(--radius-xl) var(--radius-xl)' }}>
                   <div style={{ display: 'flex', gap: '1rem' }}>
                     <button type="button" className="btn btn-secondary" onClick={() => setFormData(prev => ({ ...Object.keys(prev).reduce((acc, key) => ({ ...acc, [key]: '' }), {}), approvedBy: user?.fullName || user?.username || '' }))}>Clear</button>
-                    <button type="submit" className="btn btn-primary">
+                    <button type="submit" className="btn btn-primary" disabled={Object.keys(errors).length > 0}>
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="20 6 9 17 4 12" />
                       </svg>
-                      Save Analysis
+                      {Object.keys(errors).length > 0 ? 'Fix Errors to Save' : 'Save Analysis'}
                     </button>
 
                     {formData.id && user?.role?.toUpperCase()?.includes('HOF') && (formData.status || 'QC_ENTRY') === 'QC_ENTRY' && (

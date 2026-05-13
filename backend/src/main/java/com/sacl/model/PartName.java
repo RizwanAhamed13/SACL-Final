@@ -18,6 +18,67 @@ public class PartName {
 
     private String description;
 
+    // QC Thresholds (Chemical)
+    private Double qcMinC;
+    private Double qcMaxC;
+    private Double qcMinSi;
+    private Double qcMaxSi;
+    private Double qcMinMn;
+    private Double qcMaxMn;
+    private Double qcMinP;
+    private Double qcMaxP;
+    private Double qcMinS;
+    private Double qcMaxS;
+    private Double qcMinMg;
+    private Double qcMaxMg;
+    private Double qcMinCu;
+    private Double qcMaxCu;
+    private Double qcMinCr;
+    private Double qcMaxCr;
+    private Double qcMinSn;
+    private Double qcMaxSn;
+
+    // Micro Thresholds
+    private Double microMinNodularity;
+    private Double microMaxNodularity;
+    private Double microMinCount;
+    private Double microMaxCount;
+    private String microSize;
+    private Double microMinFerrite;
+    private Double microMaxFerrite;
+    private Double microMinPearlite;
+    private Double microMaxPearlite;
+    private Double microMinCarbide;
+    private Double microMaxCarbide;
+
+    // Tensile Thresholds
+    private Double tensileMinStrength;
+    private Double tensileMaxStrength;
+    private Double tensileMinYield;
+    private Double tensileMaxYield;
+    private Double tensileMinElongation;
+    private Double tensileMaxElongation;
+
+    // Impact Thresholds
+    private Double impactMinSpec;
+    private Double impactMaxSpec;
+
+    // Corrective Addition Thresholds (Kgs)
+    private Double corrMinC;
+    private Double corrMaxC;
+    private Double corrMinSi;
+    private Double corrMaxSi;
+    private Double corrMinMn;
+    private Double corrMaxMn;
+    private Double corrMinS;
+    private Double corrMaxS;
+    private Double corrMinCr;
+    private Double corrMaxCr;
+    private Double corrMinCu;
+    private Double corrMaxCu;
+    private Double corrMinSn;
+    private Double corrMaxSn;
+
     private Boolean active = true;
 
     @Column(updatable = false)

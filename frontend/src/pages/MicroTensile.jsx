@@ -24,6 +24,8 @@ const MicroTensile = () => {
 
   const [loading, setLoading] = useState(true);
   const [rejectModal, setRejectModal] = useState({ isOpen: false, record: null });
+  const [thresholds, setThresholds] = useState(null);
+  const [errors, setErrors] = useState({});
 
   const fetchRecords = async () => {
     try {
@@ -41,8 +43,45 @@ const MicroTensile = () => {
     fetchRecords();
   }, []);
 
+  const fetchThresholds = async (partName, currentData = formData) => {
+    if (!partName) {
+      setThresholds(null);
+      setErrors({});
+      return;
+    }
+    try {
+      const res = await axios.get(`/api/part-names/name/${encodeURIComponent(partName)}`);
+      setThresholds(res.data);
+      if (res.data) validateAll(currentData, res.data);
+    } catch (err) {
+      console.error("Failed to fetch thresholds", err);
+    }
+  };
+
+  const isOutOfRange = (val, min, max) => {
+    if (val === undefined || val === null || val === '') return false;
+    const num = parseFloat(val);
+    if (isNaN(num)) return false;
+    if (min !== null && min !== undefined && num < min) return true;
+    if (max !== null && max !== undefined && num > max) return true;
+    return false;
+  };
+
+  const validateAll = (data, ts) => {
+    const newErrors = {};
+    if (!ts) return;
+    if (isOutOfRange(data.tensileStrength, ts.tensileMinStrength, ts.tensileMaxStrength)) newErrors.tensileStrength = true;
+    if (isOutOfRange(data.yieldStrength02, ts.tensileMinYield, ts.tensileMaxYield)) newErrors.yieldStrength02 = true;
+    if (isOutOfRange(data.elongationPercent, ts.tensileMinElongation, ts.tensileMaxElongation)) newErrors.elongationPercent = true;
+    setErrors(newErrors);
+  };
+
   const openEdit = (record) => {
     setFormData({
+      ...record,
+      dateOfInspection: record.dateOfInspection ? record.dateOfInspection.split('T')[0] : ''
+    });
+    fetchThresholds(record.item, {
       ...record,
       dateOfInspection: record.dateOfInspection ? record.dateOfInspection.split('T')[0] : ''
     });
@@ -81,37 +120,48 @@ const MicroTensile = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const nextData = { ...formData, [name]: value };
+    setFormData(nextData);
+    if (thresholds) validateAll(nextData, thresholds);
   };
 
   const handlePartNameChange = (val) => {
-    setFormData(prev => ({ ...prev, item: val }));
+    const nextData = { ...formData, item: val };
+    setFormData(nextData);
+    fetchThresholds(val, nextData);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const dataToSave = { 
-      ...formData,
-      createdBy: formData.id ? formData.createdBy : (user?.fullName || user?.username)
-    };
+    if (Object.keys(errors).length > 0) {
+      return toast.error("Please correct values out of engineering range!");
+    }
     try {
       if (formData.id) {
-        await axios.put(`/api/micro-tensile/${formData.id}`, dataToSave);
+        await axios.put(`/api/micro-tensile/${formData.id}`, formData);
+        toast.success('Updated successfully');
       } else {
-        await axios.post('/api/micro-tensile', dataToSave);
+        await axios.post('/api/micro-tensile', { ...formData, createdBy: user.fullName || user.username });
+        toast.success('Added successfully');
       }
       setShowForm(false);
       setFormData({
-        id: null, dateOfInspection: '', item: '', dateCode: '',
-        barDiaMm: '', gaugeLengthMm: '', yieldStrength05: '',
+        dateOfInspection: '', item: '', dateCode: '', barDiaMm: '', gaugeLengthMm: '', yieldStrength05: '',
         maxLoadKn: '', yieldLoadKn: '', tensileStrength: '', yieldStrength02: '', elongationPercent: '',
-        remarks: '', status: 'QC_ENTRY', hofApprovedBy: '', hodApprovedBy: ''
+        status: 'QC_ENTRY', hofApprovedBy: '', hodApprovedBy: ''
       });
+      setErrors({});
       fetchRecords();
     } catch (err) {
-      console.error(err);
-      toast.error('Failed to save record');
+      toast.error('Submission failed');
     }
+  };
+
+  const renderThreshold = (min, max) => {
+    if (min !== null && min !== undefined && max !== null && max !== undefined && min !== '' && max !== '') return `(${min}–${max})`;
+    if (max !== null && max !== undefined && max !== '') return `(Max ${max})`;
+    if (min !== null && min !== undefined && min !== '') return `(${min} Min)`;
+    return '(—)';
   };
 
   const dash = (val) => val || '—';
@@ -201,16 +251,19 @@ const MicroTensile = () => {
                   </div>
                   <div className="form-row form-row-3">
                     <div className="form-group">
-                      <label className="form-label">Tensile Strength / UTS <span style={{color:'var(--color-text-secondary)', fontWeight:400}}>(Kg/mm² or MPa, ≥500)</span></label>
-                      <input type="number" step="0.1" name="tensileStrength" value={formData.tensileStrength} onChange={handleChange} className="form-control" placeholder="e.g. 540" />
+                      <label className="form-label">Tensile Strength / UTS <span style={{color: errors.tensileStrength ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.tensileMinStrength, thresholds.tensileMaxStrength) : '(500 Min)'}</span></label>
+                      <input type="number" step="0.1" name="tensileStrength" value={formData.tensileStrength} onChange={handleChange} className="form-control" style={errors.tensileStrength ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 540" />
+                      {errors.tensileStrength && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
                     </div>
                     <div className="form-group">
-                      <label className="form-label">Yield Strength @0.2% <span style={{color:'var(--color-text-secondary)', fontWeight:400}}>(Kg/mm² or MPa, ≥320)</span></label>
-                      <input type="number" step="0.1" name="yieldStrength02" value={formData.yieldStrength02} onChange={handleChange} className="form-control" placeholder="e.g. 350" />
+                      <label className="form-label">Yield Strength @0.2% <span style={{color: errors.yieldStrength02 ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.tensileMinYield, thresholds.tensileMaxYield) : '(320 Min)'}</span></label>
+                      <input type="number" step="0.1" name="yieldStrength02" value={formData.yieldStrength02} onChange={handleChange} className="form-control" style={errors.yieldStrength02 ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 350" />
+                      {errors.yieldStrength02 && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
                     </div>
                     <div className="form-group">
-                      <label className="form-label">Elongation % <span style={{color:'var(--color-text-secondary)', fontWeight:400}}>(≥10)</span></label>
-                      <input type="number" step="0.1" name="elongationPercent" value={formData.elongationPercent} onChange={handleChange} className="form-control" placeholder="e.g. 14" />
+                      <label className="form-label">Elongation % <span style={{color: errors.elongationPercent ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.tensileMinElongation, thresholds.tensileMaxElongation) : '(10 Min)'}</span></label>
+                      <input type="number" step="0.1" name="elongationPercent" value={formData.elongationPercent} onChange={handleChange} className="form-control" style={errors.elongationPercent ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 14" />
+                      {errors.elongationPercent && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
                     </div>
                   </div>
                 </div>
@@ -236,11 +289,11 @@ const MicroTensile = () => {
                 <div className="card-footer" style={{ margin: '0 -1.5rem -1.5rem', borderRadius: '0 0 var(--radius-xl) var(--radius-xl)' }}>
                   <div style={{ display: 'flex', gap: '1rem' }}>
                     <button type="button" className="btn btn-secondary" onClick={() => setFormData(prev => ({ ...Object.keys(prev).reduce((acc, key) => ({ ...acc, [key]: '' }), {}), approvedBy: user?.fullName || user?.username || '' }))}>Clear</button>
-                    <button type="submit" className="btn btn-primary">
+                    <button type="submit" className="btn btn-primary" disabled={Object.keys(errors).length > 0}>
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="20 6 9 17 4 12" />
                       </svg>
-                      Save Record
+                      {Object.keys(errors).length > 0 ? 'Fix Errors to Save' : 'Save Record'}
                     </button>
 
                     {formData.id && user?.role?.toUpperCase()?.includes('HOF') && (formData.status || 'QC_ENTRY') === 'QC_ENTRY' && (

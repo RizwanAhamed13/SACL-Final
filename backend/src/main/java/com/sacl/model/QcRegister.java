@@ -30,6 +30,7 @@ public class QcRegister {
     private Double compositionMgFl;
     private Double compositionCu;
     private Double compositionCr;
+    private Double compositionSn;
 
     private String timeOfPouring;
     private Double pouringTemp;

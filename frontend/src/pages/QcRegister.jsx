@@ -27,6 +27,8 @@ const QcRegister = () => {
 
   const [loading, setLoading] = useState(true);
   const [rejectModal, setRejectModal] = useState({ isOpen: false, record: null });
+  const [thresholds, setThresholds] = useState(null);
+  const [errors, setErrors] = useState({});
 
   const fetchRecords = async () => {
     try {
@@ -44,8 +46,64 @@ const QcRegister = () => {
     fetchRecords();
   }, []);
 
+  const fetchThresholds = async (partName, currentData = formData) => {
+    if (!partName) {
+      setThresholds(null);
+      setErrors({});
+      return;
+    }
+    try {
+      const res = await axios.get(`/api/part-names/name/${encodeURIComponent(partName)}`);
+      setThresholds(res.data);
+      // Re-validate existing data with new thresholds
+      if (res.data) validateAll(currentData, res.data);
+    } catch (err) {
+      console.error("Failed to fetch thresholds", err);
+    }
+  };
+
+  const isOutOfRange = (val, min, max) => {
+    if (val === undefined || val === null || val === '') return false;
+    const num = parseFloat(val);
+    if (isNaN(num)) return false;
+    if (min !== null && min !== undefined && num < min) return true;
+    if (max !== null && max !== undefined && num > max) return true;
+    return false;
+  };
+
+  const validateAll = (data, ts) => {
+    const newErrors = {};
+    if (!ts) return;
+
+    // Composition Validation (%)
+    if (isOutOfRange(data.compositionC, ts.qcMinC, ts.qcMaxC)) newErrors.compositionC = true;
+    if (isOutOfRange(data.compositionSi, ts.qcMinSi, ts.qcMaxSi)) newErrors.compositionSi = true;
+    if (isOutOfRange(data.compositionMn, ts.qcMinMn, ts.qcMaxMn)) newErrors.compositionMn = true;
+    if (isOutOfRange(data.compositionP, ts.qcMinP, ts.qcMaxP)) newErrors.compositionP = true;
+    if (isOutOfRange(data.compositionS, ts.qcMinS, ts.qcMaxS)) newErrors.compositionS = true;
+    if (isOutOfRange(data.compositionMgFl, ts.qcMinMg, ts.qcMaxMg)) newErrors.compositionMgFl = true;
+    if (isOutOfRange(data.compositionCu, ts.qcMinCu, ts.qcMaxCu)) newErrors.compositionCu = true;
+    if (isOutOfRange(data.compositionCr, ts.qcMinCr, ts.qcMaxCr)) newErrors.compositionCr = true;
+    if (isOutOfRange(data.compositionSn, ts.qcMinSn, ts.qcMaxSn)) newErrors.compositionSn = true;
+
+    // Corrective Addition Validation (Kgs)
+    if (isOutOfRange(data.correctiveC, ts.corrMinC, ts.corrMaxC)) newErrors.correctiveC = true;
+    if (isOutOfRange(data.correctiveSi, ts.corrMinSi, ts.corrMaxSi)) newErrors.correctiveSi = true;
+    if (isOutOfRange(data.correctiveMn, ts.corrMinMn, ts.corrMaxMn)) newErrors.correctiveMn = true;
+    if (isOutOfRange(data.correctiveS, ts.corrMinS, ts.corrMaxS)) newErrors.correctiveS = true;
+    if (isOutOfRange(data.correctiveCr, ts.corrMinCr, ts.corrMaxCr)) newErrors.correctiveCr = true;
+    if (isOutOfRange(data.correctiveCu, ts.corrMinCu, ts.corrMaxCu)) newErrors.correctiveCu = true;
+    if (isOutOfRange(data.correctiveSn, ts.corrMinSn, ts.corrMaxSn)) newErrors.correctiveSn = true;
+
+    setErrors(newErrors);
+  };
+
   const openEdit = (record) => {
     setFormData({
+      ...record,
+      date: record.date ? record.date.split('T')[0] : ''
+    });
+    fetchThresholds(record.partName, {
       ...record,
       date: record.date ? record.date.split('T')[0] : ''
     });
@@ -84,40 +142,53 @@ const QcRegister = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const nextData = { ...formData, [name]: value };
+    setFormData(nextData);
+    if (thresholds) validateAll(nextData, thresholds);
   };
 
   const handlePartNameChange = (val) => {
-    setFormData(prev => ({ ...prev, partName: val }));
+    const nextData = { ...formData, partName: val };
+    setFormData(nextData);
+    fetchThresholds(val, nextData);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const dataToSave = { 
-      ...formData,
-      createdBy: formData.id ? formData.createdBy : (user?.fullName || user?.username)
-    };
+    if (Object.keys(errors).length > 0) {
+      return toast.error("Please correct values out of engineering range!");
+    }
     try {
       if (formData.id) {
-        await axios.put(`/api/qc-register/${formData.id}`, dataToSave);
+        await axios.put(`/api/qc-register/${formData.id}`, formData);
+        toast.success('Updated successfully');
       } else {
-        await axios.post('/api/qc-register', dataToSave);
+        await axios.post('/api/qc-register', { ...formData, createdBy: user.fullName || user.username });
+        toast.success('Added successfully');
       }
       setShowForm(false);
       setFormData({
-        id: null, heatCode: '', date: '', dateCode: '', disa: '', partName: '', qtyMoulds: '',
-        compositionC: '', compositionSi: '', compositionMn: '', compositionP: '', compositionS: '',
-        compositionMgFl: '', compositionCu: '', compositionCr: '',
-        fcNoHeatNo: '', conNo: '', tappingTime: '', tappingWtKgs: '', pouringTemp: '', timeOfPouring: '', streamInnoculant: '', ppCode: '',
-        treatmentNo: '', mgKgs: '', resMgConvertorPercent: '', recMgPercent: '', pTimeSec: '',
+        disa: '', date: '', partName: '', dateCode: '', heatCode: '', qtyMoulds: '',
+        compositionC: '', compositionSi: '', compositionMn: '', compositionP: '', compositionS: '', compositionMgFl: '', compositionCu: '', compositionCr: '', compositionSn: '',
+        timeOfPouring: '', pouringTemp: '', ppCode: '', treatmentNo: '', fcNoHeatNo: '', conNo: '', tappingTime: '',
         correctiveC: '', correctiveSi: '', correctiveMn: '', correctiveS: '', correctiveCr: '', correctiveCu: '', correctiveSn: '',
-        remarks: '', status: 'QC_ENTRY', hofApprovedBy: '', hodApprovedBy: ''
+        tappingWtKgs: '', mgKgs: '', resMgConvertorPercent: '', recMgPercent: '', streamInnoculant: '', pTimeSec: '', remarks: ''
       });
+      setErrors({});
       fetchRecords();
     } catch (err) {
-      console.error(err);
-      toast.error('Failed to save record');
+      toast.error('Submission failed');
     }
+  };
+
+  const renderThreshold = (min, max) => {
+    const minText = (min !== null && min !== undefined && min !== '') ? `Min: ${min}` : '';
+    const maxText = (max !== null && max !== undefined && max !== '') ? `Max: ${max}` : '';
+    
+    if (minText && maxText) return `[${minText}] [${maxText}]`;
+    if (minText) return `[${minText}]`;
+    if (maxText) return `[${maxText}]`;
+    return '(—)';
   };
 
   const dash = (val) => val || '—';
@@ -131,8 +202,8 @@ const QcRegister = () => {
 
       <div className="page-header">
         <div>
-          <h1 className="page-title">QC Register</h1>
-          <p className="page-subtitle">Metal composition, pouring parameters, Mg treatment — DISA I/II/III/IV</p>
+          <h1 className="page-title">Quality Control Register</h1>
+          <p className="page-subtitle">Daily chemical composition &amp; metal treatment log — DISA I/II/III/IV</p>
         </div>
         <div className="page-actions">
           {(user?.role?.toUpperCase()?.includes('QC') || user?.role?.toUpperCase()?.includes('ADMIN')) && (
@@ -141,7 +212,7 @@ const QcRegister = () => {
                 <line x1="12" y1="5" x2="12" y2="19" />
                 <line x1="5" y1="12" x2="19" y2="12" />
               </svg>
-              Add Heat Record
+              Add Entry
             </button>
           )}
         </div>
@@ -151,42 +222,19 @@ const QcRegister = () => {
         <div className="form-panel" style={{ display: 'block' }}>
           <div className="card mb-3">
             <div className="card-header">
-              <h2 className="card-title">Add New Heat Record</h2>
+              <h2 className="card-title">{formData.id ? 'Edit Entry' : 'Add New Entry'}</h2>
               <button className="btn btn-secondary btn-sm" onClick={() => setShowForm(false)}>Cancel</button>
             </div>
             <div className="card-body">
               <form onSubmit={handleSubmit} noValidate>
+                
                 <div className="form-section">
-                  <div className="form-section-title">Basic Information</div>
+                  <div className="form-section-title">Record Identification</div>
                   <div className="form-row form-row-4">
                     <div className="form-group">
-                      <label className="form-label required">Heat Code</label>
-                      <input type="text" name="heatCode" value={formData.heatCode} onChange={handleChange} className="form-control" placeholder="e.g. H240130-01" required />
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label required">Date</label>
-                      <input type="date" name="date" value={formData.date} onChange={handleChange} className="form-control" required />
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label">Date Code</label>
-                      <input type="text" name="dateCode" value={formData.dateCode} onChange={handleChange} className="form-control" placeholder="e.g. 6D08" />
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label">Shift</label>
-                      <select name="disa" className="form-control" onChange={handleChange}>
-                        <option value="">Select Shift</option>
-                        <option>A</option>
-                        <option>B</option>
-                        <option>C</option>
-                        <option>General</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div className="form-row form-row-3">
-                    <div className="form-group">
-                      <label className="form-label">DISA Line</label>
+                      <label className="form-label">DISA</label>
                       <select name="disa" value={formData.disa} onChange={handleChange} className="form-control">
-                        <option value="">Select Line</option>
+                        <option value="">Select</option>
                         <option>DISA I</option>
                         <option>DISA II</option>
                         <option>DISA III</option>
@@ -194,65 +242,93 @@ const QcRegister = () => {
                       </select>
                     </div>
                     <div className="form-group">
-                      <label className="form-label">Part Name / Product</label>
+                      <label className="form-label required">Date</label>
+                      <input type="date" name="date" value={formData.date} onChange={handleChange} className="form-control" required />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Part Name</label>
                       <PartNameSelect value={formData.partName} onChange={handlePartNameChange} />
                     </div>
                     <div className="form-group">
-                      <label className="form-label">Qty of Moulds</label>
-                      <input type="number" name="qtyMoulds" value={formData.qtyMoulds} onChange={handleChange} className="form-control" placeholder="e.g. 120" />
+                      <label className="form-label">Date Code</label>
+                      <input type="text" name="dateCode" value={formData.dateCode} onChange={handleChange} className="form-control" placeholder="e.g. 10D02" />
+                    </div>
+                  </div>
+                  <div className="form-row form-row-3">
+                    <div className="form-group">
+                      <label className="form-label">Heat Code</label>
+                      <input type="text" name="heatCode" value={formData.heatCode} onChange={handleChange} className="form-control" placeholder="e.g. 5D03-45" />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Qty Moulds</label>
+                      <input type="number" name="qtyMoulds" value={formData.qtyMoulds} onChange={handleChange} className="form-control" placeholder="0" />
                     </div>
                   </div>
                 </div>
 
                 <div className="form-section">
-                  <div className="form-section-title">Metal Composition (%)</div>
+                  <div className="form-section-title">Chemical Composition (%)</div>
                   <div className="form-row form-row-4">
                     <div className="form-group">
-                      <label className="form-label">C <span style={{color:'var(--color-text-secondary)', fontWeight: 400}}>(3.00–4.00)</span></label>
-                      <input type="number" step="0.001" name="compositionC" value={formData.compositionC} onChange={handleChange} className="form-control" placeholder="e.g. 3.60" />
+                      <label className="form-label">C <span style={{color: errors.compositionC ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.qcMinC, thresholds.qcMaxC) : '[Min: 3.00] [Max: 4.00]'}</span></label>
+                      <input type="number" step="0.01" name="compositionC" value={formData.compositionC} onChange={handleChange} className="form-control" style={errors.compositionC ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="3.55" />
+                      {errors.compositionC && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
                     </div>
                     <div className="form-group">
-                      <label className="form-label">Si <span style={{color:'var(--color-text-secondary)', fontWeight: 400}}>(2.0–3.00)</span></label>
-                      <input type="number" step="0.001" name="compositionSi" value={formData.compositionSi} onChange={handleChange} className="form-control" placeholder="e.g. 2.52" />
+                      <label className="form-label">Si <span style={{color: errors.compositionSi ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.qcMinSi, thresholds.qcMaxSi) : '[Min: 2.00] [Max: 3.00]'}</span></label>
+                      <input type="number" step="0.01" name="compositionSi" value={formData.compositionSi} onChange={handleChange} className="form-control" style={errors.compositionSi ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="2.55" />
+                      {errors.compositionSi && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
                     </div>
                     <div className="form-group">
-                      <label className="form-label">Mn <span style={{color:'var(--color-text-secondary)', fontWeight: 400}}>(0.20–0.50)</span></label>
-                      <input type="number" step="0.001" name="compositionMn" value={formData.compositionMn} onChange={handleChange} className="form-control" placeholder="e.g. 0.22" />
+                      <label className="form-label">Mn <span style={{color: errors.compositionMn ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.qcMinMn, thresholds.qcMaxMn) : '[Min: 0.10] [Max: 0.50]'}</span></label>
+                      <input type="number" step="0.01" name="compositionMn" value={formData.compositionMn} onChange={handleChange} className="form-control" style={errors.compositionMn ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="0.25" />
+                      {errors.compositionMn && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
                     </div>
                     <div className="form-group">
-                      <label className="form-label">P <span style={{color:'var(--color-text-secondary)', fontWeight: 400}}>(0–0.050)</span></label>
-                      <input type="number" step="0.001" name="compositionP" value={formData.compositionP} onChange={handleChange} className="form-control" placeholder="e.g. 0.047" />
+                      <label className="form-label">P <span style={{color: errors.compositionP ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.qcMinP, thresholds.qcMaxP) : '[Max: 0.05]'}</span></label>
+                      <input type="number" step="0.001" name="compositionP" value={formData.compositionP} onChange={handleChange} className="form-control" style={errors.compositionP ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="0.03" />
+                      {errors.compositionP && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Exceeds limit!</div>}
+                    </div>
+                  </div>
+                  <div className="form-row form-row-4">
+                    <div className="form-group">
+                      <label className="form-label">S <span style={{color: errors.compositionS ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.qcMinS, thresholds.qcMaxS) : '[Max: 0.02]'}</span></label>
+                      <input type="number" step="0.001" name="compositionS" value={formData.compositionS} onChange={handleChange} className="form-control" style={errors.compositionS ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="0.012" />
+                      {errors.compositionS && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Exceeds limit!</div>}
                     </div>
                     <div className="form-group">
-                      <label className="form-label">S <span style={{color:'var(--color-text-secondary)', fontWeight: 400}}>(0–0.010)</span></label>
-                      <input type="number" step="0.001" name="compositionS" value={formData.compositionS} onChange={handleChange} className="form-control" placeholder="e.g. 0.003" />
+                      <label className="form-label">Mg F/L <span style={{color: errors.compositionMgFl ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.qcMinMg, thresholds.qcMaxMg) : '[Min: 0.015] [Max: 0.050]'}</span></label>
+                      <input type="number" step="0.001" name="compositionMgFl" value={formData.compositionMgFl} onChange={handleChange} className="form-control" style={errors.compositionMgFl ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="0.035" />
+                      {errors.compositionMgFl && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
                     </div>
                     <div className="form-group">
-                      <label className="form-label">Mg F/L <span style={{color:'var(--color-text-secondary)', fontWeight: 400}}>(0.015 Min)</span></label>
-                      <input type="number" step="0.001" name="compositionMgFl" value={formData.compositionMgFl} onChange={handleChange} className="form-control" placeholder="e.g. 0.04" />
+                      <label className="form-label">Cu <span style={{color: errors.compositionCu ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.qcMinCu, thresholds.qcMaxCu) : '[Max: 0.20]'}</span></label>
+                      <input type="number" step="0.01" name="compositionCu" value={formData.compositionCu} onChange={handleChange} className="form-control" style={errors.compositionCu ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="0.05" />
+                      {errors.compositionCu && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Exceeds limit!</div>}
                     </div>
                     <div className="form-group">
-                      <label className="form-label">Cu <span style={{color:'var(--color-text-secondary)', fontWeight: 400}}>(0.50 Max)</span></label>
-                      <input type="number" step="0.001" name="compositionCu" value={formData.compositionCu} onChange={handleChange} className="form-control" placeholder="e.g. 0.20" />
+                      <label className="form-label">Cr <span style={{color: errors.compositionCr ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.qcMinCr, thresholds.qcMaxCr) : '[Max: 0.05]'}</span></label>
+                      <input type="number" step="0.01" name="compositionCr" value={formData.compositionCr} onChange={handleChange} className="form-control" style={errors.compositionCr ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="0.02" />
+                      {errors.compositionCr && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Exceeds limit!</div>}
                     </div>
                     <div className="form-group">
-                      <label className="form-label">Cr</label>
-                      <input type="number" step="0.001" name="compositionCr" value={formData.compositionCr} onChange={handleChange} className="form-control" placeholder="e.g. 0.03" />
+                      <label className="form-label">Sn <span style={{color: errors.compositionSn ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.qcMinSn, thresholds.qcMaxSn) : '[Max: 0.01]'}</span></label>
+                      <input type="number" step="0.001" name="compositionSn" value={formData.compositionSn} onChange={handleChange} className="form-control" style={errors.compositionSn ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="0.005" />
+                      {errors.compositionSn && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
                     </div>
                   </div>
                 </div>
 
-                {/* Other sections removed for brevity in previous rewrite but I will include them to fully match layout now */}
                 <div className="form-section">
                   <div className="form-section-title">Process Parameters</div>
                   <div className="form-row form-row-4">
                     <div className="form-group"><label className="form-label">Time of Pouring</label><input type="time" name="timeOfPouring" value={formData.timeOfPouring} onChange={handleChange} className="form-control" /></div>
-                    <div className="form-group"><label className="form-label">Pouring Temp °C</label><input type="number" name="pouringTemp" value={formData.pouringTemp} onChange={handleChange} className="form-control" /></div>
-                    <div className="form-group"><label className="form-label">PP Code</label><input type="text" name="ppCode" value={formData.ppCode} onChange={handleChange} className="form-control" /></div>
-                    <div className="form-group"><label className="form-label">Treatment No</label><input type="text" name="treatmentNo" value={formData.treatmentNo} onChange={handleChange} className="form-control" /></div>
+                    <div className="form-group"><label className="form-label">Pouring Temp °C</label><input type="number" name="pouringTemp" value={formData.pouringTemp} onChange={handleChange} className="form-control" placeholder="1400" /></div>
+                    <div className="form-group"><label className="form-label">PP Code</label><input type="text" name="ppCode" value={formData.ppCode} onChange={handleChange} className="form-control" placeholder="e.g. A1" /></div>
+                    <div className="form-group"><label className="form-label">Treatment No</label><input type="text" name="treatmentNo" value={formData.treatmentNo} onChange={handleChange} className="form-control" placeholder="e.g. 12" /></div>
                   </div>
                   <div className="form-row form-row-4">
-                    <div className="form-group"><label className="form-label">F/C No / Heat No</label><input type="text" name="fcNoHeatNo" value={formData.fcNoHeatNo} onChange={handleChange} className="form-control" /></div>
+                    <div className="form-group"><label className="form-label">F/C No / Heat No</label><input type="text" name="fcNoHeatNo" value={formData.fcNoHeatNo} onChange={handleChange} className="form-control" placeholder="e.g. F1/H2" /></div>
                     <div className="form-group"><label className="form-label">Con No</label><input type="text" name="conNo" value={formData.conNo} onChange={handleChange} className="form-control" /></div>
                     <div className="form-group"><label className="form-label">Tapping Time</label><input type="time" name="tappingTime" value={formData.tappingTime} onChange={handleChange} className="form-control" /></div>
                     <div className="form-group"><label className="form-label">Tapping Wt (Kgs)</label><input type="number" name="tappingWtKgs" value={formData.tappingWtKgs} onChange={handleChange} className="form-control" /></div>
@@ -271,13 +347,36 @@ const QcRegister = () => {
                 <div className="form-section">
                   <div className="form-section-title">Corrective Addition (Kgs)</div>
                   <div className="form-row form-row-4">
-                    <div className="form-group"><label className="form-label">C</label><input type="number" step="0.1" name="correctiveC" value={formData.correctiveC} onChange={handleChange} className="form-control" /></div>
-                    <div className="form-group"><label className="form-label">Si</label><input type="number" step="0.1" name="correctiveSi" value={formData.correctiveSi} onChange={handleChange} className="form-control" /></div>
-                    <div className="form-group"><label className="form-label">Mn</label><input type="number" step="0.1" name="correctiveMn" value={formData.correctiveMn} onChange={handleChange} className="form-control" /></div>
-                    <div className="form-group"><label className="form-label">S</label><input type="number" step="0.1" name="correctiveS" value={formData.correctiveS} onChange={handleChange} className="form-control" /></div>
-                    <div className="form-group"><label className="form-label">Cr</label><input type="number" step="0.1" name="correctiveCr" value={formData.correctiveCr} onChange={handleChange} className="form-control" /></div>
-                    <div className="form-group"><label className="form-label">Cu</label><input type="number" step="0.1" name="correctiveCu" value={formData.correctiveCu} onChange={handleChange} className="form-control" /></div>
-                    <div className="form-group"><label className="form-label">Sn</label><input type="number" step="0.1" name="correctiveSn" value={formData.correctiveSn} onChange={handleChange} className="form-control" /></div>
+                    <div className="form-group">
+                      <label className="form-label">C <span style={{color: errors.correctiveC ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds && renderThreshold(thresholds.corrMinC, thresholds.corrMaxC)}</span></label>
+                      <input type="number" step="0.1" name="correctiveC" value={formData.correctiveC} onChange={handleChange} className="form-control" style={errors.correctiveC ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Si <span style={{color: errors.correctiveSi ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds && renderThreshold(thresholds.corrMinSi, thresholds.corrMaxSi)}</span></label>
+                      <input type="number" step="0.1" name="correctiveSi" value={formData.correctiveSi} onChange={handleChange} className="form-control" style={errors.correctiveSi ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Mn <span style={{color: errors.correctiveMn ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds && renderThreshold(thresholds.corrMinMn, thresholds.corrMaxMn)}</span></label>
+                      <input type="number" step="0.1" name="correctiveMn" value={formData.correctiveMn} onChange={handleChange} className="form-control" style={errors.correctiveMn ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">S <span style={{color: errors.correctiveS ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds && renderThreshold(thresholds.corrMinS, thresholds.corrMaxS)}</span></label>
+                      <input type="number" step="0.1" name="correctiveS" value={formData.correctiveS} onChange={handleChange} className="form-control" style={errors.correctiveS ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
+                    </div>
+                  </div>
+                  <div className="form-row form-row-3">
+                    <div className="form-group">
+                      <label className="form-label">Cr <span style={{color: errors.correctiveCr ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds && renderThreshold(thresholds.corrMinCr, thresholds.corrMaxCr)}</span></label>
+                      <input type="number" step="0.1" name="correctiveCr" value={formData.correctiveCr} onChange={handleChange} className="form-control" style={errors.correctiveCr ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Cu <span style={{color: errors.correctiveCu ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds && renderThreshold(thresholds.corrMinCu, thresholds.corrMaxCu)}</span></label>
+                      <input type="number" step="0.1" name="correctiveCu" value={formData.correctiveCu} onChange={handleChange} className="form-control" style={errors.correctiveCu ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Sn <span style={{color: errors.correctiveSn ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds && renderThreshold(thresholds.corrMinSn, thresholds.corrMaxSn)}</span></label>
+                      <input type="number" step="0.1" name="correctiveSn" value={formData.correctiveSn} onChange={handleChange} className="form-control" style={errors.correctiveSn ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
+                    </div>
                   </div>
                 </div>
 
@@ -302,11 +401,11 @@ const QcRegister = () => {
                 <div className="card-footer" style={{ margin: '0 -1.5rem -1.5rem', borderRadius: '0 0 var(--radius-xl) var(--radius-xl)' }}>
                   <div style={{ display: 'flex', gap: '1rem' }}>
                     <button type="button" className="btn btn-secondary" onClick={() => setFormData(prev => ({ ...Object.keys(prev).reduce((acc, key) => ({ ...acc, [key]: '' }), {}), hodQc: user?.fullName || user?.username || '' }))}>Clear</button>
-                    <button type="submit" className="btn btn-primary">
+                    <button type="submit" className="btn btn-primary" disabled={Object.keys(errors).length > 0}>
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="20 6 9 17 4 12" />
                       </svg>
-                      Save Record
+                      {Object.keys(errors).length > 0 ? 'Fix Errors to Save' : 'Save Record'}
                     </button>
 
                     {formData.id && user?.role?.toUpperCase()?.includes('HOF') && (formData.status || 'QC_ENTRY') === 'QC_ENTRY' && (
@@ -349,7 +448,7 @@ const QcRegister = () => {
                 <tr>
                   <th rowSpan="2" style={{ minWidth: '150px' }}>PART NAME / DATE / HEAT CODE</th>
                   <th rowSpan="2">Qty of Moulds</th>
-                  <th colSpan="8" className="text-center">Metal Composition (%)</th>
+                  <th colSpan="9" className="text-center">Metal Composition (%)</th>
                   <th rowSpan="2">Time of Pouring</th>
                   <th rowSpan="2">Pouring Temp °C</th>
                   <th rowSpan="2">pp Code</th>
@@ -372,7 +471,7 @@ const QcRegister = () => {
                   {/* Metal Comp */}
                   <th style={{ fontSize: '10px' }}>C</th><th style={{ fontSize: '10px' }}>Si</th><th style={{ fontSize: '10px' }}>Mn</th>
                   <th style={{ fontSize: '10px' }}>P</th><th style={{ fontSize: '10px' }}>S</th><th style={{ fontSize: '10px' }}>Mg F/L</th>
-                  <th style={{ fontSize: '10px' }}>Cu</th><th style={{ fontSize: '10px' }}>Cr</th>
+                  <th style={{ fontSize: '10px' }}>Cu</th><th style={{ fontSize: '10px' }}>Cr</th><th style={{ fontSize: '10px' }}>Sn</th>
                   {/* Corrective */}
                   <th style={{ fontSize: '10px' }}>C</th><th style={{ fontSize: '10px' }}>Si</th><th style={{ fontSize: '10px' }}>Mn</th>
                   <th style={{ fontSize: '10px' }}>S</th><th style={{ fontSize: '10px' }}>Cr</th><th style={{ fontSize: '10px' }}>Cu</th><th style={{ fontSize: '10px' }}>Sn</th>
@@ -409,6 +508,7 @@ const QcRegister = () => {
                     <td style={{ fontSize: '12px' }}>{dash(r.compositionMgFl)}</td>
                     <td style={{ fontSize: '12px' }}>{dash(r.compositionCu)}</td>
                     <td style={{ fontSize: '12px' }}>{dash(r.compositionCr)}</td>
+                    <td style={{ fontSize: '12px' }}>{dash(r.compositionSn)}</td>
 
                     <td>{dash(r.timeOfPouring)}</td>
                     <td>{dash(r.pouringTemp)}</td>

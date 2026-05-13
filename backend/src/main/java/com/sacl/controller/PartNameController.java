@@ -25,6 +25,11 @@ public class PartNameController {
         return ResponseEntity.ok(service.findActive());
     }
 
+    @GetMapping("/name/{name}")
+    public ResponseEntity<PartName> getByName(@PathVariable String name) {
+        return ResponseEntity.ok(service.findByName(name));
+    }
+
     @PostMapping
     public ResponseEntity<PartName> create(@RequestBody PartName part) {
         return ResponseEntity.ok(service.create(part));
