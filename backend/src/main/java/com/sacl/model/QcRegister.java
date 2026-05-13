@@ -53,6 +53,7 @@ public class QcRegister {
     private Double resMgConvertorPercent;
     private Double recMgPercent;
     private String streamInnoculant;
+    private Double pTimeSec;
 
     @Column(columnDefinition = "TEXT")
     private String remarks;

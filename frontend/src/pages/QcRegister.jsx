@@ -19,7 +19,7 @@ const QcRegister = () => {
     compositionC: '', compositionSi: '', compositionMn: '', compositionP: '', compositionS: '',
     compositionMgFl: '', compositionCu: '', compositionCr: '',
     fcNoHeatNo: '', conNo: '', tappingTime: '', tappingWtKgs: '', pouringTemp: '', timeOfPouring: '', streamInnoculant: '', ppCode: '',
-    treatmentNo: '', mgKgs: '', resMgConvertorPercent: '', recMgPercent: '',
+    treatmentNo: '', mgKgs: '', resMgConvertorPercent: '', recMgPercent: '', pTimeSec: '',
     correctiveC: '', correctiveSi: '', correctiveMn: '', correctiveS: '', correctiveCr: '', correctiveCu: '', correctiveSn: '',
     remarks: '',
     status: 'QC_ENTRY', hofApprovedBy: '', hodApprovedBy: '', createdBy: ''
@@ -109,7 +109,7 @@ const QcRegister = () => {
         compositionC: '', compositionSi: '', compositionMn: '', compositionP: '', compositionS: '',
         compositionMgFl: '', compositionCu: '', compositionCr: '',
         fcNoHeatNo: '', conNo: '', tappingTime: '', tappingWtKgs: '', pouringTemp: '', timeOfPouring: '', streamInnoculant: '', ppCode: '',
-        treatmentNo: '', mgKgs: '', resMgConvertorPercent: '', recMgPercent: '',
+        treatmentNo: '', mgKgs: '', resMgConvertorPercent: '', recMgPercent: '', pTimeSec: '',
         correctiveC: '', correctiveSi: '', correctiveMn: '', correctiveS: '', correctiveCr: '', correctiveCu: '', correctiveSn: '',
         remarks: '', status: 'QC_ENTRY', hofApprovedBy: '', hodApprovedBy: ''
       });
@@ -246,10 +246,38 @@ const QcRegister = () => {
                 <div className="form-section">
                   <div className="form-section-title">Process Parameters</div>
                   <div className="form-row form-row-4">
-                    <div className="form-group"><label className="form-label">Furnace No</label><input type="text" name="fcNoHeatNo" value={formData.fcNoHeatNo} onChange={handleChange} className="form-control" /></div>
-                    <div className="form-group"><label className="form-label">Converter No</label><input type="text" name="conNo" value={formData.conNo} onChange={handleChange} className="form-control" /></div>
+                    <div className="form-group"><label className="form-label">Time of Pouring</label><input type="time" name="timeOfPouring" value={formData.timeOfPouring} onChange={handleChange} className="form-control" /></div>
+                    <div className="form-group"><label className="form-label">Pouring Temp °C</label><input type="number" name="pouringTemp" value={formData.pouringTemp} onChange={handleChange} className="form-control" /></div>
+                    <div className="form-group"><label className="form-label">PP Code</label><input type="text" name="ppCode" value={formData.ppCode} onChange={handleChange} className="form-control" /></div>
+                    <div className="form-group"><label className="form-label">Treatment No</label><input type="text" name="treatmentNo" value={formData.treatmentNo} onChange={handleChange} className="form-control" /></div>
+                  </div>
+                  <div className="form-row form-row-4">
+                    <div className="form-group"><label className="form-label">F/C No / Heat No</label><input type="text" name="fcNoHeatNo" value={formData.fcNoHeatNo} onChange={handleChange} className="form-control" /></div>
+                    <div className="form-group"><label className="form-label">Con No</label><input type="text" name="conNo" value={formData.conNo} onChange={handleChange} className="form-control" /></div>
                     <div className="form-group"><label className="form-label">Tapping Time</label><input type="time" name="tappingTime" value={formData.tappingTime} onChange={handleChange} className="form-control" /></div>
-                    <div className="form-group"><label className="form-label">Tapping Wt</label><input type="number" name="tappingWtKgs" value={formData.tappingWtKgs} onChange={handleChange} className="form-control" /></div>
+                    <div className="form-group"><label className="form-label">Tapping Wt (Kgs)</label><input type="number" name="tappingWtKgs" value={formData.tappingWtKgs} onChange={handleChange} className="form-control" /></div>
+                  </div>
+                  <div className="form-row form-row-4">
+                    <div className="form-group"><label className="form-label">Mg (Kgs)</label><input type="number" step="0.01" name="mgKgs" value={formData.mgKgs} onChange={handleChange} className="form-control" /></div>
+                    <div className="form-group"><label className="form-label">Res Mg Convertor %</label><input type="number" step="0.001" name="resMgConvertorPercent" value={formData.resMgConvertorPercent} onChange={handleChange} className="form-control" /></div>
+                    <div className="form-group"><label className="form-label">Rec of Mg %</label><input type="number" step="0.01" name="recMgPercent" value={formData.recMgPercent} onChange={handleChange} className="form-control" /></div>
+                    <div className="form-group"><label className="form-label">Stream Inoculant (gms/Sec)</label><input type="text" name="streamInnoculant" value={formData.streamInnoculant} onChange={handleChange} className="form-control" /></div>
+                  </div>
+                  <div className="form-row form-row-4">
+                    <div className="form-group"><label className="form-label">P.Time (sec)</label><input type="number" step="0.1" name="pTimeSec" value={formData.pTimeSec} onChange={handleChange} className="form-control" /></div>
+                  </div>
+                </div>
+
+                <div className="form-section">
+                  <div className="form-section-title">Corrective Addition (Kgs)</div>
+                  <div className="form-row form-row-4">
+                    <div className="form-group"><label className="form-label">C</label><input type="number" step="0.1" name="correctiveC" value={formData.correctiveC} onChange={handleChange} className="form-control" /></div>
+                    <div className="form-group"><label className="form-label">Si</label><input type="number" step="0.1" name="correctiveSi" value={formData.correctiveSi} onChange={handleChange} className="form-control" /></div>
+                    <div className="form-group"><label className="form-label">Mn</label><input type="number" step="0.1" name="correctiveMn" value={formData.correctiveMn} onChange={handleChange} className="form-control" /></div>
+                    <div className="form-group"><label className="form-label">S</label><input type="number" step="0.1" name="correctiveS" value={formData.correctiveS} onChange={handleChange} className="form-control" /></div>
+                    <div className="form-group"><label className="form-label">Cr</label><input type="number" step="0.1" name="correctiveCr" value={formData.correctiveCr} onChange={handleChange} className="form-control" /></div>
+                    <div className="form-group"><label className="form-label">Cu</label><input type="number" step="0.1" name="correctiveCu" value={formData.correctiveCu} onChange={handleChange} className="form-control" /></div>
+                    <div className="form-group"><label className="form-label">Sn</label><input type="number" step="0.1" name="correctiveSn" value={formData.correctiveSn} onChange={handleChange} className="form-control" /></div>
                   </div>
                 </div>
 
@@ -319,15 +347,38 @@ const QcRegister = () => {
             <table className="table">
               <thead>
                 <tr>
-                   <th>Heat Code</th>
-                  <th>Date</th>
-                  <th>DISA</th>
-                  <th>Part Name</th>
-                  <th>Moulds</th>
-                   <th>Status</th>
-                   <th>Approval Info</th>
-                   {isStaff && <th>Actions</th>}
-                 </tr>
+                  <th rowSpan="2" style={{ minWidth: '150px' }}>PART NAME / DATE / HEAT CODE</th>
+                  <th rowSpan="2">Qty of Moulds</th>
+                  <th colSpan="8" className="text-center">Metal Composition (%)</th>
+                  <th rowSpan="2">Time of Pouring</th>
+                  <th rowSpan="2">Pouring Temp °C</th>
+                  <th rowSpan="2">pp Code</th>
+                  <th rowSpan="2">Treatment No</th>
+                  <th rowSpan="2">F/C No / Heat No</th>
+                  <th rowSpan="2">Con No</th>
+                  <th rowSpan="2">Tapping Time</th>
+                  <th colSpan="7" className="text-center">Corrective Addition (Kgs)</th>
+                  <th rowSpan="2">Tapping Wt. (kgs)</th>
+                  <th rowSpan="2">Mg (Kgs)</th>
+                  <th rowSpan="2">Res.Mg Convertor %</th>
+                  <th rowSpan="2">Rec. Of Mg %</th>
+                  <th colSpan="2" className="text-center">Stream Inoculant</th>
+                  <th rowSpan="2" style={{ minWidth: '150px' }}>Remarks</th>
+                  <th rowSpan="2">Status</th>
+                  <th rowSpan="2" style={{ minWidth: '150px' }}>Approval Info</th>
+                  {isStaff && <th rowSpan="2">Actions</th>}
+                </tr>
+                <tr>
+                  {/* Metal Comp */}
+                  <th style={{ fontSize: '10px' }}>C</th><th style={{ fontSize: '10px' }}>Si</th><th style={{ fontSize: '10px' }}>Mn</th>
+                  <th style={{ fontSize: '10px' }}>P</th><th style={{ fontSize: '10px' }}>S</th><th style={{ fontSize: '10px' }}>Mg F/L</th>
+                  <th style={{ fontSize: '10px' }}>Cu</th><th style={{ fontSize: '10px' }}>Cr</th>
+                  {/* Corrective */}
+                  <th style={{ fontSize: '10px' }}>C</th><th style={{ fontSize: '10px' }}>Si</th><th style={{ fontSize: '10px' }}>Mn</th>
+                  <th style={{ fontSize: '10px' }}>S</th><th style={{ fontSize: '10px' }}>Cr</th><th style={{ fontSize: '10px' }}>Cu</th><th style={{ fontSize: '10px' }}>Sn</th>
+                  {/* Stream */}
+                  <th style={{ fontSize: '10px' }}>gms/Sec</th><th style={{ fontSize: '10px' }}>P.Time (sec)</th>
+                </tr>
               </thead>
               <tbody>
                 {loading ? (
@@ -342,11 +393,50 @@ const QcRegister = () => {
                   </tr>
                 ) : records.map((r) => (
                   <tr key={r.id}>
-                    <td><strong>{dash(r.heatCode)}</strong></td>
-                    <td>{r.date?.split('T')[0] || '—'}</td>
-                    <td>{dash(r.disa)}</td>
-                    <td>{dash(r.partName)}</td>
-                    <td>{dash(r.qtyMoulds)}</td>
+                    <td>
+                      <div style={{ fontSize: '12px', fontWeight: 'bold' }}>{dash(r.partName)}</div>
+                      <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)' }}>{r.date?.split('T')[0]}</div>
+                      <div style={{ fontSize: '11px', color: 'var(--color-primary)', fontWeight: '500' }}>{dash(r.heatCode)}</div>
+                    </td>
+                    <td className="text-center">{dash(r.qtyMoulds)}</td>
+                    
+                    {/* Metal Composition */}
+                    <td style={{ fontSize: '12px' }}>{dash(r.compositionC)}</td>
+                    <td style={{ fontSize: '12px' }}>{dash(r.compositionSi)}</td>
+                    <td style={{ fontSize: '12px' }}>{dash(r.compositionMn)}</td>
+                    <td style={{ fontSize: '12px' }}>{dash(r.compositionP)}</td>
+                    <td style={{ fontSize: '12px' }}>{dash(r.compositionS)}</td>
+                    <td style={{ fontSize: '12px' }}>{dash(r.compositionMgFl)}</td>
+                    <td style={{ fontSize: '12px' }}>{dash(r.compositionCu)}</td>
+                    <td style={{ fontSize: '12px' }}>{dash(r.compositionCr)}</td>
+
+                    <td>{dash(r.timeOfPouring)}</td>
+                    <td>{dash(r.pouringTemp)}</td>
+                    <td>{dash(r.ppCode)}</td>
+                    <td>{dash(r.treatmentNo)}</td>
+                    <td>{dash(r.fcNoHeatNo)}</td>
+                    <td>{dash(r.conNo)}</td>
+                    <td>{dash(r.tappingTime)}</td>
+
+                    {/* Corrective Addition */}
+                    <td style={{ fontSize: '12px' }}>{dash(r.correctiveC)}</td>
+                    <td style={{ fontSize: '12px' }}>{dash(r.correctiveSi)}</td>
+                    <td style={{ fontSize: '12px' }}>{dash(r.correctiveMn)}</td>
+                    <td style={{ fontSize: '12px' }}>{dash(r.correctiveS)}</td>
+                    <td style={{ fontSize: '12px' }}>{dash(r.correctiveCr)}</td>
+                    <td style={{ fontSize: '12px' }}>{dash(r.correctiveCu)}</td>
+                    <td style={{ fontSize: '12px' }}>{dash(r.correctiveSn)}</td>
+
+                    <td>{dash(r.tappingWtKgs)}</td>
+                    <td>{dash(r.mgKgs)}</td>
+                    <td>{dash(r.resMgConvertorPercent)}</td>
+                    <td>{dash(r.recMgPercent)}</td>
+                    
+                    {/* Stream Inoculant */}
+                    <td>{dash(r.streamInnoculant)}</td>
+                    <td>{dash(r.pTimeSec)}</td>
+
+                    <td style={{ fontSize: '11px', maxWidth: '200px', whiteSpace: 'normal' }}>{dash(r.remarks)}</td>
                     <td>
                       <span className={`status-badge status-${(r.status || 'QC_ENTRY').toLowerCase()}`}>
                         {(r.status || 'QC_ENTRY').replace('_', ' ')}
@@ -408,7 +498,7 @@ const QcRegister = () => {
                            </button>
                          )}
                        </td>
-                     )}
+                    )}
                   </tr>
                 ))}
               </tbody>

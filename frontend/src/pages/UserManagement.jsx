@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
+import { useAuth } from '../context/AuthContext';
 import ConfirmModal from '../components/ConfirmModal';
 
 const UserManagement = () => {
+  const { user: currentUser } = useAuth();
   const [records, setRecords] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -298,7 +300,9 @@ const UserManagement = () => {
                     <td>{u.createdAt?.split('T')[0]}</td>
                     <td style={{ whiteSpace: 'nowrap' }}>
                       <button className="action-btn action-btn-edit" onClick={() => openEditForm(u)}>Edit</button>
-                      <button className="action-btn action-btn-delete" onClick={() => setDeleteModal({ isOpen: true, user: u })}>Delete</button>
+                      {u.id !== currentUser?.id && (
+                        <button className="action-btn action-btn-delete" onClick={() => setDeleteModal({ isOpen: true, user: u })}>Delete</button>
+                      )}
                     </td>
                   </tr>
                 ))}
