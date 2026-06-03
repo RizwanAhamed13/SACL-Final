@@ -2,11 +2,13 @@ package com.sacl.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.SQLRestriction;
 import java.time.LocalDateTime;
 
 @Data
 @Entity
 @Table(name = "part_names")
+@SQLRestriction("deleted_at IS NULL")
 public class PartName {
 
     @Id
@@ -56,12 +58,24 @@ public class PartName {
     private Double tensileMaxStrength;
     private Double tensileMinYield;
     private Double tensileMaxYield;
+    private Double tensileMinYield05;
+    private Double tensileMaxYield05;
     private Double tensileMinElongation;
     private Double tensileMaxElongation;
 
     // Impact Thresholds
     private Double impactMinSpec;
     private Double impactMaxSpec;
+
+    // Process Parameter Thresholds
+    private Double ppMinPouringTemp;
+    private Double ppMaxPouringTemp;
+    private Double ppMinMgKgs;
+    private Double ppMaxMgKgs;
+    private Double ppMinStreamInnoculant;
+    private Double ppMaxStreamInnoculant;
+    private Double ppMinPTimeSec;
+    private Double ppMaxPTimeSec;
 
     // Corrective Addition Thresholds (Kgs)
     private Double corrMinC;
@@ -79,10 +93,15 @@ public class PartName {
     private Double corrMinSn;
     private Double corrMaxSn;
 
+    private String microLocations;
+    private String mechLocations;
+
     private Boolean active = true;
 
     @Column(updatable = false)
     private LocalDateTime createdAt;
+
+    private LocalDateTime deletedAt;
 
     @PrePersist
     protected void onCreate() {

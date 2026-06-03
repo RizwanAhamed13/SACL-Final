@@ -142,7 +142,11 @@
             <form id="userForm" novalidate>
               <div class="form-section">
                 <div class="form-section-title">Account Details</div>
-                <div class="form-row form-row-3">
+                <div class="form-row form-row-4">
+                  <div class="form-group">
+                    <label class="form-label required">Employee ID</label>
+                    <input type="text" id="employeeId" class="form-control" placeholder="e.g. EMP001" required />
+                  </div>
                   <div class="form-group">
                     <label class="form-label required">Full Name</label>
                     <input type="text" id="fullName" class="form-control" placeholder="e.g. Rajesh Kumar" required />
@@ -206,6 +210,7 @@
             <table class="table">
               <thead>
                 <tr>
+                  <th>Employee ID</th>
                   <th>Full Name</th>
                   <th>Username</th>
                   <th>Email</th>
@@ -216,7 +221,7 @@
                 </tr>
               </thead>
               <tbody id="recordsBody">
-                <tr><td colspan="7" class="text-center text-muted" style="padding:2rem">No users found. Click "Add User" to get started.</td></tr>
+                <tr><td colspan="8" class="text-center text-muted" style="padding:2rem">No users found. Click "Add User" to get started.</td></tr>
               </tbody>
             </table>
           </div>
@@ -256,11 +261,12 @@
       const tbody = document.getElementById('recordsBody');
       document.getElementById('recordCount').textContent = data.length + ' user' + (data.length !== 1 ? 's' : '');
       if (!data.length) {
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted" style="padding:2rem">No users found.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted" style="padding:2rem">No users found.</td></tr>';
         return;
       }
       tbody.innerHTML = data.map(u => `
         <tr>
+          <td><strong>${dash(u.employeeId)}</strong></td>
           <td><strong>${dash(u.fullName)}</strong></td>
           <td>${dash(u.username)}</td>
           <td>${dash(u.email)}</td>
@@ -268,8 +274,8 @@
           <td>${statusBadge(u.active)}</td>
           <td>${fmtDate(u.createdAt)}</td>
           <td style="white-space:nowrap">
-            <button class="action-btn action-btn-edit" onclick="openEditForm(${u.id},'${escJs(u.fullName)}','${escJs(u.username)}','${escJs(u.email)}','${escJs(u.role)}',${u.active})">Edit</button>
-            <button class="action-btn action-btn-delete" onclick="deleteUser(${u.id},'${escJs(u.fullName)}')">Delete</button>
+            <button class="action-btn action-btn-edit" onclick="openEditForm('${escJs(u.employeeId)}','${escJs(u.fullName)}','${escJs(u.username)}','${escJs(u.email)}','${escJs(u.role)}',${u.active})">Edit</button>
+            <button class="action-btn action-btn-delete" onclick="deleteUser('${escJs(u.employeeId)}','${escJs(u.fullName)}')">Delete</button>
           </td>
         </tr>`).join('');
     } catch (e) { console.warn('Backend not available:', e.message); }
@@ -280,6 +286,8 @@
   function openAddForm() {
     editingId = null;
     document.getElementById('formTitle').textContent = 'Add User';
+    document.getElementById('employeeId').value = '';
+    document.getElementById('employeeId').disabled = false;
     document.getElementById('fullName').value = '';
     document.getElementById('username').value = '';
     document.getElementById('username').disabled = false;
@@ -292,9 +300,11 @@
     document.getElementById('formPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  function openEditForm(id, fullName, username, email, role, active) {
-    editingId = id;
+  function openEditForm(employeeId, fullName, username, email, role, active) {
+    editingId = employeeId;
     document.getElementById('formTitle').textContent = 'Edit User';
+    document.getElementById('employeeId').value = employeeId;
+    document.getElementById('employeeId').disabled = true;
     document.getElementById('fullName').value = fullName;
     document.getElementById('username').value = username;
     document.getElementById('username').disabled = true;
@@ -314,14 +324,15 @@
   }
 
   async function saveUser() {
+    const employeeId = document.getElementById('employeeId').value.trim();
     const fullName = document.getElementById('fullName').value.trim();
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value;
     const email    = document.getElementById('email').value.trim();
     const role     = document.getElementById('role').value;
 
-    if (!fullName || !username || !role) {
-      showToast('Full Name, Username and Role are required.', 'error');
+    if (!employeeId || !fullName || !username || !role) {
+      showToast('Employee ID, Full Name, Username and Role are required.', 'error');
       return;
     }
     if (!editingId && !password) {
@@ -329,7 +340,7 @@
       return;
     }
 
-    const payload = { fullName, username, email: email || null, role };
+    const payload = { employeeId, fullName, username, email: email || null, role };
     if (password) payload.password = password;
     if (editingId) payload.active = document.getElementById('active').value === 'true';
 
@@ -348,10 +359,10 @@
     }
   }
 
-  async function deleteUser(id, name) {
+  async function deleteUser(employeeId, name) {
     if (!confirm(`Delete user "${name}"? This cannot be undone.`)) return;
     try {
-      await apiDelete(API.USERS, id);
+      await apiDelete(API.USERS, employeeId);
       showToast('User deleted.', 'success');
       loadRecords();
     } catch (err) {

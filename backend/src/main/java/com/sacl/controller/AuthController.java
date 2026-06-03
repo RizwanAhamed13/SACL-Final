@@ -2,9 +2,12 @@ package com.sacl.controller;
 
 import com.sacl.dto.AuthRequest;
 import com.sacl.dto.AuthResponse;
+import com.sacl.exception.ResourceNotFoundException;
 import com.sacl.model.User;
 import com.sacl.repository.UserRepository;
 import com.sacl.security.JwtUtil;
+import com.sacl.service.RateLimitService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,16 +27,19 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
+    private final RateLimitService rateLimitService;
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest) {
+    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
+        rateLimitService.checkRateLimit(request.getRemoteAddr());
+
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
         );
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         User user = userRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         String role = user.getRole() != null ? user.getRole().toUpperCase() : "USER";
         if (!role.startsWith("ROLE_")) {

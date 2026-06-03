@@ -7,7 +7,10 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "micro_structure_analysis")
+@Table(name = "micro_structure_analysis", indexes = {
+        @Index(name = "idx_micro_part_name", columnList = "partName"),
+        @Index(name = "idx_micro_inspection_date", columnList = "inspectionDate")
+})
 public class MicroStructureAnalysis {
 
     @Id
@@ -28,15 +31,17 @@ public class MicroStructureAnalysis {
     private Double pearlitePercent;
     private Double carbidePercent;
 
-    @Column(columnDefinition = "TEXT")
+    @Lob @Column
     private String remarks;
 
     private String approvedBy;
-    
+
     private String hofApprovedBy;
     private String hodApprovedBy;
     private String createdBy;
-    private String status = "QC_ENTRY";
+
+    @Enumerated(EnumType.STRING)
+    private RecordStatus status = RecordStatus.QC_ENTRY;
 
     @Column(updatable = false)
     private LocalDateTime createdAt;

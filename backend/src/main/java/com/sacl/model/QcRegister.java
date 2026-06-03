@@ -1,13 +1,18 @@
 package com.sacl.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "qc_register")
+@Table(name = "qc_register", indexes = {
+        @Index(name = "idx_qc_part_name", columnList = "partName"),
+        @Index(name = "idx_qc_date", columnList = "date"),
+        @Index(name = "idx_qc_date_code", columnList = "dateCode")
+})
 public class QcRegister {
 
     @Id
@@ -16,7 +21,10 @@ public class QcRegister {
 
     private String disa;
     private LocalDate date;
+
+    @NotBlank
     private String partName;
+
     private String dateCode;
     private String heatCode;
     private Integer qtyMoulds;
@@ -53,18 +61,20 @@ public class QcRegister {
     private Double mgKgs;
     private Double resMgConvertorPercent;
     private Double recMgPercent;
-    private String streamInnoculant;
+    private Double streamInnoculant;
     private Double pTimeSec;
 
-    @Column(columnDefinition = "TEXT")
+    @Lob @Column
     private String remarks;
 
     private String hodQc;
-    
+
     private String hofApprovedBy;
     private String hodApprovedBy;
     private String createdBy;
-    private String status = "QC_ENTRY"; // QC_ENTRY, HOF_APPROVED, HOD_APPROVED
+
+    @Enumerated(EnumType.STRING)
+    private RecordStatus status = RecordStatus.QC_ENTRY;
 
     @Column(updatable = false)
     private LocalDateTime createdAt;

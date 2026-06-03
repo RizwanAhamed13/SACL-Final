@@ -1,12 +1,15 @@
 package com.sacl.controller;
 
+import com.sacl.dto.PageResponse;
 import com.sacl.model.MicroTensileTest;
 import com.sacl.service.MicroTensileService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/micro-tensile")
@@ -27,13 +30,17 @@ public class MicroTensileController {
     }
 
     @PostMapping
-    public ResponseEntity<MicroTensileTest> create(@RequestBody MicroTensileTest entry) {
+    public ResponseEntity<MicroTensileTest> create(@Valid @RequestBody MicroTensileTest entry) {
         return ResponseEntity.ok(service.save(entry));
     }
 
     @GetMapping
-    public ResponseEntity<List<MicroTensileTest>> getAll() {
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<PageResponse<MicroTensileTest>> getAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size) {
+        Page<MicroTensileTest> result = service.findAll(
+                PageRequest.of(page, size, Sort.by("createdAt").descending()));
+        return ResponseEntity.ok(PageResponse.of(result));
     }
 
     @GetMapping("/{id}")
@@ -42,7 +49,7 @@ public class MicroTensileController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MicroTensileTest> update(@PathVariable Long id, @RequestBody MicroTensileTest entry) {
+    public ResponseEntity<MicroTensileTest> update(@PathVariable Long id, @Valid @RequestBody MicroTensileTest entry) {
         entry.setId(id);
         return ResponseEntity.ok(service.save(entry));
     }

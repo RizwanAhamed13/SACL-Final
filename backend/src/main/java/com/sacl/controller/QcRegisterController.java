@@ -1,12 +1,15 @@
 package com.sacl.controller;
 
+import com.sacl.dto.PageResponse;
 import com.sacl.model.QcRegister;
 import com.sacl.service.QcRegisterService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/qc-register")
@@ -27,13 +30,17 @@ public class QcRegisterController {
     }
 
     @PostMapping
-    public ResponseEntity<QcRegister> create(@RequestBody QcRegister entry) {
+    public ResponseEntity<QcRegister> create(@Valid @RequestBody QcRegister entry) {
         return ResponseEntity.ok(service.save(entry));
     }
 
     @GetMapping
-    public ResponseEntity<List<QcRegister>> getAll() {
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<PageResponse<QcRegister>> getAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size) {
+        Page<QcRegister> result = service.findAll(
+                PageRequest.of(page, size, Sort.by("createdAt").descending()));
+        return ResponseEntity.ok(PageResponse.of(result));
     }
 
     @GetMapping("/{id}")
@@ -42,7 +49,7 @@ public class QcRegisterController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<QcRegister> update(@PathVariable Long id, @RequestBody QcRegister entry) {
+    public ResponseEntity<QcRegister> update(@PathVariable Long id, @Valid @RequestBody QcRegister entry) {
         entry.setId(id);
         return ResponseEntity.ok(service.save(entry));
     }

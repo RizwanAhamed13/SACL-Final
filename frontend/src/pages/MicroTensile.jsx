@@ -1,11 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../api/axios';
 import { toast } from 'react-hot-toast';
 import { PartNameSelect } from '../components/PartNameSelect';
 import { useAuth } from '../context/AuthContext';
 import ConfirmModal from '../components/ConfirmModal';
 import Skeleton from '../components/Skeleton';
+
+const TENSILE_FIELDS = [
+  { name: 'maxLoadKn', label: 'Max Load (KN)', type: 'number', step: '0.1', placeholder: 'e.g. 10.5' },
+  { name: 'yieldLoadKn', label: 'Yield Load (KN)', type: 'number', step: '0.1', placeholder: 'e.g. 7.2' },
+  { name: 'tensileStrength', label: 'Tensile Strength / UTS', type: 'number', step: '0.1', thMin: 'tensileMinStrength', thMax: 'tensileMaxStrength', placeholder: 'e.g. 540' },
+  { name: 'yieldStrength02', label: 'Yield Strength @0.2%', type: 'number', step: '0.1', thMin: 'tensileMinYield', thMax: 'tensileMaxYield', placeholder: 'e.g. 350' },
+  { name: 'yieldStrength05', label: 'Yield Strength @0.5%', type: 'number', step: '0.1', thMin: 'tensileMinYield05', thMax: 'tensileMaxYield05', placeholder: 'e.g. 300' },
+  { name: 'elongationPercent', label: 'Elongation %', type: 'number', step: '0.1', thMin: 'tensileMinElongation', thMax: 'tensileMaxElongation', placeholder: 'e.g. 14' },
+];
 
 const MicroTensile = () => {
   const { user } = useAuth();
@@ -16,8 +25,8 @@ const MicroTensile = () => {
   const [formData, setFormData] = useState({
     id: null,
     dateOfInspection: new Date().toISOString().split('T')[0], item: '', dateCode: '',
-    barDiaMm: '', gaugeLengthMm: '', yieldStrength05: '',
-    maxLoadKn: '', yieldLoadKn: '', tensileStrength: '', yieldStrength02: '', elongationPercent: '',
+    barDiaMm: '', gaugeLengthMm: '', mechLocation: '',
+    maxLoadKn: '', yieldLoadKn: '', tensileStrength: '', yieldStrength02: '', yieldStrength05: '', elongationPercent: '',
     remarks: '',
     status: 'QC_ENTRY', hofApprovedBy: '', hodApprovedBy: '', createdBy: ''
   });
@@ -27,11 +36,15 @@ const MicroTensile = () => {
   const [thresholds, setThresholds] = useState(null);
   const [errors, setErrors] = useState({});
 
+  const activeLocations = !formData.id && thresholds?.mechLocations
+    ? thresholds.mechLocations.split(',').filter(Boolean)
+    : [];
+
   const fetchRecords = async () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
       const res = await axios.get('/api/micro-tensile');
-      setRecords(res.data);
+      setRecords(res.data.content ?? res.data);
     } catch (err) {
       console.warn("Could not fetch records", err);
     } finally {
@@ -43,21 +56,6 @@ const MicroTensile = () => {
     fetchRecords();
   }, []);
 
-  const fetchThresholds = async (partName, currentData = formData) => {
-    if (!partName) {
-      setThresholds(null);
-      setErrors({});
-      return;
-    }
-    try {
-      const res = await axios.get(`/api/part-names/name/${encodeURIComponent(partName)}`);
-      setThresholds(res.data);
-      if (res.data) validateAll(currentData, res.data);
-    } catch (err) {
-      console.error("Failed to fetch thresholds", err);
-    }
-  };
-
   const isOutOfRange = (val, min, max) => {
     if (val === undefined || val === null || val === '') return false;
     const num = parseFloat(val);
@@ -67,13 +65,40 @@ const MicroTensile = () => {
     return false;
   };
 
-  const validateAll = (data, ts) => {
+  const validateAll = (data, ts, locs) => {
     const newErrors = {};
     if (!ts) return;
-    if (isOutOfRange(data.tensileStrength, ts.tensileMinStrength, ts.tensileMaxStrength)) newErrors.tensileStrength = true;
-    if (isOutOfRange(data.yieldStrength02, ts.tensileMinYield, ts.tensileMaxYield)) newErrors.yieldStrength02 = true;
-    if (isOutOfRange(data.elongationPercent, ts.tensileMinElongation, ts.tensileMaxElongation)) newErrors.elongationPercent = true;
+    const thFields = TENSILE_FIELDS.filter(f => f.thMin);
+    if (!data.id && locs && locs.length > 0) {
+      locs.forEach(loc => {
+        thFields.forEach(f => {
+          if (isOutOfRange(data[`${loc}_${f.name}`], ts[f.thMin], ts[f.thMax])) newErrors[`${loc}_${f.name}`] = true;
+        });
+      });
+    } else {
+      thFields.forEach(f => {
+        if (isOutOfRange(data[f.name], ts[f.thMin], ts[f.thMax])) newErrors[f.name] = true;
+      });
+    }
     setErrors(newErrors);
+  };
+
+  const fetchThresholds = async (partName, currentData = formData) => {
+    if (!partName) {
+      setThresholds(null);
+      setErrors({});
+      return;
+    }
+    try {
+      const res = await axios.get(`/api/part-names/name/${encodeURIComponent(partName)}`);
+      setThresholds(res.data);
+      if (res.data) {
+        const locs = res.data.mechLocations ? res.data.mechLocations.split(',').filter(Boolean) : [];
+        validateAll(currentData, res.data, locs);
+      }
+    } catch (err) {
+      console.error("Failed to fetch thresholds", err);
+    }
   };
 
   const openEdit = (record) => {
@@ -122,7 +147,7 @@ const MicroTensile = () => {
     const { name, value } = e.target;
     const nextData = { ...formData, [name]: value };
     setFormData(nextData);
-    if (thresholds) validateAll(nextData, thresholds);
+    if (thresholds) validateAll(nextData, thresholds, activeLocations);
   };
 
   const handlePartNameChange = (val) => {
@@ -140,15 +165,41 @@ const MicroTensile = () => {
       if (formData.id) {
         await axios.put(`/api/micro-tensile/${formData.id}`, formData);
         toast.success('Updated successfully');
+      } else if (activeLocations.length > 0) {
+        const base = {
+          dateOfInspection: formData.dateOfInspection,
+          item: formData.item,
+          dateCode: formData.dateCode,
+          barDiaMm: formData.barDiaMm,
+          gaugeLengthMm: formData.gaugeLengthMm,
+          remarks: formData.remarks,
+          createdBy: user.fullName || user.username
+        };
+        await Promise.all(activeLocations.map(loc =>
+          axios.post('/api/micro-tensile', {
+            ...base,
+            mechLocation: loc,
+            maxLoadKn: formData[`${loc}_maxLoadKn`] || null,
+            yieldLoadKn: formData[`${loc}_yieldLoadKn`] || null,
+            tensileStrength: formData[`${loc}_tensileStrength`] || null,
+            yieldStrength02: formData[`${loc}_yieldStrength02`] || null,
+            yieldStrength05: formData[`${loc}_yieldStrength05`] || null,
+            elongationPercent: formData[`${loc}_elongationPercent`] || null,
+          })
+        ));
+        toast.success(`${activeLocations.length} location records saved`);
       } else {
         await axios.post('/api/micro-tensile', { ...formData, createdBy: user.fullName || user.username });
         toast.success('Added successfully');
       }
       setShowForm(false);
       setFormData({
-        dateOfInspection: '', item: '', dateCode: '', barDiaMm: '', gaugeLengthMm: '', yieldStrength05: '',
-        maxLoadKn: '', yieldLoadKn: '', tensileStrength: '', yieldStrength02: '', elongationPercent: '',
-        status: 'QC_ENTRY', hofApprovedBy: '', hodApprovedBy: ''
+        id: null,
+        dateOfInspection: new Date().toISOString().split('T')[0], item: '', dateCode: '',
+        barDiaMm: '', gaugeLengthMm: '', mechLocation: '',
+        maxLoadKn: '', yieldLoadKn: '', tensileStrength: '', yieldStrength02: '', yieldStrength05: '', elongationPercent: '',
+        remarks: '',
+        status: 'QC_ENTRY', hofApprovedBy: '', hodApprovedBy: '', createdBy: ''
       });
       setErrors({});
       fetchRecords();
@@ -161,7 +212,7 @@ const MicroTensile = () => {
     if (min !== null && min !== undefined && max !== null && max !== undefined && min !== '' && max !== '') return `(${min}–${max})`;
     if (max !== null && max !== undefined && max !== '') return `(Max ${max})`;
     if (min !== null && min !== undefined && min !== '') return `(${min} Min)`;
-    return '(—)';
+    return '';
   };
 
   const dash = (val) => val || '—';
@@ -195,7 +246,7 @@ const MicroTensile = () => {
         <div className="form-panel" style={{ display: 'block' }}>
           <div className="card mb-3">
             <div className="card-header">
-              <h2 className="card-title">Add Tensile Test</h2>
+              <h2 className="card-title">{formData.id ? 'Edit Tensile Test' : 'Add Tensile Test'}</h2>
               <button className="btn btn-secondary btn-sm" onClick={() => setShowForm(false)}>Cancel</button>
             </div>
             <div className="card-body">
@@ -216,6 +267,12 @@ const MicroTensile = () => {
                       <label className="form-label">Date Code &amp; Heat Code</label>
                       <input type="text" name="dateCode" value={formData.dateCode} onChange={handleChange} className="form-control" placeholder="e.g. 6D08-41" />
                     </div>
+                    {formData.id && (
+                      <div className="form-group">
+                        <label className="form-label">Location</label>
+                        <input type="text" value={formData.mechLocation || '—'} readOnly className="form-control" style={{ background: '#f8fafc', color: '#64748b' }} />
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -230,43 +287,74 @@ const MicroTensile = () => {
                       <label className="form-label">Gauge Length Lo <span style={{color:'var(--color-text-secondary)', fontWeight:400}}>(mm)</span></label>
                       <input type="number" step="0.1" name="gaugeLengthMm" value={formData.gaugeLengthMm} onChange={handleChange} className="form-control" placeholder="e.g. 25" />
                     </div>
-                    <div className="form-group">
-                      <label className="form-label">Final Length Li <span style={{color:'var(--color-text-secondary)', fontWeight:400}}>(mm)</span></label>
-                      <input type="number" step="0.1" name="yieldStrength05" value={formData.yieldStrength05} onChange={handleChange} className="form-control" placeholder="e.g. 27.5" />
-                    </div>
                   </div>
                 </div>
 
-                <div className="form-section">
-                  <div className="form-section-title">Test Results</div>
-                  <div className="form-row form-row-3">
-                    <div className="form-group">
-                      <label className="form-label">Max Load <span style={{color:'var(--color-text-secondary)', fontWeight:400}}>(KN)</span></label>
-                      <input type="number" step="0.1" name="maxLoadKn" value={formData.maxLoadKn} onChange={handleChange} className="form-control" placeholder="e.g. 10.5" />
+                {activeLocations.length > 0 ? (
+                  <div className="form-section">
+                    <div className="form-section-title">Test Results — Per Location</div>
+                    {activeLocations.map(loc => (
+                      <div key={loc} style={{ border: '1px solid #cbd5e1', borderRadius: '10px', padding: '1rem 1.25rem', marginBottom: '1.25rem', background: '#f8fafc' }}>
+                        <div style={{ fontWeight: 700, fontSize: '13px', color: '#0f172a', marginBottom: '0.75rem', paddingBottom: '0.5rem', borderBottom: '1px solid #e2e8f0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                          📍 {loc}
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+                          {TENSILE_FIELDS.map(f => {
+                            const errKey = `${loc}_${f.name}`;
+                            const hasErr = errors[errKey];
+                            const thHint = f.thMin && thresholds ? renderThreshold(thresholds[f.thMin], thresholds[f.thMax]) : '';
+                            return (
+                              <div className="form-group" key={f.name} style={{ marginBottom: 0 }}>
+                                <label className="form-label" style={{ fontSize: '12px' }}>
+                                  {f.label}
+                                  {thHint && <span style={{ color: hasErr ? '#ef4444' : 'var(--color-text-secondary)', fontWeight: 400, marginLeft: '4px' }}>{thHint}</span>}
+                                </label>
+                                <input type={f.type} step={f.step} name={`${loc}_${f.name}`} value={formData[`${loc}_${f.name}`] || ''} onChange={handleChange} className="form-control" placeholder={f.placeholder} style={hasErr ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
+                                {hasErr && <div style={{ color: '#ef4444', fontSize: '10px', marginTop: '2px', fontWeight: '600' }}>Value out of range!</div>}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="form-section">
+                    <div className="form-section-title">Test Results</div>
+                    <div className="form-row form-row-3">
+                      <div className="form-group">
+                        <label className="form-label">Max Load <span style={{color:'var(--color-text-secondary)', fontWeight:400}}>(KN)</span></label>
+                        <input type="number" step="0.1" name="maxLoadKn" value={formData.maxLoadKn} onChange={handleChange} className="form-control" placeholder="e.g. 10.5" />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Yield Load <span style={{color:'var(--color-text-secondary)', fontWeight:400}}>(KN)</span></label>
+                        <input type="number" step="0.1" name="yieldLoadKn" value={formData.yieldLoadKn} onChange={handleChange} className="form-control" placeholder="e.g. 7.2" />
+                      </div>
                     </div>
-                    <div className="form-group">
-                      <label className="form-label">Yield Load <span style={{color:'var(--color-text-secondary)', fontWeight:400}}>(KN)</span></label>
-                      <input type="number" step="0.1" name="yieldLoadKn" value={formData.yieldLoadKn} onChange={handleChange} className="form-control" placeholder="e.g. 7.2" />
+                    <div className="form-row form-row-3">
+                      <div className="form-group">
+                        <label className="form-label">Tensile Strength / UTS <span style={{color: errors.tensileStrength ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.tensileMinStrength, thresholds.tensileMaxStrength) : '(500 Min)'}</span></label>
+                        <input type="number" step="0.1" name="tensileStrength" value={formData.tensileStrength} onChange={handleChange} className="form-control" style={errors.tensileStrength ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 540" />
+                        {errors.tensileStrength && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Yield Strength @0.2% <span style={{color: errors.yieldStrength02 ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.tensileMinYield, thresholds.tensileMaxYield) : '(320 Min)'}</span></label>
+                        <input type="number" step="0.1" name="yieldStrength02" value={formData.yieldStrength02} onChange={handleChange} className="form-control" style={errors.yieldStrength02 ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 350" />
+                        {errors.yieldStrength02 && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Yield Strength @0.5% <span style={{color: errors.yieldStrength05 ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.tensileMinYield05, thresholds.tensileMaxYield05) : ''}</span></label>
+                        <input type="number" step="0.1" name="yieldStrength05" value={formData.yieldStrength05} onChange={handleChange} className="form-control" style={errors.yieldStrength05 ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 300" />
+                        {errors.yieldStrength05 && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Elongation % <span style={{color: errors.elongationPercent ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.tensileMinElongation, thresholds.tensileMaxElongation) : '(10 Min)'}</span></label>
+                        <input type="number" step="0.1" name="elongationPercent" value={formData.elongationPercent} onChange={handleChange} className="form-control" style={errors.elongationPercent ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 14" />
+                        {errors.elongationPercent && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
+                      </div>
                     </div>
                   </div>
-                  <div className="form-row form-row-3">
-                    <div className="form-group">
-                      <label className="form-label">Tensile Strength / UTS <span style={{color: errors.tensileStrength ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.tensileMinStrength, thresholds.tensileMaxStrength) : '(500 Min)'}</span></label>
-                      <input type="number" step="0.1" name="tensileStrength" value={formData.tensileStrength} onChange={handleChange} className="form-control" style={errors.tensileStrength ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 540" />
-                      {errors.tensileStrength && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label">Yield Strength @0.2% <span style={{color: errors.yieldStrength02 ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.tensileMinYield, thresholds.tensileMaxYield) : '(320 Min)'}</span></label>
-                      <input type="number" step="0.1" name="yieldStrength02" value={formData.yieldStrength02} onChange={handleChange} className="form-control" style={errors.yieldStrength02 ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 350" />
-                      {errors.yieldStrength02 && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label">Elongation % <span style={{color: errors.elongationPercent ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.tensileMinElongation, thresholds.tensileMaxElongation) : '(10 Min)'}</span></label>
-                      <input type="number" step="0.1" name="elongationPercent" value={formData.elongationPercent} onChange={handleChange} className="form-control" style={errors.elongationPercent ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 14" />
-                      {errors.elongationPercent && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
-                    </div>
-                  </div>
-                </div>
+                )}
 
                 <div className="form-section">
                   <div className="form-section-title">Approval</div>
@@ -293,7 +381,7 @@ const MicroTensile = () => {
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="20 6 9 17 4 12" />
                       </svg>
-                      {Object.keys(errors).length > 0 ? 'Fix Errors to Save' : 'Save Record'}
+                      {Object.keys(errors).length > 0 ? 'Fix Errors to Save' : activeLocations.length > 1 ? `Save ${activeLocations.length} Location Records` : 'Save Record'}
                     </button>
 
                     {formData.id && user?.role?.toUpperCase()?.includes('HOF') && (formData.status || 'QC_ENTRY') === 'QC_ENTRY' && (
@@ -427,7 +515,7 @@ const MicroTensile = () => {
           </div>
         </div>
       </div>
-       <ConfirmModal 
+       <ConfirmModal
          isOpen={rejectModal.isOpen}
          onClose={() => setRejectModal({ isOpen: false, record: null })}
          onConfirm={handleReject}

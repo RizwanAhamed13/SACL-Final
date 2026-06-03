@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../api/axios';
 import { toast } from 'react-hot-toast';
 import { PartNameSelect } from '../components/PartNameSelect';
 import { useAuth } from '../context/AuthContext';
 import ConfirmModal from '../components/ConfirmModal';
 import Skeleton from '../components/Skeleton';
+
+const IMPACT_FIELDS = [
+  { name: 'observedValue1', label: 'Observed Value 1 (J)', placeholder: 'e.g. 14.5' },
+  { name: 'observedValue2', label: 'Observed Value 2 (J)', placeholder: 'e.g. 13.8' },
+  { name: 'observedValue3', label: 'Observed Value 3 (J)', placeholder: 'e.g. 15.2' },
+];
 
 const ImpactTest = () => {
   const { user } = useAuth();
@@ -16,7 +22,7 @@ const ImpactTest = () => {
   const [formData, setFormData] = useState({
     id: null,
     dateOfInspection: new Date().toISOString().split('T')[0], partName: '', dateCode: '',
-    specification: '', testType: '',
+    specification: '', testType: '', mechLocation: '',
     observedValue1: '', observedValue2: '', observedValue3: '',
     remarks: '',
     status: 'QC_ENTRY', hofApprovedBy: '', hodApprovedBy: '', createdBy: ''
@@ -27,11 +33,15 @@ const ImpactTest = () => {
   const [thresholds, setThresholds] = useState(null);
   const [errors, setErrors] = useState({});
 
+  const activeLocations = !formData.id && thresholds?.mechLocations
+    ? thresholds.mechLocations.split(',').filter(Boolean)
+    : [];
+
   const fetchRecords = async () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
       const res = await axios.get('/api/impact-test');
-      setRecords(res.data);
+      setRecords(res.data.content ?? res.data);
     } catch (err) {
       console.warn("Could not fetch records", err);
     } finally {
@@ -43,21 +53,6 @@ const ImpactTest = () => {
     fetchRecords();
   }, []);
 
-  const fetchThresholds = async (partName, currentData = formData) => {
-    if (!partName) {
-      setThresholds(null);
-      setErrors({});
-      return;
-    }
-    try {
-      const res = await axios.get(`/api/part-names/name/${encodeURIComponent(partName)}`);
-      setThresholds(res.data);
-      if (res.data) validateAll(currentData, res.data);
-    } catch (err) {
-      console.error("Failed to fetch thresholds", err);
-    }
-  };
-
   const isOutOfRange = (val, min, max) => {
     if (val === undefined || val === null || val === '') return false;
     const num = parseFloat(val);
@@ -67,15 +62,41 @@ const ImpactTest = () => {
     return false;
   };
 
-  const validateAll = (data, ts) => {
+  const validateAll = (data, ts, locs) => {
     const newErrors = {};
     if (!ts) return;
     const minSpec = ts.impactMinSpec;
     const maxSpec = ts.impactMaxSpec;
-    if (isOutOfRange(data.observedValue1, minSpec, maxSpec)) newErrors.observedValue1 = true;
-    if (isOutOfRange(data.observedValue2, minSpec, maxSpec)) newErrors.observedValue2 = true;
-    if (isOutOfRange(data.observedValue3, minSpec, maxSpec)) newErrors.observedValue3 = true;
+    if (!data.id && locs && locs.length > 0) {
+      locs.forEach(loc => {
+        IMPACT_FIELDS.forEach(f => {
+          if (isOutOfRange(data[`${loc}_${f.name}`], minSpec, maxSpec)) newErrors[`${loc}_${f.name}`] = true;
+        });
+      });
+    } else {
+      if (isOutOfRange(data.observedValue1, minSpec, maxSpec)) newErrors.observedValue1 = true;
+      if (isOutOfRange(data.observedValue2, minSpec, maxSpec)) newErrors.observedValue2 = true;
+      if (isOutOfRange(data.observedValue3, minSpec, maxSpec)) newErrors.observedValue3 = true;
+    }
     setErrors(newErrors);
+  };
+
+  const fetchThresholds = async (partName, currentData = formData) => {
+    if (!partName) {
+      setThresholds(null);
+      setErrors({});
+      return;
+    }
+    try {
+      const res = await axios.get(`/api/part-names/name/${encodeURIComponent(partName)}`);
+      setThresholds(res.data);
+      if (res.data) {
+        const locs = res.data.mechLocations ? res.data.mechLocations.split(',').filter(Boolean) : [];
+        validateAll(currentData, res.data, locs);
+      }
+    } catch (err) {
+      console.error("Failed to fetch thresholds", err);
+    }
   };
 
   const openEdit = (record) => {
@@ -124,7 +145,7 @@ const ImpactTest = () => {
     const { name, value } = e.target;
     const nextData = { ...formData, [name]: value };
     setFormData(nextData);
-    if (thresholds) validateAll(nextData, thresholds);
+    if (thresholds) validateAll(nextData, thresholds, activeLocations);
   };
 
   const handlePartNameChange = (val) => {
@@ -142,15 +163,38 @@ const ImpactTest = () => {
       if (formData.id) {
         await axios.put(`/api/impact-test/${formData.id}`, formData);
         toast.success('Updated successfully');
+      } else if (activeLocations.length > 0) {
+        const base = {
+          dateOfInspection: formData.dateOfInspection,
+          partName: formData.partName,
+          dateCode: formData.dateCode,
+          specification: formData.specification,
+          testType: formData.testType,
+          remarks: formData.remarks,
+          createdBy: user.fullName || user.username
+        };
+        await Promise.all(activeLocations.map(loc =>
+          axios.post('/api/impact-test', {
+            ...base,
+            mechLocation: loc,
+            observedValue1: formData[`${loc}_observedValue1`] || null,
+            observedValue2: formData[`${loc}_observedValue2`] || null,
+            observedValue3: formData[`${loc}_observedValue3`] || null,
+          })
+        ));
+        toast.success(`${activeLocations.length} location records saved`);
       } else {
         await axios.post('/api/impact-test', { ...formData, createdBy: user.fullName || user.username });
         toast.success('Added successfully');
       }
       setShowForm(false);
       setFormData({
-        dateOfInspection: '', partName: '', dateCode: '', heatCode: '',
+        id: null,
+        dateOfInspection: new Date().toISOString().split('T')[0], partName: '', dateCode: '',
+        specification: '', testType: '', mechLocation: '',
         observedValue1: '', observedValue2: '', observedValue3: '',
-        status: 'QC_ENTRY', hofApprovedBy: '', hodApprovedBy: ''
+        remarks: '',
+        status: 'QC_ENTRY', hofApprovedBy: '', hodApprovedBy: '', createdBy: ''
       });
       setErrors({});
       fetchRecords();
@@ -163,7 +207,7 @@ const ImpactTest = () => {
     if (min !== null && min !== undefined && max !== null && max !== undefined && min !== '' && max !== '') return `(${min}–${max})`;
     if (max !== null && max !== undefined && max !== '') return `(Max ${max})`;
     if (min !== null && min !== undefined && min !== '') return `(${min} Min)`;
-    return '(—)';
+    return '';
   };
 
   const dash = (val) => val || '—';
@@ -197,7 +241,7 @@ const ImpactTest = () => {
         <div className="form-panel" style={{ display: 'block' }}>
           <div className="card mb-3">
             <div className="card-header">
-              <h2 className="card-title">Add Impact Test Report</h2>
+              <h2 className="card-title">{formData.id ? 'Edit Impact Test Report' : 'Add Impact Test Report'}</h2>
               <button className="btn btn-secondary btn-sm" onClick={() => setShowForm(false)}>Cancel</button>
             </div>
             <div className="card-body">
@@ -229,29 +273,73 @@ const ImpactTest = () => {
                         <option>-20°C U notch</option>
                       </select>
                     </div>
+                    {formData.id && (
+                      <div className="form-group">
+                        <label className="form-label">Location</label>
+                        <input type="text" value={formData.mechLocation || '—'} readOnly className="form-control" style={{ background: '#f8fafc', color: '#64748b' }} />
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                <div className="form-section">
-                  <div className="form-section-title">Test Results (Joules)</div>
-                  <div className="form-row form-row-3">
-                    <div className="form-group">
-                      <label className="form-label">Observed Value 1 <span style={{color: errors.observedValue1 ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.impactMinSpec, thresholds.impactMaxSpec) : '(12 Min)'}</span></label>
-                      <input type="number" step="0.1" name="observedValue1" value={formData.observedValue1} onChange={handleChange} className="form-control" style={errors.observedValue1 ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 14.5" />
-                      {errors.observedValue1 && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label">Observed Value 2 <span style={{color: errors.observedValue2 ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.impactMinSpec, thresholds.impactMaxSpec) : '(12 Min)'}</span></label>
-                      <input type="number" step="0.1" name="observedValue2" value={formData.observedValue2} onChange={handleChange} className="form-control" style={errors.observedValue2 ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 13.8" />
-                      {errors.observedValue2 && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label">Observed Value 3 <span style={{color: errors.observedValue3 ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.impactMinSpec, thresholds.impactMaxSpec) : '(12 Min)'}</span></label>
-                      <input type="number" step="0.1" name="observedValue3" value={formData.observedValue3} onChange={handleChange} className="form-control" style={errors.observedValue3 ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 15.2" />
-                      {errors.observedValue3 && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
+                {activeLocations.length > 0 ? (
+                  <div className="form-section">
+                    <div className="form-section-title">Test Results — Per Location</div>
+                    {activeLocations.map(loc => (
+                      <div key={loc} style={{ border: '1px solid #cbd5e1', borderRadius: '10px', padding: '1rem 1.25rem', marginBottom: '1.25rem', background: '#f8fafc' }}>
+                        <div style={{ fontWeight: 700, fontSize: '13px', color: '#0f172a', marginBottom: '0.75rem', paddingBottom: '0.5rem', borderBottom: '1px solid #e2e8f0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                          📍 {loc}
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+                          {IMPACT_FIELDS.map(f => {
+                            const errKey = `${loc}_${f.name}`;
+                            const hasErr = errors[errKey];
+                            const thHint = thresholds ? renderThreshold(thresholds.impactMinSpec, thresholds.impactMaxSpec) : '';
+                            return (
+                              <div className="form-group" key={f.name} style={{ marginBottom: 0 }}>
+                                <label className="form-label" style={{ fontSize: '12px' }}>
+                                  {f.label}
+                                  {thHint && <span style={{ color: hasErr ? '#ef4444' : 'var(--color-text-secondary)', fontWeight: 400, marginLeft: '4px' }}>{thHint}</span>}
+                                </label>
+                                <input
+                                  type="number" step="0.1"
+                                  name={`${loc}_${f.name}`}
+                                  value={formData[`${loc}_${f.name}`] || ''}
+                                  onChange={handleChange}
+                                  className="form-control"
+                                  placeholder={f.placeholder}
+                                  style={hasErr ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}}
+                                />
+                                {hasErr && <div style={{ color: '#ef4444', fontSize: '10px', marginTop: '2px', fontWeight: '600' }}>Value out of range!</div>}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="form-section">
+                    <div className="form-section-title">Test Results (Joules)</div>
+                    <div className="form-row form-row-3">
+                      <div className="form-group">
+                        <label className="form-label">Observed Value 1 <span style={{color: errors.observedValue1 ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.impactMinSpec, thresholds.impactMaxSpec) : '(12 Min)'}</span></label>
+                        <input type="number" step="0.1" name="observedValue1" value={formData.observedValue1} onChange={handleChange} className="form-control" style={errors.observedValue1 ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 14.5" />
+                        {errors.observedValue1 && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Observed Value 2 <span style={{color: errors.observedValue2 ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.impactMinSpec, thresholds.impactMaxSpec) : '(12 Min)'}</span></label>
+                        <input type="number" step="0.1" name="observedValue2" value={formData.observedValue2} onChange={handleChange} className="form-control" style={errors.observedValue2 ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 13.8" />
+                        {errors.observedValue2 && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Observed Value 3 <span style={{color: errors.observedValue3 ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.impactMinSpec, thresholds.impactMaxSpec) : '(12 Min)'}</span></label>
+                        <input type="number" step="0.1" name="observedValue3" value={formData.observedValue3} onChange={handleChange} className="form-control" style={errors.observedValue3 ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 15.2" />
+                        {errors.observedValue3 && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
 
                 <div className="form-section">
                   <div className="form-section-title">Approval</div>
@@ -278,7 +366,7 @@ const ImpactTest = () => {
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="20 6 9 17 4 12" />
                       </svg>
-                      {Object.keys(errors).length > 0 ? 'Fix Errors to Save' : 'Save Record'}
+                      {Object.keys(errors).length > 0 ? 'Fix Errors to Save' : activeLocations.length > 1 ? `Save ${activeLocations.length} Location Records` : 'Save Record'}
                     </button>
 
                     {formData.id && user?.role?.toUpperCase()?.includes('HOF') && (formData.status || 'QC_ENTRY') === 'QC_ENTRY' && (
@@ -412,7 +500,7 @@ const ImpactTest = () => {
           </div>
         </div>
       </div>
-       <ConfirmModal 
+       <ConfirmModal
          isOpen={rejectModal.isOpen}
          onClose={() => setRejectModal({ isOpen: false, record: null })}
          onConfirm={handleReject}

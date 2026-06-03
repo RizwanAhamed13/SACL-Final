@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../api/axios';
 import { toast } from 'react-hot-toast';
 import { PartNameSelect } from '../components/PartNameSelect';
 import { useAuth } from '../context/AuthContext';
@@ -34,7 +34,7 @@ const QcRegister = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
       const res = await axios.get('/api/qc-register');
-      setRecords(res.data);
+      setRecords(res.data.content ?? res.data);
     } catch (err) {
       console.warn("Could not fetch records", err);
     } finally {
@@ -85,6 +85,12 @@ const QcRegister = () => {
     if (isOutOfRange(data.compositionCu, ts.qcMinCu, ts.qcMaxCu)) newErrors.compositionCu = true;
     if (isOutOfRange(data.compositionCr, ts.qcMinCr, ts.qcMaxCr)) newErrors.compositionCr = true;
     if (isOutOfRange(data.compositionSn, ts.qcMinSn, ts.qcMaxSn)) newErrors.compositionSn = true;
+
+    // Process Parameter Validation
+    if (isOutOfRange(data.pouringTemp, ts.ppMinPouringTemp, ts.ppMaxPouringTemp)) newErrors.pouringTemp = true;
+    if (isOutOfRange(data.mgKgs, ts.ppMinMgKgs, ts.ppMaxMgKgs)) newErrors.mgKgs = true;
+    if (isOutOfRange(data.streamInnoculant, ts.ppMinStreamInnoculant, ts.ppMaxStreamInnoculant)) newErrors.streamInnoculant = true;
+    if (isOutOfRange(data.pTimeSec, ts.ppMinPTimeSec, ts.ppMaxPTimeSec)) newErrors.pTimeSec = true;
 
     // Corrective Addition Validation (Kgs)
     if (isOutOfRange(data.correctiveC, ts.corrMinC, ts.corrMaxC)) newErrors.correctiveC = true;
@@ -323,7 +329,11 @@ const QcRegister = () => {
                   <div className="form-section-title">Process Parameters</div>
                   <div className="form-row form-row-4">
                     <div className="form-group"><label className="form-label">Time of Pouring</label><input type="time" name="timeOfPouring" value={formData.timeOfPouring} onChange={handleChange} className="form-control" /></div>
-                    <div className="form-group"><label className="form-label">Pouring Temp °C</label><input type="number" name="pouringTemp" value={formData.pouringTemp} onChange={handleChange} className="form-control" placeholder="1400" /></div>
+                    <div className="form-group">
+                      <label className="form-label">Pouring Temp °C <span style={{color: errors.pouringTemp ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds && (thresholds.ppMinPouringTemp || thresholds.ppMaxPouringTemp) ? renderThreshold(thresholds.ppMinPouringTemp, thresholds.ppMaxPouringTemp) : ''}</span></label>
+                      <input type="number" name="pouringTemp" value={formData.pouringTemp} onChange={handleChange} className="form-control" placeholder="1400" style={errors.pouringTemp ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
+                      {errors.pouringTemp && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
+                    </div>
                     <div className="form-group"><label className="form-label">PP Code</label><input type="text" name="ppCode" value={formData.ppCode} onChange={handleChange} className="form-control" placeholder="e.g. A1" /></div>
                     <div className="form-group"><label className="form-label">Treatment No</label><input type="text" name="treatmentNo" value={formData.treatmentNo} onChange={handleChange} className="form-control" placeholder="e.g. 12" /></div>
                   </div>
@@ -334,13 +344,25 @@ const QcRegister = () => {
                     <div className="form-group"><label className="form-label">Tapping Wt (Kgs)</label><input type="number" name="tappingWtKgs" value={formData.tappingWtKgs} onChange={handleChange} className="form-control" /></div>
                   </div>
                   <div className="form-row form-row-4">
-                    <div className="form-group"><label className="form-label">Mg (Kgs)</label><input type="number" step="0.01" name="mgKgs" value={formData.mgKgs} onChange={handleChange} className="form-control" /></div>
+                    <div className="form-group">
+                      <label className="form-label">Mg (Kgs) <span style={{color: errors.mgKgs ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds && (thresholds.ppMinMgKgs || thresholds.ppMaxMgKgs) ? renderThreshold(thresholds.ppMinMgKgs, thresholds.ppMaxMgKgs) : ''}</span></label>
+                      <input type="number" step="0.01" name="mgKgs" value={formData.mgKgs} onChange={handleChange} className="form-control" style={errors.mgKgs ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
+                      {errors.mgKgs && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
+                    </div>
                     <div className="form-group"><label className="form-label">Res Mg Convertor %</label><input type="number" step="0.001" name="resMgConvertorPercent" value={formData.resMgConvertorPercent} onChange={handleChange} className="form-control" /></div>
                     <div className="form-group"><label className="form-label">Rec of Mg %</label><input type="number" step="0.01" name="recMgPercent" value={formData.recMgPercent} onChange={handleChange} className="form-control" /></div>
-                    <div className="form-group"><label className="form-label">Stream Inoculant (gms/Sec)</label><input type="text" name="streamInnoculant" value={formData.streamInnoculant} onChange={handleChange} className="form-control" /></div>
+                    <div className="form-group">
+                      <label className="form-label">Stream Inoculant (gms/Sec) <span style={{color: errors.streamInnoculant ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds && (thresholds.ppMinStreamInnoculant || thresholds.ppMaxStreamInnoculant) ? renderThreshold(thresholds.ppMinStreamInnoculant, thresholds.ppMaxStreamInnoculant) : ''}</span></label>
+                      <input type="text" name="streamInnoculant" value={formData.streamInnoculant} onChange={handleChange} className="form-control" style={errors.streamInnoculant ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
+                      {errors.streamInnoculant && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
+                    </div>
                   </div>
                   <div className="form-row form-row-4">
-                    <div className="form-group"><label className="form-label">P.Time (sec)</label><input type="number" step="0.1" name="pTimeSec" value={formData.pTimeSec} onChange={handleChange} className="form-control" /></div>
+                    <div className="form-group">
+                      <label className="form-label">P.Time (sec) <span style={{color: errors.pTimeSec ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds && (thresholds.ppMinPTimeSec || thresholds.ppMaxPTimeSec) ? renderThreshold(thresholds.ppMinPTimeSec, thresholds.ppMaxPTimeSec) : ''}</span></label>
+                      <input type="number" step="0.1" name="pTimeSec" value={formData.pTimeSec} onChange={handleChange} className="form-control" style={errors.pTimeSec ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
+                      {errors.pTimeSec && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'606'}}>Value out of range!</div>}
+                    </div>
                   </div>
                 </div>
 

@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/reports")
@@ -31,34 +30,15 @@ public class ReportController {
             @RequestParam(required = false) String dateCode,
             @RequestParam(required = false) String heatCode) {
 
+        String pn = (partName != null && partName.isEmpty()) ? null : partName;
+        String dc = (dateCode != null && dateCode.isEmpty()) ? null : dateCode;
+        String hc = (heatCode != null && heatCode.isEmpty()) ? null : heatCode;
+
         Map<String, Object> results = new HashMap<>();
-
-        // Filter QC Register
-        results.put("qcRegister", qcRepo.findAll().stream()
-                .filter(r -> (partName == null || partName.isEmpty() || (r.getPartName() != null && r.getPartName().toLowerCase().contains(partName.toLowerCase()))) &&
-                             (dateCode == null || dateCode.isEmpty() || (r.getDateCode() != null && r.getDateCode().toLowerCase().contains(dateCode.toLowerCase()))) &&
-                             (heatCode == null || heatCode.isEmpty() || (r.getHeatCode() != null && r.getHeatCode().toLowerCase().contains(heatCode.toLowerCase()))))
-                .collect(Collectors.toList()));
-
-        // Filter Micro Structure
-        results.put("microStructure", microRepo.findAll().stream()
-                .filter(r -> (partName == null || partName.isEmpty() || (r.getPartName() != null && r.getPartName().toLowerCase().contains(partName.toLowerCase()))) &&
-                             (dateCode == null || dateCode.isEmpty() || (r.getDateCode() != null && r.getDateCode().toLowerCase().contains(dateCode.toLowerCase()))) &&
-                             (heatCode == null || heatCode.isEmpty() || (r.getHeatCode() != null && r.getHeatCode().toLowerCase().contains(heatCode.toLowerCase()))))
-                .collect(Collectors.toList()));
-
-        // Filter Micro Tensile
-        results.put("microTensile", tensileRepo.findAll().stream()
-                .filter(r -> (partName == null || partName.isEmpty() || (r.getItem() != null && r.getItem().toLowerCase().contains(partName.toLowerCase()))) &&
-                             (dateCode == null || dateCode.isEmpty() || (r.getDateCode() != null && r.getDateCode().toLowerCase().contains(dateCode.toLowerCase()))) &&
-                             (heatCode == null || heatCode.isEmpty() || (r.getHeatCode() != null && r.getHeatCode().toLowerCase().contains(heatCode.toLowerCase()))))
-                .collect(Collectors.toList()));
-
-        // Filter Impact Test (Impact test doesn't have heatCode usually, but we'll check)
-        results.put("impactTest", impactRepo.findAll().stream()
-                .filter(r -> (partName == null || partName.isEmpty() || (r.getPartName() != null && r.getPartName().toLowerCase().contains(partName.toLowerCase()))) &&
-                             (dateCode == null || dateCode.isEmpty() || (r.getDateCode() != null && r.getDateCode().toLowerCase().contains(dateCode.toLowerCase()))))
-                .collect(Collectors.toList()));
+        results.put("qcRegister", qcRepo.findByFilters(pn, dc, hc));
+        results.put("microStructure", microRepo.findByFilters(pn, dc, hc));
+        results.put("microTensile", tensileRepo.findByFilters(pn, dc, hc));
+        results.put("impactTest", impactRepo.findByFilters(pn, dc));
 
         return ResponseEntity.ok(results);
     }

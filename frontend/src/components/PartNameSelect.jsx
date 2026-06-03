@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
-import axios from 'axios';
+import axios from '../api/axios';
 
 export const PartNameSelect = ({ value, onChange, placeholder = "Select or type a part name..." }) => {
   const [options, setOptions] = useState([]);

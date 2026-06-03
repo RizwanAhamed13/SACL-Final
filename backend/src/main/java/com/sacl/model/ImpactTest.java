@@ -7,7 +7,10 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "impact_test")
+@Table(name = "impact_test", indexes = {
+        @Index(name = "idx_impact_part_name", columnList = "partName"),
+        @Index(name = "idx_impact_date_of_inspection", columnList = "dateOfInspection")
+})
 public class ImpactTest {
 
     @Id
@@ -24,15 +27,17 @@ public class ImpactTest {
     private Double observedValue3;
     private String testType;
 
-    @Column(columnDefinition = "TEXT")
+    @Lob @Column
     private String remarks;
 
     private String approvedBy;
-    
+
     private String hofApprovedBy;
     private String hodApprovedBy;
     private String createdBy;
-    private String status = "QC_ENTRY";
+
+    @Enumerated(EnumType.STRING)
+    private RecordStatus status = RecordStatus.QC_ENTRY;
 
     @Column(updatable = false)
     private LocalDateTime createdAt;

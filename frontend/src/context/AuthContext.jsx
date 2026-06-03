@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const AuthContext = createContext();
 
@@ -12,51 +12,50 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     const token = localStorage.getItem('token');
-    
+
     if (storedUser && token) {
       const userObj = JSON.parse(storedUser);
       setUser(userObj);
-      setupAxiosInterceptors(token);
+      scheduleExpiryWarning(token);
     }
     setLoading(false);
   }, []);
 
-  const setupAxiosInterceptors = (token) => {
-    axios.interceptors.request.use(
-      (config) => {
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-      },
-      (error) => Promise.reject(error)
-    );
+  const decodeJwtPayload = (token) => {
+    try {
+      const payload = token.split('.')[1];
+      return JSON.parse(atob(payload));
+    } catch {
+      return null;
+    }
+  };
 
-    axios.interceptors.response.use(
-      (response) => response,
-      (error) => {
-        // Only logout on 401 (token expired/invalid), NOT on 403 (insufficient permissions)
-        // A 403 means the user is authenticated but lacks access — don't kick them out
-        if (error.response?.status === 401) {
-          logout();
-        }
-        return Promise.reject(error);
-      }
-    );
+  const scheduleExpiryWarning = (token) => {
+    const payload = decodeJwtPayload(token);
+    if (!payload || !payload.exp) return;
+
+    const expiresAt = payload.exp * 1000;
+    const warnAt = expiresAt - 5 * 60 * 1000; // 5 minutes before expiry
+    const delay = warnAt - Date.now();
+
+    if (delay > 0) {
+      setTimeout(() => {
+        toast('Session expiring in 5 minutes — please save your work', { duration: 10000 });
+      }, delay);
+    }
   };
 
   const login = (userData, token) => {
     localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('token', token);
     setUser(userData);
-    setupAxiosInterceptors(token);
+    scheduleExpiryWarning(token);
   };
 
   const logout = () => {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
     setUser(null);
-    delete axios.defaults.headers.common['Authorization'];
     window.location.href = '/login';
   };
 

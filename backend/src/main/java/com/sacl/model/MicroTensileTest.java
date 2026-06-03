@@ -7,7 +7,10 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "micro_tensile_test")
+@Table(name = "micro_tensile_test", indexes = {
+        @Index(name = "idx_tensile_item", columnList = "item"),
+        @Index(name = "idx_tensile_date_of_inspection", columnList = "dateOfInspection")
+})
 public class MicroTensileTest {
 
     @Id
@@ -28,15 +31,17 @@ public class MicroTensileTest {
     private Double yieldStrength05;
     private Double elongationPercent;
 
-    @Column(columnDefinition = "TEXT")
+    @Lob @Column
     private String remarks;
 
     private String approvedBy;
-    
+
     private String hofApprovedBy;
     private String hodApprovedBy;
     private String createdBy;
-    private String status = "QC_ENTRY";
+
+    @Enumerated(EnumType.STRING)
+    private RecordStatus status = RecordStatus.QC_ENTRY;
 
     @Column(updatable = false)
     private LocalDateTime createdAt;

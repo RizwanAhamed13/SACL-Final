@@ -24,7 +24,7 @@ public class RejectedRecordService {
             rejected.setRejectedBy(rejectedBy);
             repository.save(rejected);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to archive rejected record", e);
+            throw new com.sacl.exception.BadRequestException("Failed to archive rejected record: " + e.getMessage());
         }
     }
 }

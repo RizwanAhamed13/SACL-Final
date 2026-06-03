@@ -1,11 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../api/axios';
 import { toast } from 'react-hot-toast';
 import { PartNameSelect } from '../components/PartNameSelect';
 import { useAuth } from '../context/AuthContext';
 import ConfirmModal from '../components/ConfirmModal';
 import Skeleton from '../components/Skeleton';
+
+const locKey = (loc) => loc.replace(/[^a-zA-Z0-9]/g, '_');
+
+const MICRO_FIELDS = [
+  { name: 'nodularityPercent', label: 'Nodularity/Graphite Type %', type: 'number', thMin: 'microMinNodularity', thMax: 'microMaxNodularity', placeholder: 'e.g. 90' },
+  { name: 'graphiteType', label: 'Graphite Type', type: 'text', placeholder: 'e.g. VI' },
+  { name: 'countNosPerMm2', label: 'Count (Nos/mm²)', type: 'number', thMin: 'microMinCount', thMax: 'microMaxCount', placeholder: 'e.g. 200' },
+  { name: 'size', label: 'Nodule Size', type: 'text', placeholder: 'e.g. 6' },
+  { name: 'ferritePercent', label: 'Ferrite %', type: 'number', thMin: 'microMinFerrite', thMax: 'microMaxFerrite', placeholder: 'e.g. 5' },
+  { name: 'pearlitePercent', label: 'Pearlite %', type: 'number', thMin: 'microMinPearlite', thMax: 'microMaxPearlite', placeholder: 'e.g. 95' },
+  { name: 'carbidePercent', label: 'Carbide %', type: 'number', thMin: 'microMinCarbide', thMax: 'microMaxCarbide', placeholder: 'e.g. 0.5' },
+];
 
 const MicroStructure = () => {
   const { user } = useAuth();
@@ -16,6 +28,7 @@ const MicroStructure = () => {
   const [formData, setFormData] = useState({
     id: null,
     inspectionDate: new Date().toISOString().split('T')[0], partName: '', disa: '', dateCode: '',
+    microLocation: '',
     nodularityPercent: '', graphiteType: '', countNosPerMm2: '', size: '',
     ferritePercent: '', pearlitePercent: '', carbidePercent: '',
     remarks: '',
@@ -27,11 +40,15 @@ const MicroStructure = () => {
   const [thresholds, setThresholds] = useState(null);
   const [errors, setErrors] = useState({});
 
+  const activeLocations = !formData.id && thresholds?.microLocations
+    ? thresholds.microLocations.split(',').filter(Boolean)
+    : [];
+
   const fetchRecords = async () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
       const res = await axios.get('/api/micro-structure');
-      setRecords(res.data);
+      setRecords(res.data.content ?? res.data);
     } catch (err) {
       console.warn("Could not fetch records", err);
     } finally {
@@ -43,21 +60,6 @@ const MicroStructure = () => {
     fetchRecords();
   }, []);
 
-  const fetchThresholds = async (partName, currentData = formData) => {
-    if (!partName) {
-      setThresholds(null);
-      setErrors({});
-      return;
-    }
-    try {
-      const res = await axios.get(`/api/part-names/name/${encodeURIComponent(partName)}`);
-      setThresholds(res.data);
-      if (res.data) validateAll(currentData, res.data);
-    } catch (err) {
-      console.error("Failed to fetch thresholds", err);
-    }
-  };
-
   const isOutOfRange = (val, min, max) => {
     if (val === undefined || val === null || val === '') return false;
     const num = parseFloat(val);
@@ -67,15 +69,47 @@ const MicroStructure = () => {
     return false;
   };
 
-  const validateAll = (data, ts) => {
+  const validateAll = (data, ts, locs) => {
     const newErrors = {};
     if (!ts) return;
-    if (isOutOfRange(data.nodularityPercent, ts.microMinNodularity, ts.microMaxNodularity)) newErrors.nodularityPercent = true;
-    if (isOutOfRange(data.countNosPerMm2, ts.microMinCount, ts.microMaxCount)) newErrors.countNosPerMm2 = true;
-    if (isOutOfRange(data.ferritePercent, ts.microMinFerrite, ts.microMaxFerrite)) newErrors.ferritePercent = true;
-    if (isOutOfRange(data.pearlitePercent, ts.microMinPearlite, ts.microMaxPearlite)) newErrors.pearlitePercent = true;
-    if (isOutOfRange(data.carbidePercent, ts.microMinCarbide, ts.microMaxCarbide)) newErrors.carbidePercent = true;
+    const fieldsToValidate = [
+      { key: 'nodularityPercent', min: ts.microMinNodularity, max: ts.microMaxNodularity },
+      { key: 'countNosPerMm2', min: ts.microMinCount, max: ts.microMaxCount },
+      { key: 'ferritePercent', min: ts.microMinFerrite, max: ts.microMaxFerrite },
+      { key: 'pearlitePercent', min: ts.microMinPearlite, max: ts.microMaxPearlite },
+      { key: 'carbidePercent', min: ts.microMinCarbide, max: ts.microMaxCarbide },
+    ];
+    if (!data.id && locs && locs.length > 0) {
+      locs.forEach(loc => {
+        const lk = locKey(loc);
+        fieldsToValidate.forEach(({ key, min, max }) => {
+          if (isOutOfRange(data[`${lk}_${key}`], min, max)) newErrors[`${lk}_${key}`] = true;
+        });
+      });
+    } else {
+      fieldsToValidate.forEach(({ key, min, max }) => {
+        if (isOutOfRange(data[key], min, max)) newErrors[key] = true;
+      });
+    }
     setErrors(newErrors);
+  };
+
+  const fetchThresholds = async (partName, currentData = formData) => {
+    if (!partName) {
+      setThresholds(null);
+      setErrors({});
+      return;
+    }
+    try {
+      const res = await axios.get(`/api/part-names/name/${encodeURIComponent(partName)}`);
+      setThresholds(res.data);
+      if (res.data) {
+        const locs = res.data.microLocations ? res.data.microLocations.split(',').filter(Boolean) : [];
+        validateAll(currentData, res.data, locs);
+      }
+    } catch (err) {
+      console.error("Failed to fetch thresholds", err);
+    }
   };
 
   const openEdit = (record) => {
@@ -124,7 +158,7 @@ const MicroStructure = () => {
     const { name, value } = e.target;
     const nextData = { ...formData, [name]: value };
     setFormData(nextData);
-    if (thresholds) validateAll(nextData, thresholds);
+    if (thresholds) validateAll(nextData, thresholds, activeLocations);
   };
 
   const handlePartNameChange = (val) => {
@@ -142,16 +176,42 @@ const MicroStructure = () => {
       if (formData.id) {
         await axios.put(`/api/micro-structure/${formData.id}`, formData);
         toast.success('Updated successfully');
+      } else if (activeLocations.length > 0) {
+        const base = {
+          inspectionDate: formData.inspectionDate,
+          partName: formData.partName,
+          dateCode: formData.dateCode,
+          remarks: formData.remarks,
+          createdBy: user.fullName || user.username,
+        };
+        await Promise.all(activeLocations.map(loc => {
+          const lk = locKey(loc);
+          return axios.post('/api/micro-structure', {
+            ...base,
+            microLocation: loc,
+            nodularityPercent: formData[`${lk}_nodularityPercent`] || null,
+            graphiteType: formData[`${lk}_graphiteType`] || null,
+            countNosPerMm2: formData[`${lk}_countNosPerMm2`] || null,
+            size: formData[`${lk}_size`] || null,
+            ferritePercent: formData[`${lk}_ferritePercent`] || null,
+            pearlitePercent: formData[`${lk}_pearlitePercent`] || null,
+            carbidePercent: formData[`${lk}_carbidePercent`] || null,
+          });
+        }));
+        toast.success(`${activeLocations.length} location records saved`);
       } else {
         await axios.post('/api/micro-structure', { ...formData, createdBy: user.fullName || user.username });
         toast.success('Added successfully');
       }
       setShowForm(false);
       setFormData({
-        inspectionDate: '', partName: '', heatCode: '',
-        nodularityPercent: '', countNosPerMm2: '', size: '',
+        id: null,
+        inspectionDate: new Date().toISOString().split('T')[0], partName: '', disa: '', dateCode: '',
+        microLocation: '',
+        nodularityPercent: '', graphiteType: '', countNosPerMm2: '', size: '',
         ferritePercent: '', pearlitePercent: '', carbidePercent: '',
-        status: 'QC_ENTRY', hofApprovedBy: '', hodApprovedBy: ''
+        remarks: '',
+        status: 'QC_ENTRY', hofApprovedBy: '', hodApprovedBy: '', createdBy: ''
       });
       setErrors({});
       fetchRecords();
@@ -164,7 +224,7 @@ const MicroStructure = () => {
     if (min !== null && min !== undefined && max !== null && max !== undefined && min !== '' && max !== '') return `(${min}–${max})`;
     if (max !== null && max !== undefined && max !== '') return `(Max ${max})`;
     if (min !== null && min !== undefined && min !== '') return `(${min} Min)`;
-    return '(—)';
+    return '';
   };
 
   const dash = (val) => val || '—';
@@ -198,7 +258,7 @@ const MicroStructure = () => {
         <div className="form-panel" style={{ display: 'block' }}>
           <div className="card mb-3">
             <div className="card-header">
-              <h2 className="card-title">Add Analysis Report</h2>
+              <h2 className="card-title">{formData.id ? 'Edit Analysis Report' : 'Add Analysis Report'}</h2>
               <button className="btn btn-secondary btn-sm" onClick={() => setShowForm(false)}>Cancel</button>
             </div>
             <div className="card-body">
@@ -216,52 +276,104 @@ const MicroStructure = () => {
                       <PartNameSelect value={formData.partName} onChange={handlePartNameChange} />
                     </div>
                     <div className="form-group">
-                      <label className="form-label">Heat Code / Date Code</label>
-                      <input type="text" name="heatCode" value={formData.heatCode} onChange={handleChange} className="form-control" placeholder="e.g. 5D03-45" />
+                      <label className="form-label">Date Code</label>
+                      <input type="text" name="dateCode" value={formData.dateCode} onChange={handleChange} className="form-control" placeholder="e.g. 5D03-45" />
                     </div>
+                    {formData.id && (
+                      <div className="form-group">
+                        <label className="form-label">Location</label>
+                        <input type="text" value={formData.microLocation || '—'} readOnly className="form-control" style={{ background: '#f8fafc', color: '#64748b' }} />
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                <div className="form-section">
-                  <div className="form-section-title">Nodule Analysis</div>
-                  <div className="form-row form-row-3">
-                    <div className="form-group">
-                      <label className="form-label">Nodularity % <span style={{color: errors.nodularityPercent ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.microMinNodularity, thresholds.microMaxNodularity) : '(85 Min)'}</span></label>
-                      <input type="number" name="nodularityPercent" value={formData.nodularityPercent} onChange={handleChange} className="form-control" style={errors.nodularityPercent ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 90" />
-                      {errors.nodularityPercent && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label">Count <span style={{color: errors.countNosPerMm2 ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>(Nos/mm²) {thresholds ? renderThreshold(thresholds.microMinCount, thresholds.microMaxCount) : '(150 Min)'}</span></label>
-                      <input type="number" name="countNosPerMm2" value={formData.countNosPerMm2} onChange={handleChange} className="form-control" style={errors.countNosPerMm2 ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 200" />
-                      {errors.countNosPerMm2 && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label">Size <span style={{color:'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? `(${thresholds.microSize || '—'})` : '(6-7)'}</span></label>
-                      <input type="text" name="size" value={formData.size} onChange={handleChange} className="form-control" placeholder="e.g. 6" />
-                    </div>
+                {activeLocations.length > 0 ? (
+                  <div className="form-section">
+                    <div className="form-section-title">Micro Analysis — Per Location</div>
+                    {activeLocations.map(loc => {
+                      const lk = locKey(loc);
+                      return (
+                        <div key={loc} style={{ border: '1px solid #cbd5e1', borderRadius: '10px', padding: '1rem 1.25rem', marginBottom: '1.25rem', background: '#f8fafc' }}>
+                          <div style={{ fontWeight: 700, fontSize: '13px', color: '#0f172a', marginBottom: '0.75rem', paddingBottom: '0.5rem', borderBottom: '1px solid #e2e8f0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                            📍 {loc}
+                          </div>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+                            {MICRO_FIELDS.map(f => {
+                              const errKey = `${lk}_${f.name}`;
+                              const hasErr = errors[errKey];
+                              const thHint = f.thMin && thresholds ? renderThreshold(thresholds[f.thMin], thresholds[f.thMax]) : '';
+                              return (
+                                <div className="form-group" key={f.name} style={{ marginBottom: 0 }}>
+                                  <label className="form-label" style={{ fontSize: '12px' }}>
+                                    {f.label}
+                                    {thHint && <span style={{ color: hasErr ? '#ef4444' : 'var(--color-text-secondary)', fontWeight: 400, marginLeft: '4px' }}>{thHint}</span>}
+                                  </label>
+                                  <input
+                                    type={f.type}
+                                    name={`${lk}_${f.name}`}
+                                    value={formData[`${lk}_${f.name}`] || ''}
+                                    onChange={handleChange}
+                                    className="form-control"
+                                    placeholder={f.placeholder}
+                                    style={hasErr ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}}
+                                  />
+                                  {hasErr && <div style={{ color: '#ef4444', fontSize: '10px', marginTop: '2px', fontWeight: '600' }}>Value out of range!</div>}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
-                </div>
-
-                <div className="form-section">
-                  <div className="form-section-title">Matrix Composition (%)</div>
-                  <div className="form-row form-row-3">
-                    <div className="form-group">
-                      <label className="form-label">Ferrite % <span style={{color: errors.ferritePercent ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.microMinFerrite, thresholds.microMaxFerrite) : '(Max 10)'}</span></label>
-                      <input type="number" name="ferritePercent" value={formData.ferritePercent} onChange={handleChange} className="form-control" style={errors.ferritePercent ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 5" />
-                      {errors.ferritePercent && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
+                ) : (
+                  <>
+                    <div className="form-section">
+                      <div className="form-section-title">Nodule Analysis</div>
+                      <div className="form-row form-row-3">
+                        <div className="form-group">
+                          <label className="form-label">Nodularity/Graphite Type % <span style={{color: errors.nodularityPercent ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.microMinNodularity, thresholds.microMaxNodularity) : '(85 Min)'}</span></label>
+                          <input type="number" name="nodularityPercent" value={formData.nodularityPercent} onChange={handleChange} className="form-control" style={errors.nodularityPercent ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 90" />
+                          {errors.nodularityPercent && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
+                        </div>
+                        <div className="form-group">
+                          <label className="form-label">Graphite Type</label>
+                          <input type="text" name="graphiteType" value={formData.graphiteType} onChange={handleChange} className="form-control" placeholder="e.g. VI" />
+                        </div>
+                        <div className="form-group">
+                          <label className="form-label">Count (Nos/mm²) <span style={{color: errors.countNosPerMm2 ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.microMinCount, thresholds.microMaxCount) : '(150 Min)'}</span></label>
+                          <input type="number" name="countNosPerMm2" value={formData.countNosPerMm2} onChange={handleChange} className="form-control" style={errors.countNosPerMm2 ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 200" />
+                          {errors.countNosPerMm2 && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
+                        </div>
+                        <div className="form-group">
+                          <label className="form-label">Size <span style={{color:'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? `(${thresholds.microSize || '—'})` : '(6-7)'}</span></label>
+                          <input type="text" name="size" value={formData.size} onChange={handleChange} className="form-control" placeholder="e.g. 6" />
+                        </div>
+                      </div>
                     </div>
-                    <div className="form-group">
-                      <label className="form-label">Pearlite % <span style={{color: errors.pearlitePercent ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.microMinPearlite, thresholds.microMaxPearlite) : '(90 Min)'}</span></label>
-                      <input type="number" name="pearlitePercent" value={formData.pearlitePercent} onChange={handleChange} className="form-control" style={errors.pearlitePercent ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 95" />
-                      {errors.pearlitePercent && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
+                    <div className="form-section">
+                      <div className="form-section-title">Matrix Composition (%)</div>
+                      <div className="form-row form-row-3">
+                        <div className="form-group">
+                          <label className="form-label">Ferrite % <span style={{color: errors.ferritePercent ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.microMinFerrite, thresholds.microMaxFerrite) : '(Max 10)'}</span></label>
+                          <input type="number" name="ferritePercent" value={formData.ferritePercent} onChange={handleChange} className="form-control" style={errors.ferritePercent ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 5" />
+                          {errors.ferritePercent && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
+                        </div>
+                        <div className="form-group">
+                          <label className="form-label">Pearlite % <span style={{color: errors.pearlitePercent ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.microMinPearlite, thresholds.microMaxPearlite) : '(90 Min)'}</span></label>
+                          <input type="number" name="pearlitePercent" value={formData.pearlitePercent} onChange={handleChange} className="form-control" style={errors.pearlitePercent ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 95" />
+                          {errors.pearlitePercent && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
+                        </div>
+                        <div className="form-group">
+                          <label className="form-label">Carbide % <span style={{color: errors.carbidePercent ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.microMinCarbide, thresholds.microMaxCarbide) : '(Max 1)'}</span></label>
+                          <input type="number" name="carbidePercent" value={formData.carbidePercent} onChange={handleChange} className="form-control" style={errors.carbidePercent ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 0.5" />
+                          {errors.carbidePercent && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
+                        </div>
+                      </div>
                     </div>
-                    <div className="form-group">
-                      <label className="form-label">Carbide % <span style={{color: errors.carbidePercent ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.microMinCarbide, thresholds.microMaxCarbide) : '(Max 1)'}</span></label>
-                      <input type="number" name="carbidePercent" value={formData.carbidePercent} onChange={handleChange} className="form-control" style={errors.carbidePercent ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 0.5" />
-                      {errors.carbidePercent && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
-                    </div>
-                  </div>
-                </div>
+                  </>
+                )}
 
                 <div className="form-section">
                   <div className="form-section-title">Approval</div>
@@ -288,7 +400,7 @@ const MicroStructure = () => {
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="20 6 9 17 4 12" />
                       </svg>
-                      {Object.keys(errors).length > 0 ? 'Fix Errors to Save' : 'Save Analysis'}
+                      {Object.keys(errors).length > 0 ? 'Fix Errors to Save' : activeLocations.length > 1 ? `Save ${activeLocations.length} Location Records` : 'Save Analysis'}
                     </button>
 
                     {formData.id && user?.role?.toUpperCase()?.includes('HOF') && (formData.status || 'QC_ENTRY') === 'QC_ENTRY' && (
@@ -422,7 +534,7 @@ const MicroStructure = () => {
           </div>
         </div>
       </div>
-       <ConfirmModal 
+       <ConfirmModal
          isOpen={rejectModal.isOpen}
          onClose={() => setRejectModal({ isOpen: false, record: null })}
          onConfirm={handleReject}
