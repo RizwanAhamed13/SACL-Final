@@ -124,7 +124,7 @@ const MicroTensile = () => {
       const payload = {
         ...record,
         status: nextStatus,
-        [approvalField]: user.fullName || user.username
+        [approvalField]: user.employeeId || user.fullName
       };
       await axios.put(`/api/micro-tensile/${record.id}`, payload);
       fetchRecords();
@@ -138,7 +138,7 @@ const MicroTensile = () => {
     const record = rejectModal.record;
     if (!record) return;
     try {
-      await axios.post(`/api/micro-tensile/reject/${record.id}?rejectedBy=${user.fullName || user.username}`);
+      await axios.post(`/api/micro-tensile/reject/${record.id}?rejectedBy=${user.employeeId || user.fullName}`);
       fetchRecords();
       setShowForm(false);
       setRejectModal({ isOpen: false, record: null });
@@ -171,30 +171,31 @@ const MicroTensile = () => {
         await axios.put(`/api/micro-tensile/${formData.id}`, formData);
         toast.success('Updated successfully');
       } else if (activeLocations.length > 0) {
-        const base = {
-          dateOfInspection: formData.dateOfInspection,
-          item: formData.item,
-          dateCode: formData.dateCode,
-          barDiaMm: formData.barDiaMm,
-          gaugeLengthMm: formData.gaugeLengthMm,
-          remarks: formData.remarks,
-          createdBy: user.fullName || user.username
-        };
-        await Promise.all(activeLocations.map(loc =>
-          axios.post('/api/micro-tensile', {
-            ...base,
-            mechLocation: loc,
+        const locationValues = {};
+        activeLocations.forEach(loc => {
+          locationValues[loc] = {
             maxLoadKn: formData[`${loc}_maxLoadKn`] || null,
             yieldLoadKn: formData[`${loc}_yieldLoadKn`] || null,
             tensileStrength: formData[`${loc}_tensileStrength`] || null,
             yieldStrength02: formData[`${loc}_yieldStrength02`] || null,
             yieldStrength05: formData[`${loc}_yieldStrength05`] || null,
             elongationPercent: formData[`${loc}_elongationPercent`] || null,
-          })
-        ));
-        toast.success(`${activeLocations.length} location records saved`);
+          };
+        });
+        await axios.post('/api/micro-tensile', {
+          dateOfInspection: formData.dateOfInspection,
+          item: formData.item,
+          dateCode: formData.dateCode,
+          barDiaMm: formData.barDiaMm,
+          gaugeLengthMm: formData.gaugeLengthMm,
+          remarks: formData.remarks,
+          createdBy: user.employeeId || user.fullName,
+          mechLocation: activeLocations.join(','),
+          locationValues: JSON.stringify(locationValues),
+        });
+        toast.success('1 record saved');
       } else {
-        await axios.post('/api/micro-tensile', { ...formData, createdBy: user.fullName || user.username });
+        await axios.post('/api/micro-tensile', { ...formData, createdBy: user.employeeId || user.fullName });
         toast.success('Added successfully');
       }
       setShowForm(false);
@@ -385,12 +386,12 @@ const MicroTensile = () => {
 
                 <div className="card-footer" style={{ margin: '0 -1.5rem -1.5rem', borderRadius: '0 0 var(--radius-xl) var(--radius-xl)' }}>
                   <div style={{ display: 'flex', gap: '1rem' }}>
-                    <button type="button" className="btn btn-secondary" onClick={() => setFormData(prev => ({ ...Object.keys(prev).reduce((acc, key) => ({ ...acc, [key]: '' }), {}), approvedBy: user?.fullName || user?.username || '' }))}>Clear</button>
+                    <button type="button" className="btn btn-secondary" onClick={() => setFormData(prev => ({ ...Object.keys(prev).reduce((acc, key) => ({ ...acc, [key]: '' }), {}), approvedBy: user?.employeeId || user?.fullName || '' }))}>Clear</button>
                     <button type="submit" className="btn btn-primary" disabled={Object.keys(errors).length > 0}>
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="20 6 9 17 4 12" />
                       </svg>
-                      {Object.keys(errors).length > 0 ? 'Fix Errors to Save' : activeLocations.length > 1 ? `Save ${activeLocations.length} Location Records` : 'Save Record'}
+                      {Object.keys(errors).length > 0 ? 'Fix Errors to Save' : 'Save Record'}
                     </button>
 
                     {formData.id && user?.role?.toUpperCase()?.includes('HOF') && (formData.status || 'QC_ENTRY') === 'QC_ENTRY' && (

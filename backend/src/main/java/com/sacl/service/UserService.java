@@ -37,6 +37,9 @@ public class UserService {
             log.warn("Username already exists: {}", user.getUsername());
             throw new DuplicateResourceException("Username already exists: " + user.getUsername());
         }
+        if (user.getEmployeeId() != null && !user.getEmployeeId().isBlank() && repo.existsByEmployeeId(user.getEmployeeId())) {
+            throw new DuplicateResourceException("Employee ID already exists: " + user.getEmployeeId());
+        }
         if (user.getPassword() != null && !user.getPassword().isBlank()) {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
@@ -52,6 +55,7 @@ public class UserService {
         existing.setEmail(updates.getEmail());
         existing.setRole(updates.getRole());
         existing.setFormPermissions(updates.getFormPermissions());
+        existing.setEmployeeId(updates.getEmployeeId());
         existing.setActive(updates.getActive() != null ? updates.getActive() : existing.getActive());
         if (updates.getPassword() != null && !updates.getPassword().isBlank()) {
             existing.setPassword(passwordEncoder.encode(updates.getPassword()));

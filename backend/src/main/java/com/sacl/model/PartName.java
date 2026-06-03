@@ -63,9 +63,20 @@ public class PartName {
     private Double tensileMinElongation;
     private Double tensileMaxElongation;
 
-    // Impact Thresholds
+    // Impact Thresholds (generic fallback)
     private Double impactMinSpec;
     private Double impactMaxSpec;
+
+    // Impact Notch Types config (comma-separated: "Unotch,Vnotch,Unnotch")
+    private String impactNotchTypes;
+
+    // Impact per-combination thresholds (location x notch type)
+    private Double impactMinTRAUnotch;  private Double impactMaxTRAUnotch;
+    private Double impactMinTRAVnotch;  private Double impactMaxTRAVnotch;
+    private Double impactMinTRAUnnotch; private Double impactMaxTRAUnnotch;
+    private Double impactMinSBAUnotch;  private Double impactMaxSBAUnotch;
+    private Double impactMinSBAVnotch;  private Double impactMaxSBAVnotch;
+    private Double impactMinSBAUnnotch; private Double impactMaxSBAUnnotch;
 
     // Process Parameter Thresholds
     private Double ppMinPouringTemp;

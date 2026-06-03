@@ -23,6 +23,11 @@ public class MicroStructureAnalysis {
     private String partName;
     private String dateCode;
     private String heatCode;
+    private String microLocation;
+
+    // JSON blob storing per-location values for multi-location records
+    @JdbcTypeCode(SqlTypes.LONG32VARCHAR) @Column
+    private String locationValues;
 
     // Micro Structure
     private Double nodularityPercent;

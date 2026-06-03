@@ -81,12 +81,22 @@ public class PartNameService {
 
         // Impact Thresholds
         existing.setImpactMinSpec(updates.getImpactMinSpec()); existing.setImpactMaxSpec(updates.getImpactMaxSpec());
+        existing.setImpactNotchTypes(updates.getImpactNotchTypes());
+        existing.setImpactMinTRAUnotch(updates.getImpactMinTRAUnotch()); existing.setImpactMaxTRAUnotch(updates.getImpactMaxTRAUnotch());
+        existing.setImpactMinTRAVnotch(updates.getImpactMinTRAVnotch()); existing.setImpactMaxTRAVnotch(updates.getImpactMaxTRAVnotch());
+        existing.setImpactMinTRAUnnotch(updates.getImpactMinTRAUnnotch()); existing.setImpactMaxTRAUnnotch(updates.getImpactMaxTRAUnnotch());
+        existing.setImpactMinSBAUnotch(updates.getImpactMinSBAUnotch()); existing.setImpactMaxSBAUnotch(updates.getImpactMaxSBAUnotch());
+        existing.setImpactMinSBAVnotch(updates.getImpactMinSBAVnotch()); existing.setImpactMaxSBAVnotch(updates.getImpactMaxSBAVnotch());
+        existing.setImpactMinSBAUnnotch(updates.getImpactMinSBAUnnotch()); existing.setImpactMaxSBAUnnotch(updates.getImpactMaxSBAUnnotch());
+        existing.setBarDiaMin(updates.getBarDiaMin()); existing.setBarDiaMax(updates.getBarDiaMax());
+        existing.setMicroSizeMin(updates.getMicroSizeMin()); existing.setMicroSizeMax(updates.getMicroSizeMax());
 
         // Process Parameter Thresholds
         existing.setPpMinPouringTemp(updates.getPpMinPouringTemp()); existing.setPpMaxPouringTemp(updates.getPpMaxPouringTemp());
         existing.setPpMinMgKgs(updates.getPpMinMgKgs()); existing.setPpMaxMgKgs(updates.getPpMaxMgKgs());
         existing.setPpMinStreamInnoculant(updates.getPpMinStreamInnoculant()); existing.setPpMaxStreamInnoculant(updates.getPpMaxStreamInnoculant());
         existing.setPpMinPTimeSec(updates.getPpMinPTimeSec()); existing.setPpMaxPTimeSec(updates.getPpMaxPTimeSec());
+        existing.setPpMinResMgConvertor(updates.getPpMinResMgConvertor()); existing.setPpMaxResMgConvertor(updates.getPpMaxResMgConvertor());
 
         // Corrective Addition Thresholds
         existing.setCorrMinC(updates.getCorrMinC()); existing.setCorrMaxC(updates.getCorrMaxC());

@@ -23,6 +23,11 @@ public class MicroTensileTest {
     private String item;
     private String dateCode;
     private String heatCode;
+    private String mechLocation;
+
+    // JSON blob storing per-location values for multi-location records
+    @JdbcTypeCode(SqlTypes.LONG32VARCHAR) @Column
+    private String locationValues;
 
     private Double barDiaMm;
     private Double gaugeLengthMm;

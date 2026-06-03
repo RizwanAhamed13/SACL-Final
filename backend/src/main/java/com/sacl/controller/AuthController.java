@@ -33,8 +33,12 @@ public class AuthController {
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         rateLimitService.checkRateLimit(request.getRemoteAddr());
 
+        // Resolve employeeId → username for Spring Security authentication
+        User userByEmpId = userRepository.findByEmployeeId(authRequest.getEmployeeId())
+                .orElseThrow(() -> new ResourceNotFoundException("Invalid employee ID or password"));
+
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
+                new UsernamePasswordAuthenticationToken(userByEmpId.getUsername(), authRequest.getPassword())
         );
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();

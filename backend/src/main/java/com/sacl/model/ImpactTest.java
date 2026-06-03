@@ -28,6 +28,12 @@ public class ImpactTest {
     private Double observedValue2;
     private Double observedValue3;
     private String testType;
+    private String notchType; // "Unotch", "Vnotch", "Unnotch"
+
+    // JSON blob storing per-location/notch observed values for multi-combo records
+    // Format: {"TRA":{"Unotch":{"v1":14.5,"v2":13.8,"v3":15.2}}, "SBA":{...}}
+    @JdbcTypeCode(SqlTypes.LONG32VARCHAR) @Column
+    private String locationValues;
 
     @JdbcTypeCode(SqlTypes.LONG32VARCHAR) @Column
     private String remarks;

@@ -156,7 +156,7 @@ const MicroStructure = () => {
       const payload = {
         ...record,
         status: nextStatus,
-        [approvalField]: user.fullName || user.username
+        [approvalField]: user.employeeId || user.fullName
       };
       await axios.put(`/api/micro-structure/${record.id}`, payload);
       fetchRecords();
@@ -170,7 +170,7 @@ const MicroStructure = () => {
     const record = rejectModal.record;
     if (!record) return;
     try {
-      await axios.post(`/api/micro-structure/reject/${record.id}?rejectedBy=${user.fullName || user.username}`);
+      await axios.post(`/api/micro-structure/reject/${record.id}?rejectedBy=${user.employeeId || user.fullName}`);
       fetchRecords();
       setShowForm(false);
       setRejectModal({ isOpen: false, record: null });
@@ -203,25 +203,14 @@ const MicroStructure = () => {
         await axios.put(`/api/micro-structure/${formData.id}`, formData);
         toast.success('Updated successfully');
       } else if (activeLocations.length > 0) {
-        const base = {
-          inspectionDate: formData.inspectionDate,
-          partName: formData.partName,
-          dateCode: formData.dateCode,
-          remarks: formData.remarks,
-          createdBy: user.fullName || user.username,
-        };
-        await Promise.all(activeLocations.map(loc => {
+        const locationValues = {};
+        activeLocations.forEach(loc => {
           const lk = locKey(loc);
-          return axios.post('/api/micro-structure', {
-            ...base,
-            microLocation: loc,
+          locationValues[loc] = {
             nodularityPercent: formData[`${lk}_nodularityPercent`] || null,
             graphiteType: formData[`${lk}_graphiteType`] || null,
             countNosPerMm2: formData[`${lk}_countNosPerMm2`] || null,
             size: formData[`${lk}_size`] || null,
-            ferritePercent: formData[`${lk}_ferritePercent`] || null,
-            pearlitePercent: formData[`${lk}_pearlitePercent`] || null,
-            carbidePercent: formData[`${lk}_carbidePercent`] || null,
             ferritePercentMin: formData[`${lk}_ferritePercentMin`] || null,
             ferritePercentMax: formData[`${lk}_ferritePercentMax`] || null,
             pearlitePercentMin: formData[`${lk}_pearlitePercentMin`] || null,
@@ -230,11 +219,20 @@ const MicroStructure = () => {
             carbidePercentMax: formData[`${lk}_carbidePercentMax`] || null,
             sizeMin: formData[`${lk}_sizeMin`] || null,
             sizeMax: formData[`${lk}_sizeMax`] || null,
-          });
-        }));
-        toast.success(`${activeLocations.length} location records saved`);
+          };
+        });
+        await axios.post('/api/micro-structure', {
+          inspectionDate: formData.inspectionDate,
+          partName: formData.partName,
+          dateCode: formData.dateCode,
+          remarks: formData.remarks,
+          createdBy: user.employeeId || user.fullName,
+          microLocation: activeLocations.join(','),
+          locationValues: JSON.stringify(locationValues),
+        });
+        toast.success('1 record saved');
       } else {
-        await axios.post('/api/micro-structure', { ...formData, createdBy: user.fullName || user.username });
+        await axios.post('/api/micro-structure', { ...formData, createdBy: user.employeeId || user.fullName });
         toast.success('Added successfully');
       }
       setShowForm(false);
@@ -405,13 +403,23 @@ const MicroStructure = () => {
                           {errors.countNosPerMm2 && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
                         </div>
                         <div className="form-group">
-                          <label className="form-label">Size <span style={{color:'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? `(${thresholds.microSize || '—'})` : '(6-7)'}</span></label>
-                          <input type="text" name="size" value={formData.size} onChange={handleChange} className="form-control" placeholder="e.g. 6" />
+                          <label className="form-label">Nodule Size
+                            <span style={{color:(errors.sizeMin||errors.sizeMax)?'#ef4444':'var(--color-text-secondary)',fontWeight:400,marginLeft:'4px'}}>
+                              {thresholds && (thresholds.microSizeMin || thresholds.microSizeMax) ? renderThreshold(thresholds.microSizeMin, thresholds.microSizeMax) : ''}
+                            </span>
+                          </label>
+                          <div style={{display:'flex',gap:'0.5rem',alignItems:'center'}}>
+                            <input type="number" step="0.1" name="sizeMin" value={formData.sizeMin} onChange={handleChange} className="form-control"
+                              style={errors.sizeMin?{borderColor:'#ef4444',backgroundColor:'#fef2f2',color:'#ef4444'}:{}} placeholder="Min" />
+                            <span style={{color:'#94a3b8',fontWeight:600}}>—</span>
+                            <input type="number" step="0.1" name="sizeMax" value={formData.sizeMax} onChange={handleChange} className="form-control"
+                              style={errors.sizeMax?{borderColor:'#ef4444',backgroundColor:'#fef2f2',color:'#ef4444'}:{}} placeholder="Max" />
+                          </div>
                         </div>
                       </div>
                     </div>
                     <div className="form-section">
-                      <div className="form-section-title">Matrix Composition (%)</div>
+                      <div className="form-section-title">Matrix</div>
                       <div className="form-row form-row-3">
                         <div className="form-group">
                           <label className="form-label">Ferrite %
@@ -458,20 +466,6 @@ const MicroStructure = () => {
                           </div>
                           {(errors.carbidePercentMin||errors.carbidePercentMax) && <div style={{color:'#ef4444',fontSize:'10px',marginTop:'2px',fontWeight:'600'}}>Value out of range!</div>}
                         </div>
-                        <div className="form-group">
-                          <label className="form-label">Nodule Size
-                            <span style={{color:(errors.sizeMin||errors.sizeMax)?'#ef4444':'var(--color-text-secondary)',fontWeight:400,marginLeft:'4px'}}>
-                              {thresholds && (thresholds.microSizeMin || thresholds.microSizeMax) ? renderThreshold(thresholds.microSizeMin, thresholds.microSizeMax) : ''}
-                            </span>
-                          </label>
-                          <div style={{display:'flex',gap:'0.5rem',alignItems:'center'}}>
-                            <input type="number" step="0.1" name="sizeMin" value={formData.sizeMin} onChange={handleChange} className="form-control"
-                              style={errors.sizeMin?{borderColor:'#ef4444',backgroundColor:'#fef2f2',color:'#ef4444'}:{}} placeholder="Min" />
-                            <span style={{color:'#94a3b8',fontWeight:600}}>—</span>
-                            <input type="number" step="0.1" name="sizeMax" value={formData.sizeMax} onChange={handleChange} className="form-control"
-                              style={errors.sizeMax?{borderColor:'#ef4444',backgroundColor:'#fef2f2',color:'#ef4444'}:{}} placeholder="Max" />
-                          </div>
-                        </div>
                       </div>
                     </div>
                   </>
@@ -497,12 +491,12 @@ const MicroStructure = () => {
 
                 <div className="card-footer" style={{ margin: '0 -1.5rem -1.5rem', borderRadius: '0 0 var(--radius-xl) var(--radius-xl)' }}>
                   <div style={{ display: 'flex', gap: '1rem' }}>
-                    <button type="button" className="btn btn-secondary" onClick={() => setFormData(prev => ({ ...Object.keys(prev).reduce((acc, key) => ({ ...acc, [key]: '' }), {}), approvedBy: user?.fullName || user?.username || '' }))}>Clear</button>
+                    <button type="button" className="btn btn-secondary" onClick={() => setFormData(prev => ({ ...Object.keys(prev).reduce((acc, key) => ({ ...acc, [key]: '' }), {}), approvedBy: user?.employeeId || user?.fullName || '' }))}>Clear</button>
                     <button type="submit" className="btn btn-primary" disabled={Object.keys(errors).length > 0}>
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="20 6 9 17 4 12" />
                       </svg>
-                      {Object.keys(errors).length > 0 ? 'Fix Errors to Save' : activeLocations.length > 1 ? `Save ${activeLocations.length} Location Records` : 'Save Analysis'}
+                      {Object.keys(errors).length > 0 ? 'Fix Errors to Save' : 'Save Analysis'}
                     </button>
 
                     {formData.id && user?.role?.toUpperCase()?.includes('HOF') && (formData.status || 'QC_ENTRY') === 'QC_ENTRY' && (

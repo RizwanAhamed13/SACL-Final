@@ -13,12 +13,19 @@ const IMPACT_FIELDS = [
   { name: 'observedValue3', label: 'Observed Value 3 (J)', placeholder: 'e.g. 15.2' },
 ];
 
+const NOTCH_LABEL = { Unnotch: 'Un-notch', Unotch: 'U-notch', Vnotch: 'V-notch' };
+const NOTCH_REVERSE = Object.entries(NOTCH_LABEL).reduce((acc, [k, v]) => ({ ...acc, [v]: k }), {});
+const normalizeNotch = (notch) => NOTCH_REVERSE[notch] || notch;
+const comboKey = (loc, notch, field) => `${loc}_${notch}_${field}`;
+const ALL_NOTCHES = Object.entries(NOTCH_LABEL).map(([k, v]) => ({ key: k, label: v }));
+
 const ImpactTest = () => {
   const { user } = useAuth();
   const isStaff = user?.role?.toUpperCase()?.includes('HOF') || user?.role?.toUpperCase()?.includes('HOD') || user?.role?.toUpperCase()?.includes('ADMIN');
 
   const [records, setRecords] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [selectedNotches, setSelectedNotches] = useState([]);
   const [formData, setFormData] = useState({
     id: null,
     dateOfInspection: new Date().toISOString().split('T')[0], partName: '', dateCode: '',
@@ -36,6 +43,8 @@ const ImpactTest = () => {
   const activeLocations = !formData.id && thresholds?.mechLocations
     ? thresholds.mechLocations.split(',').filter(Boolean)
     : [];
+  const activeNotches = !formData.id ? selectedNotches.map(k => NOTCH_LABEL[k]) : [];
+  const useCombos = activeLocations.length > 0 && activeNotches.length > 0;
 
   const fetchRecords = async () => {
     try {
@@ -65,18 +74,32 @@ const ImpactTest = () => {
     return false;
   };
 
-  const validateAll = (data, ts, locs) => {
+  const validateAll = (data, ts, locs, notches) => {
     const newErrors = {};
     if (!ts) return;
     const minSpec = ts.impactMinSpec;
     const maxSpec = ts.impactMaxSpec;
-    if (!data.id && locs && locs.length > 0) {
+    if (!data.id && locs && locs.length > 0 && notches && notches.length > 0) {
+      // Per (location x notch) — use combo-specific threshold
+      locs.forEach(loc => {
+        notches.forEach(notch => {
+          const cMin = ts[`impactMin${loc}${notch}`];
+          const cMax = ts[`impactMax${loc}${notch}`];
+          IMPACT_FIELDS.forEach(f => {
+            const key = comboKey(loc, notch, f.name);
+            if (isOutOfRange(data[key], cMin, cMax)) newErrors[key] = true;
+          });
+        });
+      });
+    } else if (!data.id && locs && locs.length > 0) {
+      // Per location only — fallback to generic impactMinSpec/Max
       locs.forEach(loc => {
         IMPACT_FIELDS.forEach(f => {
           if (isOutOfRange(data[`${loc}_${f.name}`], minSpec, maxSpec)) newErrors[`${loc}_${f.name}`] = true;
         });
       });
     } else {
+      // Single mode
       if (isOutOfRange(data.observedValue1, minSpec, maxSpec)) newErrors.observedValue1 = true;
       if (isOutOfRange(data.observedValue2, minSpec, maxSpec)) newErrors.observedValue2 = true;
       if (isOutOfRange(data.observedValue3, minSpec, maxSpec)) newErrors.observedValue3 = true;
@@ -87,6 +110,7 @@ const ImpactTest = () => {
   const fetchThresholds = async (partName, currentData = formData) => {
     if (!partName) {
       setThresholds(null);
+      setSelectedNotches([]);
       setErrors({});
       return;
     }
@@ -95,7 +119,9 @@ const ImpactTest = () => {
       setThresholds(res.data);
       if (res.data) {
         const locs = res.data.mechLocations ? res.data.mechLocations.split(',').filter(Boolean) : [];
-        validateAll(currentData, res.data, locs);
+        const notches = res.data.impactNotchTypes ? res.data.impactNotchTypes.split(',').filter(Boolean) : [];
+        setSelectedNotches(notches);
+        validateAll(currentData, res.data, locs, notches);
       }
     } catch (err) {
       console.error("Failed to fetch thresholds", err);
@@ -120,7 +146,7 @@ const ImpactTest = () => {
       const payload = {
         ...record,
         status: nextStatus,
-        [approvalField]: user.fullName || user.username
+        [approvalField]: user.employeeId || user.fullName
       };
       await axios.put(`/api/impact-test/${record.id}`, payload);
       fetchRecords();
@@ -134,7 +160,7 @@ const ImpactTest = () => {
     const record = rejectModal.record;
     if (!record) return;
     try {
-      await axios.post(`/api/impact-test/reject/${record.id}?rejectedBy=${user.fullName || user.username}`);
+      await axios.post(`/api/impact-test/reject/${record.id}?rejectedBy=${user.employeeId || user.fullName}`);
       fetchRecords();
       setShowForm(false);
       setRejectModal({ isOpen: false, record: null });
@@ -148,7 +174,7 @@ const ImpactTest = () => {
     const { name, value } = e.target;
     const nextData = { ...formData, [name]: value };
     setFormData(nextData);
-    if (thresholds) validateAll(nextData, thresholds, activeLocations);
+    if (thresholds) validateAll(nextData, thresholds, activeLocations, activeNotches);
   };
 
   const handlePartNameChange = (val) => {
@@ -166,31 +192,58 @@ const ImpactTest = () => {
       if (formData.id) {
         await axios.put(`/api/impact-test/${formData.id}`, formData);
         toast.success('Updated successfully');
+      } else if (useCombos) {
+        const locationValues = {};
+        activeLocations.forEach(loc => {
+          locationValues[loc] = {};
+          selectedNotches.forEach(notchKey => {
+            locationValues[loc][notchKey] = {
+              v1: formData[comboKey(loc, notchKey, 'observedValue1')] || null,
+              v2: formData[comboKey(loc, notchKey, 'observedValue2')] || null,
+              v3: formData[comboKey(loc, notchKey, 'observedValue3')] || null,
+            };
+          });
+        });
+        await axios.post('/api/impact-test', {
+          dateOfInspection: formData.dateOfInspection,
+          partName: formData.partName,
+          dateCode: formData.dateCode,
+          specification: formData.specification,
+          remarks: formData.remarks,
+          createdBy: user.employeeId || user.fullName,
+          mechLocation: activeLocations.join(','),
+          notchType: selectedNotches.join(','),
+          testType: selectedNotches.map(k => NOTCH_LABEL[k]).join(','),
+          locationValues: JSON.stringify(locationValues),
+        });
+        toast.success('1 record saved');
       } else if (activeLocations.length > 0) {
-        const base = {
+        const locationValues = {};
+        activeLocations.forEach(loc => {
+          locationValues[loc] = {
+            v1: formData[`${loc}_observedValue1`] || null,
+            v2: formData[`${loc}_observedValue2`] || null,
+            v3: formData[`${loc}_observedValue3`] || null,
+          };
+        });
+        await axios.post('/api/impact-test', {
           dateOfInspection: formData.dateOfInspection,
           partName: formData.partName,
           dateCode: formData.dateCode,
           specification: formData.specification,
           testType: formData.testType,
           remarks: formData.remarks,
-          createdBy: user.fullName || user.username
-        };
-        await Promise.all(activeLocations.map(loc =>
-          axios.post('/api/impact-test', {
-            ...base,
-            mechLocation: loc,
-            observedValue1: formData[`${loc}_observedValue1`] || null,
-            observedValue2: formData[`${loc}_observedValue2`] || null,
-            observedValue3: formData[`${loc}_observedValue3`] || null,
-          })
-        ));
-        toast.success(`${activeLocations.length} location records saved`);
+          createdBy: user.employeeId || user.fullName,
+          mechLocation: activeLocations.join(','),
+          locationValues: JSON.stringify(locationValues),
+        });
+        toast.success('1 record saved');
       } else {
-        await axios.post('/api/impact-test', { ...formData, createdBy: user.fullName || user.username });
+        await axios.post('/api/impact-test', { ...formData, createdBy: user.employeeId || user.fullName });
         toast.success('Added successfully');
       }
       setShowForm(false);
+      setSelectedNotches([]);
       setFormData({
         id: null,
         dateOfInspection: new Date().toISOString().split('T')[0], partName: '', dateCode: '',
@@ -265,27 +318,69 @@ const ImpactTest = () => {
                       <label className="form-label">Date Code</label>
                       <input type="text" name="dateCode" value={formData.dateCode} onChange={handleChange} className="form-control" placeholder="e.g. 5D03-45" />
                     </div>
-                    <div className="form-group">
-                      <label className="form-label">Test Type</label>
-                      <select name="testType" value={formData.testType} onChange={handleChange} className="form-control">
-                        <option value="">Select</option>
-                        <option>Unnotch – Rt</option>
-                        <option>-30°C U notch</option>
-                        <option>-40°C V notch</option>
-                        <option>Notch – Rt</option>
-                        <option>-20°C U notch</option>
-                      </select>
-                    </div>
                     {formData.id && (
-                      <div className="form-group">
-                        <label className="form-label">Location</label>
-                        <input type="text" value={formData.mechLocation || '—'} readOnly className="form-control" style={{ background: '#f8fafc', color: '#64748b' }} />
-                      </div>
+                      <>
+                        <div className="form-group">
+                          <label className="form-label">Location</label>
+                          <input type="text" value={formData.mechLocation || '—'} readOnly className="form-control" style={{ background: '#f8fafc', color: '#64748b' }} />
+                        </div>
+                        {formData.notchType && (
+                          <div className="form-group">
+                            <label className="form-label">Notch Type</label>
+                            <input type="text" value={NOTCH_LABEL[formData.notchType] || formData.notchType} readOnly className="form-control" style={{ background: '#f8fafc', color: '#64748b' }} />
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
+
+
                 </div>
 
-                {activeLocations.length > 0 ? (
+                {useCombos ? (
+                  <div className="form-section">
+                    <div className="form-section-title">Test Results — {activeLocations.length} Location{activeLocations.length > 1 ? 's' : ''} × {selectedNotches.length} Notch{selectedNotches.length > 1 ? 'es' : ''} = {activeLocations.length * selectedNotches.length} Block{activeLocations.length * selectedNotches.length > 1 ? 's' : ''}</div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
+                      {activeLocations.flatMap(loc => selectedNotches.map(notchKey => {
+                        const notchLabel = NOTCH_LABEL[notchKey];
+                        const cMin = thresholds?.[`impactMin${loc}${notchKey}`];
+                        const cMax = thresholds?.[`impactMax${loc}${notchKey}`];
+                        const thHint = renderThreshold(cMin, cMax);
+                        return (
+                          <div key={`${loc}_${notchKey}`} style={{ border: '1px solid #cbd5e1', borderRadius: '10px', padding: '1rem 1.25rem', background: '#f8fafc' }}>
+                            <div style={{ fontWeight: 700, fontSize: '13px', color: '#0f172a', marginBottom: '0.75rem', paddingBottom: '0.5rem', borderBottom: '1px solid #e2e8f0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                              📍 {loc} — {notchLabel}
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+                              {IMPACT_FIELDS.map(f => {
+                                const errKey = comboKey(loc, notchKey, f.name);
+                                const hasErr = errors[errKey];
+                                return (
+                                  <div className="form-group" key={f.name} style={{ marginBottom: 0 }}>
+                                    <label className="form-label" style={{ fontSize: '12px' }}>
+                                      {f.label}
+                                      {thHint && <span style={{ color: hasErr ? '#ef4444' : 'var(--color-text-secondary)', fontWeight: 400, marginLeft: '4px' }}>{thHint}</span>}
+                                    </label>
+                                    <input
+                                      type="number" step="0.1"
+                                      name={errKey}
+                                      value={formData[errKey] || ''}
+                                      onChange={handleChange}
+                                      className="form-control"
+                                      placeholder={f.placeholder}
+                                      style={hasErr ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}}
+                                    />
+                                    {hasErr && <div style={{ color: '#ef4444', fontSize: '10px', marginTop: '2px', fontWeight: '600' }}>Value out of range!</div>}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+                      }))}
+                    </div>
+                  </div>
+                ) : activeLocations.length > 0 ? (
                   <div className="form-section">
                     <div className="form-section-title">Test Results — Per Location</div>
                     {activeLocations.map(loc => (
@@ -364,12 +459,12 @@ const ImpactTest = () => {
 
                 <div className="card-footer" style={{ margin: '0 -1.5rem -1.5rem', borderRadius: '0 0 var(--radius-xl) var(--radius-xl)' }}>
                   <div style={{ display: 'flex', gap: '1rem' }}>
-                    <button type="button" className="btn btn-secondary" onClick={() => setFormData(prev => ({ ...Object.keys(prev).reduce((acc, key) => ({ ...acc, [key]: '' }), {}), approvedBy: user?.fullName || user?.username || '' }))}>Clear</button>
+                    <button type="button" className="btn btn-secondary" onClick={() => setFormData(prev => ({ ...Object.keys(prev).reduce((acc, key) => ({ ...acc, [key]: '' }), {}), approvedBy: user?.employeeId || user?.fullName || '' }))}>Clear</button>
                     <button type="submit" className="btn btn-primary" disabled={Object.keys(errors).length > 0}>
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="20 6 9 17 4 12" />
                       </svg>
-                      {Object.keys(errors).length > 0 ? 'Fix Errors to Save' : activeLocations.length > 1 ? `Save ${activeLocations.length} Location Records` : 'Save Record'}
+                      {Object.keys(errors).length > 0 ? 'Fix Errors to Save' : 'Save Record'}
                     </button>
 
                     {formData.id && user?.role?.toUpperCase()?.includes('HOF') && (formData.status || 'QC_ENTRY') === 'QC_ENTRY' && (
@@ -413,6 +508,8 @@ const ImpactTest = () => {
                    <th>Inspection Date</th>
                   <th>Part Name</th>
                   <th>Date Code</th>
+                  <th>Location</th>
+                  <th>Notch</th>
                   <th>Status</th>
                   <th>Approval Info</th>
                   {isStaff && <th>Actions</th>}
@@ -434,6 +531,8 @@ const ImpactTest = () => {
                     <td>{r.dateOfInspection?.split('T')[0] || '—'}</td>
                     <td><strong>{dash(r.partName)}</strong></td>
                     <td>{dash(r.dateCode)}</td>
+                    <td>{dash(r.mechLocation)}</td>
+                    <td>{r.notchType ? (NOTCH_LABEL[r.notchType] || r.notchType) : '—'}</td>
                     <td>
                       <span className={`status-badge status-${(r.status || 'QC_ENTRY').toLowerCase()}`}>
                         {(r.status || 'QC_ENTRY').replace('_', ' ')}

@@ -11,9 +11,9 @@ const UserManagement = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, user: null });
-  const [formData, setFormData] = useState({ 
-    fullName: '', username: '', password: '', email: '', role: '', active: 'true',
-    permissions: [] // Array of form IDs
+  const [formData, setFormData] = useState({
+    fullName: '', username: '', employeeId: '', password: '', email: '', role: '', active: 'true',
+    permissions: []
   });
 
   const fetchRecords = async () => {
@@ -36,7 +36,7 @@ const UserManagement = () => {
 
   const openAddForm = () => {
     setEditingId(null);
-    setFormData({ fullName: '', username: '', password: '', email: '', role: '', active: 'true', permissions: [] });
+    setFormData({ fullName: '', username: '', employeeId: '', password: '', email: '', role: '', active: 'true', permissions: [] });
     setShowForm(true);
   };
 
@@ -47,11 +47,12 @@ const UserManagement = () => {
     }
 
     setEditingId(user.id);
-    setFormData({ 
-      fullName: user.fullName, 
-      username: user.username, 
-      password: '', 
-      email: user.email || '', 
+    setFormData({
+      fullName: user.fullName,
+      username: user.username,
+      employeeId: user.employeeId || '',
+      password: '',
+      email: user.email || '',
       role: normalizedRole,
       active: user.active ? 'true' : 'false',
       permissions: user.formPermissions ? user.formPermissions.split(',') : []
@@ -61,16 +62,17 @@ const UserManagement = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.fullName.trim() || !formData.username.trim() || !formData.role) {
-      return toast.error("Full Name, Username, and Role are required");
+    if (!formData.fullName.trim() || !formData.username.trim() || !formData.employeeId.trim() || !formData.role) {
+      return toast.error("Full Name, Username, Employee ID, and Role are required");
     }
     if (!editingId && !formData.password) {
       return toast.error("Password is required when creating a user.");
     }
 
-    const payload = { 
-      fullName: formData.fullName.trim(), 
-      username: formData.username.trim(), 
+    const payload = {
+      fullName: formData.fullName.trim(),
+      username: formData.username.trim(),
+      employeeId: formData.employeeId.trim(),
       email: formData.email.trim() || null,
       role: formData.role,
       formPermissions: formData.permissions.join(',')
@@ -192,6 +194,10 @@ const UserManagement = () => {
                       <input type="text" name="username" value={formData.username} onChange={handleChange} className="form-control" placeholder="e.g. rajesh.kumar" required disabled={editingId !== null} />
                     </div>
                     <div className="form-group">
+                      <label className="form-label required">Employee ID</label>
+                      <input type="text" name="employeeId" value={formData.employeeId} onChange={handleChange} className="form-control" placeholder="e.g. EMP001" required />
+                    </div>
+                    <div className="form-group">
                       <label className="form-label">Password {editingId && <span style={{color:'var(--color-text-secondary)', fontWeight:400}}>(leave blank to keep current)</span>}</label>
                       <input type="password" name="password" value={formData.password} onChange={handleChange} className="form-control" placeholder="Enter password" />
                     </div>
@@ -273,6 +279,7 @@ const UserManagement = () => {
               <thead>
                 <tr>
                   <th>Full Name</th>
+                  <th>Employee ID</th>
                   <th>Username</th>
                   <th>Email</th>
                   <th>Role</th>
@@ -289,6 +296,7 @@ const UserManagement = () => {
                 ) : records.map(u => (
                   <tr key={u.id}>
                     <td><strong>{dash(u.fullName)}</strong></td>
+                    <td><strong style={{color:'#2563eb'}}>{dash(u.employeeId)}</strong></td>
                     <td>{dash(u.username)}</td>
                     <td>{dash(u.email)}</td>
                     <td>{roleBadge(u.role)}</td>

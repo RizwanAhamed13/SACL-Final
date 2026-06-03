@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import logo from '../assets/image.png';
 
 const Login = () => {
-  const [username, setUsername] = useState('');
+  const [employeeId, setEmployeeId] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -16,7 +16,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('/api/auth/login', { username, password });
+      const response = await axios.post('/api/auth/login', { employeeId, password });
       login(response.data.user, response.data.token);
       // User is redirected in context or via protected routes automatically when auth state updates
       window.location.href = '/'; 
@@ -46,14 +46,14 @@ const Login = () => {
 
         <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <div className="form-group" style={{ margin: 0 }}>
-            <label className="form-label required">Username</label>
-            <input 
-              type="text" 
-              className="form-control" 
-              value={username} 
-              onChange={(e) => setUsername(e.target.value)} 
-              required 
-              placeholder="Enter your username"
+            <label className="form-label required">Employee ID</label>
+            <input
+              type="text"
+              className="form-control"
+              value={employeeId}
+              onChange={(e) => setEmployeeId(e.target.value)}
+              required
+              placeholder="Enter your Employee ID"
             />
           </div>
           

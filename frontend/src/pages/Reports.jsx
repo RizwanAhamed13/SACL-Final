@@ -107,37 +107,39 @@ const QC_KEYS = [
 ];
 
 const MICRO_HEADERS = [
-  'ID', 'Part Name', 'Inspection Date', 'Heat Code', 'Date Code',
-  'Nodularity %', 'Graphite Type', 'Count (nos/mm²)', 'Size',
-  'Ferrite %', 'Pearlite %', 'Carbide %', 'Created By', 'Status',
+  'ID', 'Part Name', 'Inspection Date', 'Heat Code', 'Date Code', 'Location',
+  'Nodularity %', 'Graphite Type', 'Count (nos/mm²)',
+  'Ferrite Min %', 'Ferrite Max %', 'Pearlite Min %', 'Pearlite Max %', 'Carbide Min %', 'Carbide Max %',
+  'Size Min', 'Size Max', 'Created By', 'Status',
 ];
 const MICRO_KEYS = [
-  'id', 'partName', 'inspectionDate', 'heatCode', 'dateCode',
-  'nodularityPercent', 'graphiteType', 'countNosPerMm2', 'size',
-  'ferritePercent', 'pearlitePercent', 'carbidePercent', 'createdBy', 'status',
+  'id', 'partName', 'inspectionDate', 'heatCode', 'dateCode', 'location',
+  'nodularityPercent', 'graphiteType', 'countNosPerMm2',
+  'ferritePercentMin', 'ferritePercentMax', 'pearlitePercentMin', 'pearlitePercentMax', 'carbidePercentMin', 'carbidePercentMax',
+  'sizeMin', 'sizeMax', 'createdBy', 'status',
 ];
 
 const TENSILE_HEADERS = [
-  'ID', 'Item', 'Inspection Date', 'Heat Code', 'Date Code',
+  'ID', 'Item', 'Inspection Date', 'Heat Code', 'Date Code', 'Location',
   'Bar Dia (mm)', 'Gauge Length (mm)', 'Max Load (kN)', 'Yield Load (kN)',
   'Tensile Strength', 'Yield Strength 0.2 %', 'Yield Strength 0.5 %', 'Elongation %',
   'Created By', 'Status',
 ];
 const TENSILE_KEYS = [
-  'id', 'item', 'dateOfInspection', 'heatCode', 'dateCode',
+  'id', 'item', 'dateOfInspection', 'heatCode', 'dateCode', 'location',
   'barDiaMm', 'gaugeLengthMm', 'maxLoadKn', 'yieldLoadKn',
   'tensileStrength', 'yieldStrength02', 'yieldStrength05', 'elongationPercent',
   'createdBy', 'status',
 ];
 
 const IMPACT_HEADERS = [
-  'ID', 'Part Name', 'Inspection Date', 'Date Code', 'Specification',
-  'Test Type', 'Observed Value 1', 'Observed Value 2', 'Observed Value 3',
+  'ID', 'Part Name', 'Inspection Date', 'Date Code', 'Location', 'Notch Type',
+  'Observed Value 1 (J)', 'Observed Value 2 (J)', 'Observed Value 3 (J)',
   'Created By', 'Status',
 ];
 const IMPACT_KEYS = [
-  'id', 'partName', 'dateOfInspection', 'dateCode', 'specification',
-  'testType', 'observedValue1', 'observedValue2', 'observedValue3',
+  'id', 'partName', 'dateOfInspection', 'dateCode', 'location', 'notchType',
+  'observedValue1', 'observedValue2', 'observedValue3',
   'createdBy', 'status',
 ];
 
@@ -146,6 +148,46 @@ const THEMES = {
   micro: { bg: '#134e4a', fg: '#ccfbf1', rowTint: '#edfaf7' },
   tensile: { bg: '#78350f', fg: '#fef3c7', rowTint: '#fdf8ee' },
   impact: { bg: '#3b0764', fg: '#f3e8ff', rowTint: '#f6f0fd' },
+};
+
+// Expand records with locationValues JSON into multiple rows (one per location)
+const expandLocationValues = (records, type) => {
+  if (!records) return [];
+  const expanded = [];
+  records.forEach(r => {
+    if (!r.locationValues) {
+      expanded.push(r);
+      return;
+    }
+    try {
+      const locValues = typeof r.locationValues === 'string' ? JSON.parse(r.locationValues) : r.locationValues;
+      Object.entries(locValues).forEach(([location, data]) => {
+        if (type === 'impact') {
+          // Impact Test has location × notch structure: {TRA: {Unotch: {v1, v2, v3}, ...}, ...}
+          Object.entries(data).forEach(([notch, values]) => {
+            expanded.push({
+              ...r,
+              location,
+              notchType: notch,
+              observedValue1: values.v1,
+              observedValue2: values.v2,
+              observedValue3: values.v3,
+            });
+          });
+        } else {
+          // Micro/Tensile have flat location structure: {TRA: {...fields...}, SBA: {...fields...}}
+          expanded.push({
+            ...r,
+            location,
+            ...data,
+          });
+        }
+      });
+    } catch (e) {
+      expanded.push(r);
+    }
+  });
+  return expanded;
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -248,9 +290,9 @@ const Reports = () => {
       // Only show and export data approved by HOD
       const approvedResults = {
         qcRegister: res.data.qcRegister.filter(r => r.status === 'HOD_APPROVED'),
-        microStructure: res.data.microStructure.filter(r => r.status === 'HOD_APPROVED'),
-        microTensile: res.data.microTensile.filter(r => r.status === 'HOD_APPROVED'),
-        impactTest: res.data.impactTest.filter(r => r.status === 'HOD_APPROVED')
+        microStructure: expandLocationValues(res.data.microStructure.filter(r => r.status === 'HOD_APPROVED'), 'micro'),
+        microTensile: expandLocationValues(res.data.microTensile.filter(r => r.status === 'HOD_APPROVED'), 'tensile'),
+        impactTest: expandLocationValues(res.data.impactTest.filter(r => r.status === 'HOD_APPROVED'), 'impact')
       };
       setResults(approvedResults);
     } catch {
@@ -513,13 +555,16 @@ const Reports = () => {
               <tbody>
                 {results.microStructure.length === 0
                   ? <tr><td colSpan={MICRO_HEADERS.length} className="rpt-empty">No records found.</td></tr>
-                  : results.microStructure.map(r => (
-                    <tr key={r.id}>
+                  : results.microStructure.map((r, idx) => (
+                    <tr key={`${r.id}-${r.location}-${idx}`}>
                       <td>{r.id}</td><td className="part-name">{r.partName}</td>
-                      <td>{r.inspectionDate}</td><td style={{ fontWeight: 700 }}>{r.heatCode}</td><td>{r.dateCode}</td>
+                      <td>{r.inspectionDate}</td><td style={{ fontWeight: 700 }}>{r.heatCode}</td><td>{r.dateCode}</td><td>{r.location || '—'}</td>
                       <td>{dash(r.nodularityPercent)}</td><td>{dash(r.graphiteType)}</td>
-                      <td>{dash(r.countNosPerMm2)}</td><td>{dash(r.size)}</td>
-                      <td>{dash(r.ferritePercent)}</td><td>{dash(r.pearlitePercent)}</td><td>{dash(r.carbidePercent)}</td>
+                      <td>{dash(r.countNosPerMm2)}</td>
+                      <td>{dash(r.ferritePercentMin)}</td><td>{dash(r.ferritePercentMax)}</td>
+                      <td>{dash(r.pearlitePercentMin)}</td><td>{dash(r.pearlitePercentMax)}</td>
+                      <td>{dash(r.carbidePercentMin)}</td><td>{dash(r.carbidePercentMax)}</td>
+                      <td>{dash(r.sizeMin)}</td><td>{dash(r.sizeMax)}</td>
                       <td>{r.createdBy}</td>
                       <td><span className="status-badge status-green">{r.status}</span></td>
                     </tr>
@@ -548,10 +593,10 @@ const Reports = () => {
               <tbody>
                 {results.microTensile.length === 0
                   ? <tr><td colSpan={TENSILE_HEADERS.length} className="rpt-empty">No records found.</td></tr>
-                  : results.microTensile.map(r => (
-                    <tr key={r.id}>
+                  : results.microTensile.map((r, idx) => (
+                    <tr key={`${r.id}-${r.location}-${idx}`}>
                       <td>{r.id}</td><td className="part-name">{r.item}</td>
-                      <td>{r.dateOfInspection}</td><td style={{ fontWeight: 700 }}>{r.heatCode}</td><td>{r.dateCode}</td>
+                      <td>{r.dateOfInspection}</td><td style={{ fontWeight: 700 }}>{r.heatCode}</td><td>{r.dateCode}</td><td>{r.location || '—'}</td>
                       <td>{dash(r.barDiaMm)}</td><td>{dash(r.gaugeLengthMm)}</td>
                       <td>{dash(r.maxLoadKn)}</td><td>{dash(r.yieldLoadKn)}</td>
                       <td>{dash(r.tensileStrength)}</td><td>{dash(r.yieldStrength02)}</td>
@@ -584,11 +629,11 @@ const Reports = () => {
               <tbody>
                 {results.impactTest.length === 0
                   ? <tr><td colSpan={IMPACT_HEADERS.length} className="rpt-empty">No records found.</td></tr>
-                  : results.impactTest.map(r => (
-                    <tr key={r.id}>
+                  : results.impactTest.map((r, idx) => (
+                    <tr key={`${r.id}-${r.location}-${r.notchType}-${idx}`}>
                       <td>{r.id}</td><td className="part-name">{r.partName}</td>
                       <td>{r.dateOfInspection}</td><td style={{ fontWeight: 700 }}>{r.dateCode}</td>
-                      <td>{r.specification}</td><td>{r.testType}</td>
+                      <td>{r.location || '—'}</td><td>{r.notchType || '—'}</td>
                       <td>{dash(r.observedValue1)}</td><td>{dash(r.observedValue2)}</td><td>{dash(r.observedValue3)}</td>
                       <td>{r.createdBy}</td>
                       <td><span className="status-badge status-purple">{r.status}</span></td>

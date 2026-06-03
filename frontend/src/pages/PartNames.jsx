@@ -15,6 +15,13 @@ const emptyForm = {
   tensileMinElongation: '', tensileMaxElongation: '',
   impactMinSpec: '', impactMaxSpec: '',
   mechLocations: '',
+  impactNotchTypes: '',
+  impactMinTRAUnotch: '', impactMaxTRAUnotch: '',
+  impactMinTRAVnotch: '', impactMaxTRAVnotch: '',
+  impactMinTRAUnnotch: '', impactMaxTRAUnnotch: '',
+  impactMinSBAUnotch: '', impactMaxSBAUnotch: '',
+  impactMinSBAVnotch: '', impactMaxSBAVnotch: '',
+  impactMinSBAUnnotch: '', impactMaxSBAUnnotch: '',
   ppMinPouringTemp: '', ppMaxPouringTemp: '', ppMinMgKgs: '', ppMaxMgKgs: '', ppMinStreamInnoculant: '', ppMaxStreamInnoculant: '', ppMinPTimeSec: '', ppMaxPTimeSec: '',
   ppMinResMgConvertor: '', ppMaxResMgConvertor: '', barDiaMin: '', barDiaMax: '', microSizeMin: '', microSizeMax: '',
   corrMinC: '', corrMaxC: '', corrMinSi: '', corrMaxSi: '', corrMinMn: '', corrMaxMn: '', corrMinS: '', corrMaxS: '', corrMinCr: '', corrMaxCr: '', corrMinCu: '', corrMaxCu: '', corrMinSn: '', corrMaxSn: ''
@@ -68,6 +75,13 @@ const PartNames = () => {
       tensileMinElongation: part.tensileMinElongation ?? '', tensileMaxElongation: part.tensileMaxElongation ?? '',
       impactMinSpec: part.impactMinSpec ?? '', impactMaxSpec: part.impactMaxSpec ?? '',
       mechLocations: part.mechLocations ?? '',
+      impactNotchTypes: part.impactNotchTypes ?? '',
+      impactMinTRAUnotch: part.impactMinTRAUnotch ?? '', impactMaxTRAUnotch: part.impactMaxTRAUnotch ?? '',
+      impactMinTRAVnotch: part.impactMinTRAVnotch ?? '', impactMaxTRAVnotch: part.impactMaxTRAVnotch ?? '',
+      impactMinTRAUnnotch: part.impactMinTRAUnnotch ?? '', impactMaxTRAUnnotch: part.impactMaxTRAUnnotch ?? '',
+      impactMinSBAUnotch: part.impactMinSBAUnotch ?? '', impactMaxSBAUnotch: part.impactMaxSBAUnotch ?? '',
+      impactMinSBAVnotch: part.impactMinSBAVnotch ?? '', impactMaxSBAVnotch: part.impactMaxSBAVnotch ?? '',
+      impactMinSBAUnnotch: part.impactMinSBAUnnotch ?? '', impactMaxSBAUnnotch: part.impactMaxSBAUnnotch ?? '',
       ppMinPouringTemp: part.ppMinPouringTemp ?? '', ppMaxPouringTemp: part.ppMaxPouringTemp ?? '', ppMinMgKgs: part.ppMinMgKgs ?? '', ppMaxMgKgs: part.ppMaxMgKgs ?? '', ppMinStreamInnoculant: part.ppMinStreamInnoculant ?? '', ppMaxStreamInnoculant: part.ppMaxStreamInnoculant ?? '', ppMinPTimeSec: part.ppMinPTimeSec ?? '', ppMaxPTimeSec: part.ppMaxPTimeSec ?? '',
       ppMinResMgConvertor: part.ppMinResMgConvertor ?? '', ppMaxResMgConvertor: part.ppMaxResMgConvertor ?? '', barDiaMin: part.barDiaMin ?? '', barDiaMax: part.barDiaMax ?? '', microSizeMin: part.microSizeMin ?? '', microSizeMax: part.microSizeMax ?? '',
       corrMinC: part.corrMinC ?? '', corrMaxC: part.corrMaxC ?? '', corrMinSi: part.corrMinSi ?? '', corrMaxSi: part.corrMaxSi ?? '', corrMinMn: part.corrMinMn ?? '', corrMaxMn: part.corrMaxMn ?? '', corrMinS: part.corrMinS ?? '', corrMaxS: part.corrMaxS ?? '', corrMinCr: part.corrMinCr ?? '', corrMaxCr: part.corrMaxCr ?? '', corrMinCu: part.corrMinCu ?? '', corrMaxCu: part.corrMaxCu ?? '', corrMinSn: part.corrMinSn ?? '', corrMaxSn: part.corrMaxSn ?? ''
@@ -92,6 +106,13 @@ const PartNames = () => {
       tensileMinElongation: n(formData.tensileMinElongation), tensileMaxElongation: n(formData.tensileMaxElongation),
       impactMinSpec: n(formData.impactMinSpec), impactMaxSpec: n(formData.impactMaxSpec),
       mechLocations: formData.mechLocations || null,
+      impactNotchTypes: formData.impactNotchTypes || null,
+      impactMinTRAUnotch: n(formData.impactMinTRAUnotch), impactMaxTRAUnotch: n(formData.impactMaxTRAUnotch),
+      impactMinTRAVnotch: n(formData.impactMinTRAVnotch), impactMaxTRAVnotch: n(formData.impactMaxTRAVnotch),
+      impactMinTRAUnnotch: n(formData.impactMinTRAUnnotch), impactMaxTRAUnnotch: n(formData.impactMaxTRAUnnotch),
+      impactMinSBAUnotch: n(formData.impactMinSBAUnotch), impactMaxSBAUnotch: n(formData.impactMaxSBAUnotch),
+      impactMinSBAVnotch: n(formData.impactMinSBAVnotch), impactMaxSBAVnotch: n(formData.impactMaxSBAVnotch),
+      impactMinSBAUnnotch: n(formData.impactMinSBAUnnotch), impactMaxSBAUnnotch: n(formData.impactMaxSBAUnnotch),
       ppMinPouringTemp: n(formData.ppMinPouringTemp), ppMaxPouringTemp: n(formData.ppMaxPouringTemp), ppMinMgKgs: n(formData.ppMinMgKgs), ppMaxMgKgs: n(formData.ppMaxMgKgs), ppMinStreamInnoculant: n(formData.ppMinStreamInnoculant), ppMaxStreamInnoculant: n(formData.ppMaxStreamInnoculant), ppMinPTimeSec: n(formData.ppMinPTimeSec), ppMaxPTimeSec: n(formData.ppMaxPTimeSec),
       ppMinResMgConvertor: n(formData.ppMinResMgConvertor), ppMaxResMgConvertor: n(formData.ppMaxResMgConvertor), barDiaMin: n(formData.barDiaMin), barDiaMax: n(formData.barDiaMax), microSizeMin: n(formData.microSizeMin), microSizeMax: n(formData.microSizeMax),
       corrMinC: n(formData.corrMinC), corrMaxC: n(formData.corrMaxC), corrMinSi: n(formData.corrMinSi), corrMaxSi: n(formData.corrMaxSi), corrMinMn: n(formData.corrMinMn), corrMaxMn: n(formData.corrMaxMn), corrMinS: n(formData.corrMinS), corrMaxS: n(formData.corrMaxS), corrMinCr: n(formData.corrMinCr), corrMaxCr: n(formData.corrMaxCr), corrMinCu: n(formData.corrMinCu), corrMaxCu: n(formData.corrMaxCu), corrMinSn: n(formData.corrMinSn), corrMaxSn: n(formData.corrMaxSn)
@@ -264,11 +285,7 @@ const PartNames = () => {
                     </div>
                   ))}
                   <div className="range-row">
-                    <span className="range-label">Nodule Size (text)</span>
-                    <input type="text" name="microSize" value={formData.microSize || ''} onChange={handleChange} className="form-control" style={{ maxWidth: '210px', fontSize: '13px' }} placeholder="e.g. 6-7" />
-                  </div>
-                  <div className="range-row">
-                    <span className="range-label">Nodule Size (Min)</span>
+                    <span className="range-label">Nodule Size</span>
                     <input type="number" step="0.1" name="microSizeMin" value={formData.microSizeMin || ''} onChange={handleChange} className="form-control range-input" placeholder="Min" />
                     <span className="range-sep">—</span>
                     <input type="number" step="0.1" name="microSizeMax" value={formData.microSizeMax || ''} onChange={handleChange} className="form-control range-input" placeholder="Max" />
@@ -292,6 +309,26 @@ const PartNames = () => {
                       <input type="number" step={r.step} name={r.max} value={formData[r.max] || ''} onChange={handleChange} className="form-control range-input" placeholder="Max" />
                     </div>
                   ))}
+                </div>
+
+                {/* Impact Notch Types */}
+                <div className="form-section-title">Impact Notch Types</div>
+                <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', marginBottom: '1rem', background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                  {['Unnotch', 'Unotch', 'Vnotch'].map(notch => {
+                    const label = notch === 'Unnotch' ? 'Un-notch' : notch === 'Unotch' ? 'U-notch' : 'V-notch';
+                    const isChecked = formData.impactNotchTypes ? formData.impactNotchTypes.split(',').includes(notch) : false;
+                    return (
+                      <label key={notch} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontWeight: 600, color: '#334155' }}>
+                        <input type="checkbox" checked={isChecked}
+                          onChange={(e) => {
+                            const current = formData.impactNotchTypes ? formData.impactNotchTypes.split(',').filter(Boolean) : [];
+                            const next = e.target.checked ? [...current, notch] : current.filter(x => x !== notch);
+                            setFormData(prev => ({ ...prev, impactNotchTypes: next.join(',') }));
+                          }} />
+                        {label}
+                      </label>
+                    );
+                  })}
                 </div>
 
                 <div className="form-section-title">4. Process Parameter Thresholds</div>
@@ -384,14 +421,14 @@ const PartNames = () => {
           </div>
         </div>
       </div>
-       <ConfirmModal
-         isOpen={deleteModal.isOpen}
-         onClose={() => setDeleteModal({ isOpen: false, part: null })}
-         onConfirm={handleDelete}
-         title="Delete Part?"
-         message={`Are you sure you want to delete "${deleteModal.part?.name}"? This action cannot be undone.`}
-         confirmText="Delete Part"
-       />
+      <ConfirmModal
+        isOpen={deleteModal.isOpen}
+        onClose={() => setDeleteModal({ isOpen: false, part: null })}
+        onConfirm={handleDelete}
+        title="Delete Part?"
+        message={`Are you sure you want to delete "${deleteModal.part?.name}"? This action cannot be undone.`}
+        confirmText="Delete Part"
+      />
     </>
   );
 };
