@@ -16,6 +16,7 @@ const emptyForm = {
   impactMinSpec: '', impactMaxSpec: '',
   mechLocations: '',
   ppMinPouringTemp: '', ppMaxPouringTemp: '', ppMinMgKgs: '', ppMaxMgKgs: '', ppMinStreamInnoculant: '', ppMaxStreamInnoculant: '', ppMinPTimeSec: '', ppMaxPTimeSec: '',
+  ppMinResMgConvertor: '', ppMaxResMgConvertor: '', barDiaMin: '', barDiaMax: '', microSizeMin: '', microSizeMax: '',
   corrMinC: '', corrMaxC: '', corrMinSi: '', corrMaxSi: '', corrMinMn: '', corrMaxMn: '', corrMinS: '', corrMaxS: '', corrMinCr: '', corrMaxCr: '', corrMinCu: '', corrMaxCu: '', corrMinSn: '', corrMaxSn: ''
 };
 
@@ -68,6 +69,7 @@ const PartNames = () => {
       impactMinSpec: part.impactMinSpec ?? '', impactMaxSpec: part.impactMaxSpec ?? '',
       mechLocations: part.mechLocations ?? '',
       ppMinPouringTemp: part.ppMinPouringTemp ?? '', ppMaxPouringTemp: part.ppMaxPouringTemp ?? '', ppMinMgKgs: part.ppMinMgKgs ?? '', ppMaxMgKgs: part.ppMaxMgKgs ?? '', ppMinStreamInnoculant: part.ppMinStreamInnoculant ?? '', ppMaxStreamInnoculant: part.ppMaxStreamInnoculant ?? '', ppMinPTimeSec: part.ppMinPTimeSec ?? '', ppMaxPTimeSec: part.ppMaxPTimeSec ?? '',
+      ppMinResMgConvertor: part.ppMinResMgConvertor ?? '', ppMaxResMgConvertor: part.ppMaxResMgConvertor ?? '', barDiaMin: part.barDiaMin ?? '', barDiaMax: part.barDiaMax ?? '', microSizeMin: part.microSizeMin ?? '', microSizeMax: part.microSizeMax ?? '',
       corrMinC: part.corrMinC ?? '', corrMaxC: part.corrMaxC ?? '', corrMinSi: part.corrMinSi ?? '', corrMaxSi: part.corrMaxSi ?? '', corrMinMn: part.corrMinMn ?? '', corrMaxMn: part.corrMaxMn ?? '', corrMinS: part.corrMinS ?? '', corrMaxS: part.corrMaxS ?? '', corrMinCr: part.corrMinCr ?? '', corrMaxCr: part.corrMaxCr ?? '', corrMinCu: part.corrMinCu ?? '', corrMaxCu: part.corrMaxCu ?? '', corrMinSn: part.corrMinSn ?? '', corrMaxSn: part.corrMaxSn ?? ''
     });
     setShowForm(true);
@@ -91,6 +93,7 @@ const PartNames = () => {
       impactMinSpec: n(formData.impactMinSpec), impactMaxSpec: n(formData.impactMaxSpec),
       mechLocations: formData.mechLocations || null,
       ppMinPouringTemp: n(formData.ppMinPouringTemp), ppMaxPouringTemp: n(formData.ppMaxPouringTemp), ppMinMgKgs: n(formData.ppMinMgKgs), ppMaxMgKgs: n(formData.ppMaxMgKgs), ppMinStreamInnoculant: n(formData.ppMinStreamInnoculant), ppMaxStreamInnoculant: n(formData.ppMaxStreamInnoculant), ppMinPTimeSec: n(formData.ppMinPTimeSec), ppMaxPTimeSec: n(formData.ppMaxPTimeSec),
+      ppMinResMgConvertor: n(formData.ppMinResMgConvertor), ppMaxResMgConvertor: n(formData.ppMaxResMgConvertor), barDiaMin: n(formData.barDiaMin), barDiaMax: n(formData.barDiaMax), microSizeMin: n(formData.microSizeMin), microSizeMax: n(formData.microSizeMax),
       corrMinC: n(formData.corrMinC), corrMaxC: n(formData.corrMaxC), corrMinSi: n(formData.corrMinSi), corrMaxSi: n(formData.corrMaxSi), corrMinMn: n(formData.corrMinMn), corrMaxMn: n(formData.corrMaxMn), corrMinS: n(formData.corrMinS), corrMaxS: n(formData.corrMaxS), corrMinCr: n(formData.corrMinCr), corrMaxCr: n(formData.corrMaxCr), corrMinCu: n(formData.corrMinCu), corrMaxCu: n(formData.corrMaxCu), corrMinSn: n(formData.corrMinSn), corrMaxSn: n(formData.corrMaxSn)
     };
 
@@ -182,10 +185,6 @@ const PartNames = () => {
                     <label className="form-label required">Part Name</label>
                     <input type="text" name="name" value={formData.name} onChange={handleChange} className="form-control" placeholder="e.g. YTA KNUCKLE" required disabled={editingId !== null} />
                   </div>
-                  <div className="col-md-6">
-                    <label className="form-label">Date Code</label>
-                    <input type="text" name="description" value={formData.description} onChange={handleChange} className="form-control" placeholder="Optional description" />
-                  </div>
                 </div>
 
                 {/* Part Micro Locations */}
@@ -265,8 +264,14 @@ const PartNames = () => {
                     </div>
                   ))}
                   <div className="range-row">
-                    <span className="range-label">Nodule Size</span>
+                    <span className="range-label">Nodule Size (text)</span>
                     <input type="text" name="microSize" value={formData.microSize || ''} onChange={handleChange} className="form-control" style={{ maxWidth: '210px', fontSize: '13px' }} placeholder="e.g. 6-7" />
+                  </div>
+                  <div className="range-row">
+                    <span className="range-label">Nodule Size (Min)</span>
+                    <input type="number" step="0.1" name="microSizeMin" value={formData.microSizeMin || ''} onChange={handleChange} className="form-control range-input" placeholder="Min" />
+                    <span className="range-sep">—</span>
+                    <input type="number" step="0.1" name="microSizeMax" value={formData.microSizeMax || ''} onChange={handleChange} className="form-control range-input" placeholder="Max" />
                   </div>
                 </div>
 
@@ -278,6 +283,7 @@ const PartNames = () => {
                     { label: 'Yield 0.5% Strength', min: 'tensileMinYield05', max: 'tensileMaxYield05', step: '1' },
                     { label: 'Elongation Percentage', min: 'tensileMinElongation', max: 'tensileMaxElongation', step: '0.1' },
                     { label: 'Impact Strength', min: 'impactMinSpec', max: 'impactMaxSpec', step: '0.1' },
+                    { label: 'Bar Dia (mm)', min: 'barDiaMin', max: 'barDiaMax', step: '0.01' },
                   ].map(r => (
                     <div className="range-row" key={r.min}>
                       <span className="range-label">{r.label}</span>
@@ -295,6 +301,7 @@ const PartNames = () => {
                     { label: 'Mg (Kgs)', min: 'ppMinMgKgs', max: 'ppMaxMgKgs', step: '0.01' },
                     { label: 'Stream Inoculant (gms/s)', min: 'ppMinStreamInnoculant', max: 'ppMaxStreamInnoculant', step: '0.01' },
                     { label: 'P.Time (sec)', min: 'ppMinPTimeSec', max: 'ppMaxPTimeSec', step: '0.1' },
+                    { label: 'Res Mg Convertor %', min: 'ppMinResMgConvertor', max: 'ppMaxResMgConvertor', step: '0.001' },
                   ].map(r => (
                     <div className="range-row" key={r.min}>
                       <span className="range-label">{r.label}</span>

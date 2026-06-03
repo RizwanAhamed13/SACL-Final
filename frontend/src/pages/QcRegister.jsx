@@ -18,8 +18,8 @@ const QcRegister = () => {
     heatCode: '', date: new Date().toISOString().split('T')[0], dateCode: '', disa: '', partName: '', qtyMoulds: '',
     compositionC: '', compositionSi: '', compositionMn: '', compositionP: '', compositionS: '',
     compositionMgFl: '', compositionCu: '', compositionCr: '',
-    fcNoHeatNo: '', conNo: '', tappingTime: '', tappingWtKgs: '', pouringTemp: '', timeOfPouring: '', streamInnoculant: '', ppCode: '',
-    treatmentNo: '', mgKgs: '', resMgConvertorPercent: '', recMgPercent: '', pTimeSec: '',
+    fcNoHeatNo: '', conNo: '', tappingTime: '', tappingWtKgs: '', pouringTemp: '', pouringTempStart: '', pouringTempEnd: '', timeOfPouring: '', streamInnoculant: '', ppCode: '',
+    treatmentNo: '', mgKgs: '', resMgConvertorPercent: '', recMgPercent: '', pTimeSec: '', pTimeSecStart: '', pTimeSecEnd: '',
     correctiveC: '', correctiveSi: '', correctiveMn: '', correctiveS: '', correctiveCr: '', correctiveCu: '', correctiveSn: '',
     remarks: '',
     status: 'QC_ENTRY', hofApprovedBy: '', hodApprovedBy: '', createdBy: ''
@@ -64,10 +64,13 @@ const QcRegister = () => {
 
   const isOutOfRange = (val, min, max) => {
     if (val === undefined || val === null || val === '') return false;
+    const hasMin = min !== null && min !== undefined && min !== '';
+    const hasMax = max !== null && max !== undefined && max !== '';
+    if (!hasMin && !hasMax) return false; // no threshold set — accept any value
     const num = parseFloat(val);
     if (isNaN(num)) return false;
-    if (min !== null && min !== undefined && num < min) return true;
-    if (max !== null && max !== undefined && num > max) return true;
+    if (hasMin && num < parseFloat(min)) return true;
+    if (hasMax && num > parseFloat(max)) return true;
     return false;
   };
 
@@ -88,9 +91,14 @@ const QcRegister = () => {
 
     // Process Parameter Validation
     if (isOutOfRange(data.pouringTemp, ts.ppMinPouringTemp, ts.ppMaxPouringTemp)) newErrors.pouringTemp = true;
+    if (isOutOfRange(data.pouringTempStart, ts.ppMinPouringTemp, ts.ppMaxPouringTemp)) newErrors.pouringTempStart = true;
+    if (isOutOfRange(data.pouringTempEnd, ts.ppMinPouringTemp, ts.ppMaxPouringTemp)) newErrors.pouringTempEnd = true;
     if (isOutOfRange(data.mgKgs, ts.ppMinMgKgs, ts.ppMaxMgKgs)) newErrors.mgKgs = true;
     if (isOutOfRange(data.streamInnoculant, ts.ppMinStreamInnoculant, ts.ppMaxStreamInnoculant)) newErrors.streamInnoculant = true;
     if (isOutOfRange(data.pTimeSec, ts.ppMinPTimeSec, ts.ppMaxPTimeSec)) newErrors.pTimeSec = true;
+    if (isOutOfRange(data.pTimeSecStart, ts.ppMinPTimeSec, ts.ppMaxPTimeSec)) newErrors.pTimeSecStart = true;
+    if (isOutOfRange(data.pTimeSecEnd, ts.ppMinPTimeSec, ts.ppMaxPTimeSec)) newErrors.pTimeSecEnd = true;
+    if (isOutOfRange(data.resMgConvertorPercent, ts.ppMinResMgConvertor, ts.ppMaxResMgConvertor)) newErrors.resMgConvertorPercent = true;
 
     // Corrective Addition Validation (Kgs)
     if (isOutOfRange(data.correctiveC, ts.corrMinC, ts.corrMaxC)) newErrors.correctiveC = true;
@@ -176,9 +184,9 @@ const QcRegister = () => {
       setFormData({
         disa: '', date: '', partName: '', dateCode: '', heatCode: '', qtyMoulds: '',
         compositionC: '', compositionSi: '', compositionMn: '', compositionP: '', compositionS: '', compositionMgFl: '', compositionCu: '', compositionCr: '', compositionSn: '',
-        timeOfPouring: '', pouringTemp: '', ppCode: '', treatmentNo: '', fcNoHeatNo: '', conNo: '', tappingTime: '',
+        timeOfPouring: '', pouringTemp: '', pouringTempStart: '', pouringTempEnd: '', ppCode: '', treatmentNo: '', fcNoHeatNo: '', conNo: '', tappingTime: '',
         correctiveC: '', correctiveSi: '', correctiveMn: '', correctiveS: '', correctiveCr: '', correctiveCu: '', correctiveSn: '',
-        tappingWtKgs: '', mgKgs: '', resMgConvertorPercent: '', recMgPercent: '', streamInnoculant: '', pTimeSec: '', remarks: ''
+        tappingWtKgs: '', mgKgs: '', resMgConvertorPercent: '', recMgPercent: '', streamInnoculant: '', pTimeSec: '', pTimeSecStart: '', pTimeSecEnd: '', remarks: ''
       });
       setErrors({});
       fetchRecords();
@@ -330,9 +338,23 @@ const QcRegister = () => {
                   <div className="form-row form-row-4">
                     <div className="form-group"><label className="form-label">Time of Pouring</label><input type="time" name="timeOfPouring" value={formData.timeOfPouring} onChange={handleChange} className="form-control" /></div>
                     <div className="form-group">
-                      <label className="form-label">Pouring Temp °C <span style={{color: errors.pouringTemp ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds && (thresholds.ppMinPouringTemp || thresholds.ppMaxPouringTemp) ? renderThreshold(thresholds.ppMinPouringTemp, thresholds.ppMaxPouringTemp) : ''}</span></label>
-                      <input type="number" name="pouringTemp" value={formData.pouringTemp} onChange={handleChange} className="form-control" placeholder="1400" style={errors.pouringTemp ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
-                      {errors.pouringTemp && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
+                      <label className="form-label">Pouring Temp °C
+                        {thresholds && (thresholds.ppMinPouringTemp || thresholds.ppMaxPouringTemp) && (
+                          <span style={{color:'var(--color-text-secondary)', fontWeight:400, marginLeft:'4px'}}>
+                            {renderThreshold(thresholds.ppMinPouringTemp, thresholds.ppMaxPouringTemp)}
+                          </span>
+                        )}
+                      </label>
+                      <div style={{display:'flex', gap:'0.5rem', alignItems:'center'}}>
+                        <input type="number" name="pouringTempStart" value={formData.pouringTempStart} onChange={handleChange} className="form-control"
+                          style={errors.pouringTempStart ? { borderColor:'#ef4444', backgroundColor:'#fef2f2', color:'#ef4444' } : {}}
+                          placeholder="Start" />
+                        <span style={{color:'#94a3b8', fontWeight:600}}>—</span>
+                        <input type="number" name="pouringTempEnd" value={formData.pouringTempEnd} onChange={handleChange} className="form-control"
+                          style={errors.pouringTempEnd ? { borderColor:'#ef4444', backgroundColor:'#fef2f2', color:'#ef4444' } : {}}
+                          placeholder="End" />
+                      </div>
+                      {(errors.pouringTempStart || errors.pouringTempEnd) && <div style={{color:'#ef4444',fontSize:'10px',marginTop:'2px',fontWeight:'600'}}>Value out of range!</div>}
                     </div>
                     <div className="form-group"><label className="form-label">PP Code</label><input type="text" name="ppCode" value={formData.ppCode} onChange={handleChange} className="form-control" placeholder="e.g. A1" /></div>
                     <div className="form-group"><label className="form-label">Treatment No</label><input type="text" name="treatmentNo" value={formData.treatmentNo} onChange={handleChange} className="form-control" placeholder="e.g. 12" /></div>
@@ -349,7 +371,18 @@ const QcRegister = () => {
                       <input type="number" step="0.01" name="mgKgs" value={formData.mgKgs} onChange={handleChange} className="form-control" style={errors.mgKgs ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
                       {errors.mgKgs && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
                     </div>
-                    <div className="form-group"><label className="form-label">Res Mg Convertor %</label><input type="number" step="0.001" name="resMgConvertorPercent" value={formData.resMgConvertorPercent} onChange={handleChange} className="form-control" /></div>
+                    <div className="form-group">
+                      <label className="form-label">Res Mg Convertor %
+                        {thresholds && (thresholds.ppMinResMgConvertor || thresholds.ppMaxResMgConvertor) && (
+                          <span style={{color: errors.resMgConvertorPercent ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400, marginLeft:'4px'}}>
+                            {renderThreshold(thresholds.ppMinResMgConvertor, thresholds.ppMaxResMgConvertor)}
+                          </span>
+                        )}
+                      </label>
+                      <input type="number" step="0.001" name="resMgConvertorPercent" value={formData.resMgConvertorPercent} onChange={handleChange} className="form-control"
+                        style={errors.resMgConvertorPercent ? { borderColor:'#ef4444', backgroundColor:'#fef2f2', color:'#ef4444' } : {}} />
+                      {errors.resMgConvertorPercent && <div style={{color:'#ef4444',fontSize:'10px',marginTop:'2px',fontWeight:'600'}}>Value out of range!</div>}
+                    </div>
                     <div className="form-group"><label className="form-label">Rec of Mg %</label><input type="number" step="0.01" name="recMgPercent" value={formData.recMgPercent} onChange={handleChange} className="form-control" /></div>
                     <div className="form-group">
                       <label className="form-label">Stream Inoculant (gms/Sec) <span style={{color: errors.streamInnoculant ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds && (thresholds.ppMinStreamInnoculant || thresholds.ppMaxStreamInnoculant) ? renderThreshold(thresholds.ppMinStreamInnoculant, thresholds.ppMaxStreamInnoculant) : ''}</span></label>
@@ -359,9 +392,23 @@ const QcRegister = () => {
                   </div>
                   <div className="form-row form-row-4">
                     <div className="form-group">
-                      <label className="form-label">P.Time (sec) <span style={{color: errors.pTimeSec ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds && (thresholds.ppMinPTimeSec || thresholds.ppMaxPTimeSec) ? renderThreshold(thresholds.ppMinPTimeSec, thresholds.ppMaxPTimeSec) : ''}</span></label>
-                      <input type="number" step="0.1" name="pTimeSec" value={formData.pTimeSec} onChange={handleChange} className="form-control" style={errors.pTimeSec ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
-                      {errors.pTimeSec && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'606'}}>Value out of range!</div>}
+                      <label className="form-label">P.Time (sec)
+                        {thresholds && (thresholds.ppMinPTimeSec || thresholds.ppMaxPTimeSec) && (
+                          <span style={{color:'var(--color-text-secondary)', fontWeight:400, marginLeft:'4px'}}>
+                            {renderThreshold(thresholds.ppMinPTimeSec, thresholds.ppMaxPTimeSec)}
+                          </span>
+                        )}
+                      </label>
+                      <div style={{display:'flex', gap:'0.5rem', alignItems:'center'}}>
+                        <input type="number" step="0.1" name="pTimeSecStart" value={formData.pTimeSecStart} onChange={handleChange} className="form-control"
+                          style={errors.pTimeSecStart ? { borderColor:'#ef4444', backgroundColor:'#fef2f2', color:'#ef4444' } : {}}
+                          placeholder="Start" />
+                        <span style={{color:'#94a3b8', fontWeight:600}}>—</span>
+                        <input type="number" step="0.1" name="pTimeSecEnd" value={formData.pTimeSecEnd} onChange={handleChange} className="form-control"
+                          style={errors.pTimeSecEnd ? { borderColor:'#ef4444', backgroundColor:'#fef2f2', color:'#ef4444' } : {}}
+                          placeholder="End" />
+                      </div>
+                      {(errors.pTimeSecStart || errors.pTimeSecEnd) && <div style={{color:'#ef4444',fontSize:'10px',marginTop:'2px',fontWeight:'600'}}>Value out of range!</div>}
                     </div>
                   </div>
                 </div>

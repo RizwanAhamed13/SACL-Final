@@ -1,6 +1,8 @@
 package com.sacl.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import lombok.Data;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -30,8 +32,16 @@ public class MicroStructureAnalysis {
     private Double ferritePercent;
     private Double pearlitePercent;
     private Double carbidePercent;
+    private Double ferritePercentMin;
+    private Double ferritePercentMax;
+    private Double pearlitePercentMin;
+    private Double pearlitePercentMax;
+    private Double carbidePercentMin;
+    private Double carbidePercentMax;
+    private Double sizeMin;
+    private Double sizeMax;
 
-    @Lob @Column
+    @JdbcTypeCode(SqlTypes.LONG32VARCHAR) @Column
     private String remarks;
 
     private String approvedBy;

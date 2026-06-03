@@ -58,10 +58,13 @@ const MicroTensile = () => {
 
   const isOutOfRange = (val, min, max) => {
     if (val === undefined || val === null || val === '') return false;
+    const hasMin = min !== null && min !== undefined && min !== '';
+    const hasMax = max !== null && max !== undefined && max !== '';
+    if (!hasMin && !hasMax) return false; // no threshold set — accept any value
     const num = parseFloat(val);
     if (isNaN(num)) return false;
-    if (min !== null && min !== undefined && num < min) return true;
-    if (max !== null && max !== undefined && num > max) return true;
+    if (hasMin && num < parseFloat(min)) return true;
+    if (hasMax && num > parseFloat(max)) return true;
     return false;
   };
 
@@ -74,11 +77,13 @@ const MicroTensile = () => {
         thFields.forEach(f => {
           if (isOutOfRange(data[`${loc}_${f.name}`], ts[f.thMin], ts[f.thMax])) newErrors[`${loc}_${f.name}`] = true;
         });
+        if (isOutOfRange(data[`${loc}_barDiaMm`] ?? data.barDiaMm, ts.barDiaMin, ts.barDiaMax)) newErrors.barDiaMm = true;
       });
     } else {
       thFields.forEach(f => {
         if (isOutOfRange(data[f.name], ts[f.thMin], ts[f.thMax])) newErrors[f.name] = true;
       });
+      if (isOutOfRange(data.barDiaMm, ts.barDiaMin, ts.barDiaMax)) newErrors.barDiaMm = true;
     }
     setErrors(newErrors);
   };
@@ -264,7 +269,7 @@ const MicroTensile = () => {
                       <PartNameSelect value={formData.item} onChange={handlePartNameChange} />
                     </div>
                     <div className="form-group">
-                      <label className="form-label">Date Code &amp; Heat Code</label>
+                      <label className="form-label">Date Code</label>
                       <input type="text" name="dateCode" value={formData.dateCode} onChange={handleChange} className="form-control" placeholder="e.g. 6D08-41" />
                     </div>
                     {formData.id && (
@@ -280,8 +285,12 @@ const MicroTensile = () => {
                   <div className="form-section-title">Specimen Data</div>
                   <div className="form-row form-row-3">
                     <div className="form-group">
-                      <label className="form-label">Bar Dia <span style={{color:'var(--color-text-secondary)', fontWeight:400}}>(mm, 5±0.06)</span></label>
-                      <input type="number" step="0.01" name="barDiaMm" value={formData.barDiaMm} onChange={handleChange} className="form-control" placeholder="e.g. 5.00" />
+                      <label className="form-label">Bar Dia <span style={{color: errors.barDiaMm ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>
+                        (mm, 5±0.06) {thresholds && (thresholds.barDiaMin || thresholds.barDiaMax) ? renderThreshold(thresholds.barDiaMin, thresholds.barDiaMax) : ''}
+                      </span></label>
+                      <input type="number" step="0.01" name="barDiaMm" value={formData.barDiaMm} onChange={handleChange} className="form-control"
+                        style={errors.barDiaMm ? { borderColor:'#ef4444', backgroundColor:'#fef2f2', color:'#ef4444' } : {}} placeholder="e.g. 5.00" />
+                      {errors.barDiaMm && <div style={{color:'#ef4444',fontSize:'10px',marginTop:'2px',fontWeight:'600'}}>Value out of range!</div>}
                     </div>
                     <div className="form-group">
                       <label className="form-label">Gauge Length Lo <span style={{color:'var(--color-text-secondary)', fontWeight:400}}>(mm)</span></label>

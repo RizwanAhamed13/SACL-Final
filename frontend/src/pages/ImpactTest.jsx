@@ -55,10 +55,13 @@ const ImpactTest = () => {
 
   const isOutOfRange = (val, min, max) => {
     if (val === undefined || val === null || val === '') return false;
+    const hasMin = min !== null && min !== undefined && min !== '';
+    const hasMax = max !== null && max !== undefined && max !== '';
+    if (!hasMin && !hasMax) return false; // no threshold set — accept any value
     const num = parseFloat(val);
     if (isNaN(num)) return false;
-    if (min !== null && min !== undefined && num < min) return true;
-    if (max !== null && max !== undefined && num > max) return true;
+    if (hasMin && num < parseFloat(min)) return true;
+    if (hasMax && num > parseFloat(max)) return true;
     return false;
   };
 
@@ -259,7 +262,7 @@ const ImpactTest = () => {
                       <PartNameSelect value={formData.partName} onChange={handlePartNameChange} />
                     </div>
                     <div className="form-group">
-                      <label className="form-label">Heat Code / Date Code</label>
+                      <label className="form-label">Date Code</label>
                       <input type="text" name="dateCode" value={formData.dateCode} onChange={handleChange} className="form-control" placeholder="e.g. 5D03-45" />
                     </div>
                     <div className="form-group">

@@ -76,6 +76,12 @@ public class PartName {
     private Double ppMaxStreamInnoculant;
     private Double ppMinPTimeSec;
     private Double ppMaxPTimeSec;
+    private Double ppMinResMgConvertor;
+    private Double ppMaxResMgConvertor;
+    private Double barDiaMin;
+    private Double barDiaMax;
+    private Double microSizeMin;
+    private Double microSizeMax;
 
     // Corrective Addition Thresholds (Kgs)
     private Double corrMinC;

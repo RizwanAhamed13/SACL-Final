@@ -1,6 +1,8 @@
 package com.sacl.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import java.time.LocalDate;
@@ -63,8 +65,12 @@ public class QcRegister {
     private Double recMgPercent;
     private Double streamInnoculant;
     private Double pTimeSec;
+    private Double pouringTempStart;
+    private Double pouringTempEnd;
+    private Double pTimeSecStart;
+    private Double pTimeSecEnd;
 
-    @Lob @Column
+    @JdbcTypeCode(SqlTypes.LONG32VARCHAR) @Column
     private String remarks;
 
     private String hodQc;

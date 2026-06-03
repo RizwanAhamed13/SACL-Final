@@ -1,6 +1,8 @@
 package com.sacl.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import lombok.Data;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -27,7 +29,7 @@ public class ImpactTest {
     private Double observedValue3;
     private String testType;
 
-    @Lob @Column
+    @JdbcTypeCode(SqlTypes.LONG32VARCHAR) @Column
     private String remarks;
 
     private String approvedBy;

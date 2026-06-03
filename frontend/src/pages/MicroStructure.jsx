@@ -9,10 +9,22 @@ import Skeleton from '../components/Skeleton';
 
 const locKey = (loc) => loc.replace(/[^a-zA-Z0-9]/g, '_');
 
-const MICRO_FIELDS = [
+const MICRO_SINGLE_FIELDS = [
   { name: 'nodularityPercent', label: 'Nodularity/Graphite Type %', type: 'number', thMin: 'microMinNodularity', thMax: 'microMaxNodularity', placeholder: 'e.g. 90' },
   { name: 'graphiteType', label: 'Graphite Type', type: 'text', placeholder: 'e.g. VI' },
   { name: 'countNosPerMm2', label: 'Count (Nos/mm²)', type: 'number', thMin: 'microMinCount', thMax: 'microMaxCount', placeholder: 'e.g. 200' },
+];
+
+const MICRO_RANGE_FIELDS = [
+  { nameMin: 'ferritePercentMin', nameMax: 'ferritePercentMax', label: 'Ferrite %', thMin: 'microMinFerrite', thMax: 'microMaxFerrite' },
+  { nameMin: 'pearlitePercentMin', nameMax: 'pearlitePercentMax', label: 'Pearlite %', thMin: 'microMinPearlite', thMax: 'microMaxPearlite' },
+  { nameMin: 'carbidePercentMin', nameMax: 'carbidePercentMax', label: 'Carbide %', thMin: 'microMinCarbide', thMax: 'microMaxCarbide' },
+  { nameMin: 'sizeMin', nameMax: 'sizeMax', label: 'Nodule Size', thMin: 'microSizeMin', thMax: 'microSizeMax' },
+];
+
+// Keep MICRO_FIELDS for backward compat references
+const MICRO_FIELDS = [
+  ...MICRO_SINGLE_FIELDS,
   { name: 'size', label: 'Nodule Size', type: 'text', placeholder: 'e.g. 6' },
   { name: 'ferritePercent', label: 'Ferrite %', type: 'number', thMin: 'microMinFerrite', thMax: 'microMaxFerrite', placeholder: 'e.g. 5' },
   { name: 'pearlitePercent', label: 'Pearlite %', type: 'number', thMin: 'microMinPearlite', thMax: 'microMaxPearlite', placeholder: 'e.g. 95' },
@@ -31,6 +43,8 @@ const MicroStructure = () => {
     microLocation: '',
     nodularityPercent: '', graphiteType: '', countNosPerMm2: '', size: '',
     ferritePercent: '', pearlitePercent: '', carbidePercent: '',
+    ferritePercentMin: '', ferritePercentMax: '', pearlitePercentMin: '', pearlitePercentMax: '',
+    carbidePercentMin: '', carbidePercentMax: '', sizeMin: '', sizeMax: '',
     remarks: '',
     status: 'QC_ENTRY', hofApprovedBy: '', hodApprovedBy: '', createdBy: ''
   });
@@ -62,34 +76,46 @@ const MicroStructure = () => {
 
   const isOutOfRange = (val, min, max) => {
     if (val === undefined || val === null || val === '') return false;
+    const hasMin = min !== null && min !== undefined && min !== '';
+    const hasMax = max !== null && max !== undefined && max !== '';
+    if (!hasMin && !hasMax) return false; // no threshold set — accept any value
     const num = parseFloat(val);
     if (isNaN(num)) return false;
-    if (min !== null && min !== undefined && num < min) return true;
-    if (max !== null && max !== undefined && num > max) return true;
+    if (hasMin && num < parseFloat(min)) return true;
+    if (hasMax && num > parseFloat(max)) return true;
     return false;
   };
 
   const validateAll = (data, ts, locs) => {
     const newErrors = {};
     if (!ts) return;
-    const fieldsToValidate = [
+    const singleFields = [
       { key: 'nodularityPercent', min: ts.microMinNodularity, max: ts.microMaxNodularity },
       { key: 'countNosPerMm2', min: ts.microMinCount, max: ts.microMaxCount },
-      { key: 'ferritePercent', min: ts.microMinFerrite, max: ts.microMaxFerrite },
-      { key: 'pearlitePercent', min: ts.microMinPearlite, max: ts.microMaxPearlite },
-      { key: 'carbidePercent', min: ts.microMinCarbide, max: ts.microMaxCarbide },
     ];
     if (!data.id && locs && locs.length > 0) {
       locs.forEach(loc => {
         const lk = locKey(loc);
-        fieldsToValidate.forEach(({ key, min, max }) => {
+        singleFields.forEach(({ key, min, max }) => {
           if (isOutOfRange(data[`${lk}_${key}`], min, max)) newErrors[`${lk}_${key}`] = true;
+        });
+        MICRO_RANGE_FIELDS.forEach(f => {
+          if (isOutOfRange(data[`${lk}_${f.nameMin}`], ts[f.thMin], ts[f.thMax])) newErrors[`${lk}_${f.nameMin}`] = true;
+          if (isOutOfRange(data[`${lk}_${f.nameMax}`], ts[f.thMin], ts[f.thMax])) newErrors[`${lk}_${f.nameMax}`] = true;
         });
       });
     } else {
-      fieldsToValidate.forEach(({ key, min, max }) => {
+      singleFields.forEach(({ key, min, max }) => {
         if (isOutOfRange(data[key], min, max)) newErrors[key] = true;
       });
+      if (isOutOfRange(data.ferritePercentMin, ts.microMinFerrite, ts.microMaxFerrite)) newErrors.ferritePercentMin = true;
+      if (isOutOfRange(data.ferritePercentMax, ts.microMinFerrite, ts.microMaxFerrite)) newErrors.ferritePercentMax = true;
+      if (isOutOfRange(data.pearlitePercentMin, ts.microMinPearlite, ts.microMaxPearlite)) newErrors.pearlitePercentMin = true;
+      if (isOutOfRange(data.pearlitePercentMax, ts.microMinPearlite, ts.microMaxPearlite)) newErrors.pearlitePercentMax = true;
+      if (isOutOfRange(data.carbidePercentMin, ts.microMinCarbide, ts.microMaxCarbide)) newErrors.carbidePercentMin = true;
+      if (isOutOfRange(data.carbidePercentMax, ts.microMinCarbide, ts.microMaxCarbide)) newErrors.carbidePercentMax = true;
+      if (isOutOfRange(data.sizeMin, ts.microSizeMin, ts.microSizeMax)) newErrors.sizeMin = true;
+      if (isOutOfRange(data.sizeMax, ts.microSizeMin, ts.microSizeMax)) newErrors.sizeMax = true;
     }
     setErrors(newErrors);
   };
@@ -196,6 +222,14 @@ const MicroStructure = () => {
             ferritePercent: formData[`${lk}_ferritePercent`] || null,
             pearlitePercent: formData[`${lk}_pearlitePercent`] || null,
             carbidePercent: formData[`${lk}_carbidePercent`] || null,
+            ferritePercentMin: formData[`${lk}_ferritePercentMin`] || null,
+            ferritePercentMax: formData[`${lk}_ferritePercentMax`] || null,
+            pearlitePercentMin: formData[`${lk}_pearlitePercentMin`] || null,
+            pearlitePercentMax: formData[`${lk}_pearlitePercentMax`] || null,
+            carbidePercentMin: formData[`${lk}_carbidePercentMin`] || null,
+            carbidePercentMax: formData[`${lk}_carbidePercentMax`] || null,
+            sizeMin: formData[`${lk}_sizeMin`] || null,
+            sizeMax: formData[`${lk}_sizeMax`] || null,
           });
         }));
         toast.success(`${activeLocations.length} location records saved`);
@@ -210,6 +244,8 @@ const MicroStructure = () => {
         microLocation: '',
         nodularityPercent: '', graphiteType: '', countNosPerMm2: '', size: '',
         ferritePercent: '', pearlitePercent: '', carbidePercent: '',
+        ferritePercentMin: '', ferritePercentMax: '', pearlitePercentMin: '', pearlitePercentMax: '',
+        carbidePercentMin: '', carbidePercentMax: '', sizeMin: '', sizeMax: '',
         remarks: '',
         status: 'QC_ENTRY', hofApprovedBy: '', hodApprovedBy: '', createdBy: ''
       });
@@ -299,7 +335,7 @@ const MicroStructure = () => {
                             📍 {loc}
                           </div>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
-                            {MICRO_FIELDS.map(f => {
+                            {MICRO_SINGLE_FIELDS.map(f => {
                               const errKey = `${lk}_${f.name}`;
                               const hasErr = errors[errKey];
                               const thHint = f.thMin && thresholds ? renderThreshold(thresholds[f.thMin], thresholds[f.thMax]) : '';
@@ -318,6 +354,28 @@ const MicroStructure = () => {
                                     placeholder={f.placeholder}
                                     style={hasErr ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}}
                                   />
+                                  {hasErr && <div style={{ color: '#ef4444', fontSize: '10px', marginTop: '2px', fontWeight: '600' }}>Value out of range!</div>}
+                                </div>
+                              );
+                            })}
+                            {MICRO_RANGE_FIELDS.map(f => {
+                              const minKey = `${lk}_${f.nameMin}`;
+                              const maxKey = `${lk}_${f.nameMax}`;
+                              const hasErr = errors[minKey] || errors[maxKey];
+                              const thHint = thresholds ? renderThreshold(thresholds[f.thMin], thresholds[f.thMax]) : '';
+                              return (
+                                <div className="form-group" key={f.nameMin} style={{ marginBottom: 0 }}>
+                                  <label className="form-label" style={{ fontSize: '12px' }}>
+                                    {f.label}
+                                    {thHint && <span style={{ color: hasErr ? '#ef4444' : 'var(--color-text-secondary)', fontWeight: 400, marginLeft: '4px' }}>{thHint}</span>}
+                                  </label>
+                                  <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                    <input type="number" step="0.1" name={minKey} value={formData[minKey] || ''} onChange={handleChange} className="form-control"
+                                      style={errors[minKey] ? { borderColor:'#ef4444', backgroundColor:'#fef2f2', color:'#ef4444' } : {}} placeholder="Min" />
+                                    <span style={{ color: '#94a3b8', fontWeight: 600 }}>—</span>
+                                    <input type="number" step="0.1" name={maxKey} value={formData[maxKey] || ''} onChange={handleChange} className="form-control"
+                                      style={errors[maxKey] ? { borderColor:'#ef4444', backgroundColor:'#fef2f2', color:'#ef4444' } : {}} placeholder="Max" />
+                                  </div>
                                   {hasErr && <div style={{ color: '#ef4444', fontSize: '10px', marginTop: '2px', fontWeight: '600' }}>Value out of range!</div>}
                                 </div>
                               );
@@ -356,19 +414,63 @@ const MicroStructure = () => {
                       <div className="form-section-title">Matrix Composition (%)</div>
                       <div className="form-row form-row-3">
                         <div className="form-group">
-                          <label className="form-label">Ferrite % <span style={{color: errors.ferritePercent ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.microMinFerrite, thresholds.microMaxFerrite) : '(Max 10)'}</span></label>
-                          <input type="number" name="ferritePercent" value={formData.ferritePercent} onChange={handleChange} className="form-control" style={errors.ferritePercent ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 5" />
-                          {errors.ferritePercent && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
+                          <label className="form-label">Ferrite %
+                            <span style={{color:(errors.ferritePercentMin||errors.ferritePercentMax)?'#ef4444':'var(--color-text-secondary)',fontWeight:400,marginLeft:'4px'}}>
+                              {thresholds ? renderThreshold(thresholds.microMinFerrite, thresholds.microMaxFerrite) : '(Max 10)'}
+                            </span>
+                          </label>
+                          <div style={{display:'flex',gap:'0.5rem',alignItems:'center'}}>
+                            <input type="number" name="ferritePercentMin" value={formData.ferritePercentMin} onChange={handleChange} className="form-control"
+                              style={(errors.ferritePercentMin)?{borderColor:'#ef4444',backgroundColor:'#fef2f2',color:'#ef4444'}:{}} placeholder="Min" />
+                            <span style={{color:'#94a3b8',fontWeight:600}}>—</span>
+                            <input type="number" name="ferritePercentMax" value={formData.ferritePercentMax} onChange={handleChange} className="form-control"
+                              style={(errors.ferritePercentMax)?{borderColor:'#ef4444',backgroundColor:'#fef2f2',color:'#ef4444'}:{}} placeholder="Max" />
+                          </div>
+                          {(errors.ferritePercentMin||errors.ferritePercentMax) && <div style={{color:'#ef4444',fontSize:'10px',marginTop:'2px',fontWeight:'600'}}>Value out of range!</div>}
                         </div>
                         <div className="form-group">
-                          <label className="form-label">Pearlite % <span style={{color: errors.pearlitePercent ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.microMinPearlite, thresholds.microMaxPearlite) : '(90 Min)'}</span></label>
-                          <input type="number" name="pearlitePercent" value={formData.pearlitePercent} onChange={handleChange} className="form-control" style={errors.pearlitePercent ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 95" />
-                          {errors.pearlitePercent && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
+                          <label className="form-label">Pearlite %
+                            <span style={{color:(errors.pearlitePercentMin||errors.pearlitePercentMax)?'#ef4444':'var(--color-text-secondary)',fontWeight:400,marginLeft:'4px'}}>
+                              {thresholds ? renderThreshold(thresholds.microMinPearlite, thresholds.microMaxPearlite) : '(90 Min)'}
+                            </span>
+                          </label>
+                          <div style={{display:'flex',gap:'0.5rem',alignItems:'center'}}>
+                            <input type="number" name="pearlitePercentMin" value={formData.pearlitePercentMin} onChange={handleChange} className="form-control"
+                              style={(errors.pearlitePercentMin)?{borderColor:'#ef4444',backgroundColor:'#fef2f2',color:'#ef4444'}:{}} placeholder="Min" />
+                            <span style={{color:'#94a3b8',fontWeight:600}}>—</span>
+                            <input type="number" name="pearlitePercentMax" value={formData.pearlitePercentMax} onChange={handleChange} className="form-control"
+                              style={(errors.pearlitePercentMax)?{borderColor:'#ef4444',backgroundColor:'#fef2f2',color:'#ef4444'}:{}} placeholder="Max" />
+                          </div>
+                          {(errors.pearlitePercentMin||errors.pearlitePercentMax) && <div style={{color:'#ef4444',fontSize:'10px',marginTop:'2px',fontWeight:'600'}}>Value out of range!</div>}
                         </div>
                         <div className="form-group">
-                          <label className="form-label">Carbide % <span style={{color: errors.carbidePercent ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.microMinCarbide, thresholds.microMaxCarbide) : '(Max 1)'}</span></label>
-                          <input type="number" name="carbidePercent" value={formData.carbidePercent} onChange={handleChange} className="form-control" style={errors.carbidePercent ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 0.5" />
-                          {errors.carbidePercent && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
+                          <label className="form-label">Carbide %
+                            <span style={{color:(errors.carbidePercentMin||errors.carbidePercentMax)?'#ef4444':'var(--color-text-secondary)',fontWeight:400,marginLeft:'4px'}}>
+                              {thresholds ? renderThreshold(thresholds.microMinCarbide, thresholds.microMaxCarbide) : '(Max 1)'}
+                            </span>
+                          </label>
+                          <div style={{display:'flex',gap:'0.5rem',alignItems:'center'}}>
+                            <input type="number" name="carbidePercentMin" value={formData.carbidePercentMin} onChange={handleChange} className="form-control"
+                              style={(errors.carbidePercentMin)?{borderColor:'#ef4444',backgroundColor:'#fef2f2',color:'#ef4444'}:{}} placeholder="Min" />
+                            <span style={{color:'#94a3b8',fontWeight:600}}>—</span>
+                            <input type="number" name="carbidePercentMax" value={formData.carbidePercentMax} onChange={handleChange} className="form-control"
+                              style={(errors.carbidePercentMax)?{borderColor:'#ef4444',backgroundColor:'#fef2f2',color:'#ef4444'}:{}} placeholder="Max" />
+                          </div>
+                          {(errors.carbidePercentMin||errors.carbidePercentMax) && <div style={{color:'#ef4444',fontSize:'10px',marginTop:'2px',fontWeight:'600'}}>Value out of range!</div>}
+                        </div>
+                        <div className="form-group">
+                          <label className="form-label">Nodule Size
+                            <span style={{color:(errors.sizeMin||errors.sizeMax)?'#ef4444':'var(--color-text-secondary)',fontWeight:400,marginLeft:'4px'}}>
+                              {thresholds && (thresholds.microSizeMin || thresholds.microSizeMax) ? renderThreshold(thresholds.microSizeMin, thresholds.microSizeMax) : ''}
+                            </span>
+                          </label>
+                          <div style={{display:'flex',gap:'0.5rem',alignItems:'center'}}>
+                            <input type="number" step="0.1" name="sizeMin" value={formData.sizeMin} onChange={handleChange} className="form-control"
+                              style={errors.sizeMin?{borderColor:'#ef4444',backgroundColor:'#fef2f2',color:'#ef4444'}:{}} placeholder="Min" />
+                            <span style={{color:'#94a3b8',fontWeight:600}}>—</span>
+                            <input type="number" step="0.1" name="sizeMax" value={formData.sizeMax} onChange={handleChange} className="form-control"
+                              style={errors.sizeMax?{borderColor:'#ef4444',backgroundColor:'#fef2f2',color:'#ef4444'}:{}} placeholder="Max" />
+                          </div>
                         </div>
                       </div>
                     </div>
