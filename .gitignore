@@ -38,3 +38,4 @@ db.json
 mssql_data/
 mysql_data/
 mariadb_data/
+.claude/
