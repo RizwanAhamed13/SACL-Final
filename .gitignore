@@ -39,3 +39,5 @@ mssql_data/
 mysql_data/
 mariadb_data/
 .claude/
+.env.production
+.env*.local
