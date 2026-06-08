@@ -1,0 +1,37 @@
+@echo off
+echo ================================================
+echo   SACL Quality Management System — Deploy
+echo ================================================
+
+:: Create .env file with all credentials
+(
+echo SPRING_PROFILES_ACTIVE=prod
+echo DB_HOST=192.168.7.75
+echo DB_PORT=1433
+echo DB_NAME=SakthiWeb
+echo DB_USERNAME=SakthiWeb
+echo DB_PASSWORD=SakthiWeb@2)2%%
+echo DB_ENCRYPT=false
+echo DB_TRUST_CERT=false
+echo JWT_SECRET=sacl-quality-jwt-secret-must-be-64chars-minimum-change-this-now!!
+echo CORS_ORIGINS=http://192.168.7.75:9201
+) > .env
+
+echo [1/3] Credentials file created.
+
+:: Pull latest images from Docker Hub
+echo [2/3] Downloading images from Docker Hub...
+docker compose pull
+
+:: Start containers
+echo [3/3] Starting application...
+docker compose up -d
+
+echo.
+echo ================================================
+echo   Done! Open browser and go to:
+echo   http://192.168.7.75:9201
+echo.
+echo   Login: EMP043 / Rizwan@25012007
+echo ================================================
+pause

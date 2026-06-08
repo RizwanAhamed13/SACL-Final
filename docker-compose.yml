@@ -1,13 +1,15 @@
 version: '3.8'
 
-# Ports:  9201 → Frontend   |   9202 → Backend
-# DB: External SQL Server (192.168.7.75) — NOT in Docker
-# Credentials loaded from .env file (never committed to git)
+# ── SACL Quality Management System ─────────────────────────────
+# Client deployment — just run: docker compose pull && docker compose up -d
+# Ports: 9201 → Frontend  |  9202 → Backend
+# DB: External SQL Server (no DB container needed)
+# ────────────────────────────────────────────────────────────────
 
 services:
 
   backend:
-    build: ./backend
+    image: rizwanahamed13/sacl-backend:latest
     container_name: sacl-backend
     restart: always
     ports:
@@ -18,10 +20,7 @@ services:
       - "host.docker.internal:host-gateway"
 
   frontend:
-    build:
-      context: ./frontend
-      args:
-        VITE_API_BASE_URL: ""
+    image: rizwanahamed13/sacl-frontend:latest
     container_name: sacl-frontend
     restart: always
     ports:
