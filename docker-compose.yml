@@ -2,7 +2,8 @@ version: '3.8'
 
 # ── SACL Quality Management System ─────────────────────────────
 # Client deployment — just run: docker compose pull && docker compose up -d
-# Ports: 9201 → Frontend  |  9202 → Backend
+# Access: http://<server-ip>  (port 80)
+# Frontend Nginx proxies /api/* → backend internally (no backend port exposed)
 # DB: External SQL Server (no DB container needed)
 # ────────────────────────────────────────────────────────────────
 
@@ -12,8 +13,9 @@ services:
     image: rizwanahamed13/sacl-backend:latest
     container_name: sacl-backend
     restart: always
-    ports:
-      - "9202:8080"
+    # No host port — only reachable from within the Docker network via frontend proxy
+    expose:
+      - "8080"
     env_file:
       - .env
     extra_hosts:
@@ -24,6 +26,6 @@ services:
     container_name: sacl-frontend
     restart: always
     ports:
-      - "9201:80"
+      - "80:80"
     depends_on:
       - backend
