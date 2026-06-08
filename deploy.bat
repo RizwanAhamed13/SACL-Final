@@ -3,6 +3,33 @@ echo ================================================
 echo   SACL Quality Management System — Deploy
 echo ================================================
 
+:: Check if Docker is installed
+docker --version >nul 2>&1
+if %errorlevel% neq 0 (
+    echo.
+    echo  ERROR: Docker is not installed on this machine.
+    echo  Please install Docker Desktop from https://www.docker.com
+    echo  Then run this script again.
+    echo.
+    pause
+    exit /b 1
+)
+
+:: Check if Docker daemon is running
+docker info >nul 2>&1
+if %errorlevel% neq 0 (
+    echo.
+    echo  ERROR: Docker is installed but not running.
+    echo  Please open Docker Desktop and wait for it to start,
+    echo  then run this script again.
+    echo.
+    pause
+    exit /b 1
+)
+
+echo  Docker is ready.
+echo.
+
 :: Create .env file with all credentials
 (
 echo SPRING_PROFILES_ACTIVE=prod
