@@ -1,7 +1,10 @@
 package com.sacl.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import com.sacl.dto.PageResponse;
+import org.springframework.security.access.prepost.PreAuthorize;
 import com.sacl.model.QcRegister;
+import org.springframework.security.access.prepost.PreAuthorize;
 import com.sacl.service.QcRegisterService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,11 +22,12 @@ public class QcRegisterController {
     private final QcRegisterService service;
     private final com.sacl.service.RejectedRecordService rejectedService;
 
+    @PreAuthorize("hasAnyRole('HOF','HOD','ADMIN')")
     @PostMapping("/reject/{id}")
     public ResponseEntity<Void> reject(@PathVariable Long id, @RequestParam String rejectedBy) {
         QcRegister entry = service.findById(id);
         if (entry != null) {
-            rejectedService.archiveAndReject("QC_REGISTER", id, entry, rejectedBy);
+            rejectedService.archiveAndReject("QC_REGISTER", id, entry, rejectedBy, entry.getStatus() != null && entry.getStatus().name().equals("QC_ENTRY") ? "HOF" : "HOD", entry.getCreatedBy());
             service.deleteById(id);
         }
         return ResponseEntity.noContent().build();
@@ -48,6 +52,7 @@ public class QcRegisterController {
         return ResponseEntity.ok(service.findById(id));
     }
 
+    @PreAuthorize("hasAnyRole('HOF','HOD','ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<QcRegister> update(@PathVariable Long id, @Valid @RequestBody QcRegister entry) {
         entry.setId(id);

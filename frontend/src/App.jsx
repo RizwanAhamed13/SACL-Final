@@ -15,6 +15,7 @@ import ImpactTest from './pages/ImpactTest';
 import PartNames from './pages/PartNames';
 import UserManagement from './pages/UserManagement';
 import Reports from './pages/Reports';
+import EmployeeEfficiency from './pages/EmployeeEfficiency';
 
 import { Toaster } from 'react-hot-toast';
 
@@ -49,6 +50,7 @@ const App = () => {
               <Route path="part-names" element={<ProtectedRoute requiredRole="ADMIN"><PartNames /></ProtectedRoute>} />
               <Route path="users" element={<ProtectedRoute requiredRole="ADMIN"><UserManagement /></ProtectedRoute>} />
               <Route path="reports" element={<ProtectedRoute requiredRole="ADMIN"><Reports /></ProtectedRoute>} />
+              <Route path="efficiency" element={<ProtectedRoute requiredRole="ADMIN"><EmployeeEfficiency /></ProtectedRoute>} />
             </Route>
 
             <Route path="*" element={<Navigate to="/" replace />} />

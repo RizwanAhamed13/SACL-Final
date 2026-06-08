@@ -1,7 +1,10 @@
 package com.sacl.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import com.sacl.dto.PageResponse;
+import org.springframework.security.access.prepost.PreAuthorize;
 import com.sacl.model.MicroTensileTest;
+import org.springframework.security.access.prepost.PreAuthorize;
 import com.sacl.service.MicroTensileService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,11 +22,12 @@ public class MicroTensileController {
     private final MicroTensileService service;
     private final com.sacl.service.RejectedRecordService rejectedService;
 
+    @PreAuthorize("hasAnyRole('HOF','HOD','ADMIN')")
     @PostMapping("/reject/{id}")
     public ResponseEntity<Void> reject(@PathVariable Long id, @RequestParam String rejectedBy) {
         MicroTensileTest entry = service.findById(id);
         if (entry != null) {
-            rejectedService.archiveAndReject("TENSILE_TEST", id, entry, rejectedBy);
+            rejectedService.archiveAndReject("TENSILE_TEST", id, entry, rejectedBy, entry.getStatus() != null && entry.getStatus().name().equals("QC_ENTRY") ? "HOF" : "HOD", entry.getCreatedBy());
             service.deleteById(id);
         }
         return ResponseEntity.noContent().build();
@@ -48,6 +52,7 @@ public class MicroTensileController {
         return ResponseEntity.ok(service.findById(id));
     }
 
+    @PreAuthorize("hasAnyRole('HOF','HOD','ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<MicroTensileTest> update(@PathVariable Long id, @Valid @RequestBody MicroTensileTest entry) {
         entry.setId(id);

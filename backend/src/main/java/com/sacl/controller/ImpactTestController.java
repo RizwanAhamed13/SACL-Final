@@ -1,7 +1,10 @@
 package com.sacl.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import com.sacl.dto.PageResponse;
+import org.springframework.security.access.prepost.PreAuthorize;
 import com.sacl.model.ImpactTest;
+import org.springframework.security.access.prepost.PreAuthorize;
 import com.sacl.service.ImpactTestService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,11 +22,12 @@ public class ImpactTestController {
     private final ImpactTestService service;
     private final com.sacl.service.RejectedRecordService rejectedService;
 
+    @PreAuthorize("hasAnyRole('HOF','HOD','ADMIN')")
     @PostMapping("/reject/{id}")
     public ResponseEntity<Void> reject(@PathVariable Long id, @RequestParam String rejectedBy) {
         ImpactTest entry = service.findById(id);
         if (entry != null) {
-            rejectedService.archiveAndReject("IMPACT_TEST", id, entry, rejectedBy);
+            rejectedService.archiveAndReject("IMPACT_TEST", id, entry, rejectedBy, entry.getStatus() != null && entry.getStatus().name().equals("QC_ENTRY") ? "HOF" : "HOD", entry.getCreatedBy());
             service.deleteById(id);
         }
         return ResponseEntity.noContent().build();
@@ -48,6 +52,7 @@ public class ImpactTestController {
         return ResponseEntity.ok(service.findById(id));
     }
 
+    @PreAuthorize("hasAnyRole('HOF','HOD','ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<ImpactTest> update(@PathVariable Long id, @Valid @RequestBody ImpactTest entry) {
         entry.setId(id);

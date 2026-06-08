@@ -20,19 +20,23 @@ public class SaclApplication {
             if (userRepository.count() == 0 || userRepository.findByUsername("admin").isEmpty()) {
                 User admin = new User();
                 admin.setUsername("admin");
-                admin.setPassword(passwordEncoder.encode("admin"));
+                admin.setEmployeeId("EMP043");
+                admin.setPassword(passwordEncoder.encode("Rizwan@25012007"));
                 admin.setFullName("Administrator");
-                admin.setEmail("admin@example.com");
+                admin.setEmail("admin@sacl.com");
                 admin.setRole("ADMIN");
                 admin.setActive(true);
                 userRepository.save(admin);
-                System.out.println("Default admin user created with username 'admin' and password 'admin'");
+                System.out.println("Default admin created — EmployeeID: EMP043");
             } else {
                 userRepository.findByUsername("admin").ifPresent(user -> {
                     if (user.getActive() == null || !user.getActive()) {
                         user.setActive(true);
                         userRepository.save(user);
-                        System.out.println("User 'admin' has been reactivated.");
+                    }
+                    if (user.getEmployeeId() == null || user.getEmployeeId().isBlank()) {
+                        user.setEmployeeId("EMP043");
+                        userRepository.save(user);
                     }
                 });
             }

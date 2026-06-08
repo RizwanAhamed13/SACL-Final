@@ -1,7 +1,10 @@
 package com.sacl.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import com.sacl.dto.PageResponse;
+import org.springframework.security.access.prepost.PreAuthorize;
 import com.sacl.model.MicroStructureAnalysis;
+import org.springframework.security.access.prepost.PreAuthorize;
 import com.sacl.service.MicroStructureService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,11 +22,12 @@ public class MicroStructureController {
     private final MicroStructureService service;
     private final com.sacl.service.RejectedRecordService rejectedService;
 
+    @PreAuthorize("hasAnyRole('HOF','HOD','ADMIN')")
     @PostMapping("/reject/{id}")
     public ResponseEntity<Void> reject(@PathVariable Long id, @RequestParam String rejectedBy) {
         MicroStructureAnalysis entry = service.findById(id);
         if (entry != null) {
-            rejectedService.archiveAndReject("MICRO_STRUCTURE", id, entry, rejectedBy);
+            rejectedService.archiveAndReject("MICRO_STRUCTURE", id, entry, rejectedBy, entry.getStatus() != null && entry.getStatus().name().equals("QC_ENTRY") ? "HOF" : "HOD", entry.getCreatedBy());
             service.deleteById(id);
         }
         return ResponseEntity.noContent().build();
@@ -48,6 +52,7 @@ public class MicroStructureController {
         return ResponseEntity.ok(service.findById(id));
     }
 
+    @PreAuthorize("hasAnyRole('HOF','HOD','ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<MicroStructureAnalysis> update(@PathVariable Long id, @Valid @RequestBody MicroStructureAnalysis entry) {
         entry.setId(id);

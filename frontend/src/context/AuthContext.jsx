@@ -52,7 +52,17 @@ export const AuthProvider = ({ children }) => {
     scheduleExpiryWarning(token);
   };
 
-  const logout = () => {
+  const logout = async () => {
+    // BUG-005: Blacklist token on server before clearing local state
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      } catch { /* ignore network errors — still clear local state */ }
+    }
     localStorage.removeItem('user');
     localStorage.removeItem('token');
     setUser(null);

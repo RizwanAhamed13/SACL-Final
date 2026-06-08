@@ -16,6 +16,9 @@ const emptyForm = {
   impactMinSpec: '', impactMaxSpec: '',
   mechLocations: '',
   impactNotchTypes: '',
+  impactMinUnnotch: '', impactMaxUnnotch: '',
+  impactMinUnotch: '', impactMaxUnotch: '',
+  impactMinVnotch: '', impactMaxVnotch: '',
   impactMinTRAUnotch: '', impactMaxTRAUnotch: '',
   impactMinTRAVnotch: '', impactMaxTRAVnotch: '',
   impactMinTRAUnnotch: '', impactMaxTRAUnnotch: '',
@@ -76,6 +79,9 @@ const PartNames = () => {
       impactMinSpec: part.impactMinSpec ?? '', impactMaxSpec: part.impactMaxSpec ?? '',
       mechLocations: part.mechLocations ?? '',
       impactNotchTypes: part.impactNotchTypes ?? '',
+      impactMinUnnotch: part.impactMinUnnotch ?? '', impactMaxUnnotch: part.impactMaxUnnotch ?? '',
+      impactMinUnotch: part.impactMinUnotch ?? '', impactMaxUnotch: part.impactMaxUnotch ?? '',
+      impactMinVnotch: part.impactMinVnotch ?? '', impactMaxVnotch: part.impactMaxVnotch ?? '',
       impactMinTRAUnotch: part.impactMinTRAUnotch ?? '', impactMaxTRAUnotch: part.impactMaxTRAUnotch ?? '',
       impactMinTRAVnotch: part.impactMinTRAVnotch ?? '', impactMaxTRAVnotch: part.impactMaxTRAVnotch ?? '',
       impactMinTRAUnnotch: part.impactMinTRAUnnotch ?? '', impactMaxTRAUnnotch: part.impactMaxTRAUnnotch ?? '',
@@ -107,6 +113,9 @@ const PartNames = () => {
       impactMinSpec: n(formData.impactMinSpec), impactMaxSpec: n(formData.impactMaxSpec),
       mechLocations: formData.mechLocations || null,
       impactNotchTypes: formData.impactNotchTypes || null,
+      impactMinUnnotch: n(formData.impactMinUnnotch), impactMaxUnnotch: n(formData.impactMaxUnnotch),
+      impactMinUnotch: n(formData.impactMinUnotch), impactMaxUnotch: n(formData.impactMaxUnotch),
+      impactMinVnotch: n(formData.impactMinVnotch), impactMaxVnotch: n(formData.impactMaxVnotch),
       impactMinTRAUnotch: n(formData.impactMinTRAUnotch), impactMaxTRAUnotch: n(formData.impactMaxTRAUnotch),
       impactMinTRAVnotch: n(formData.impactMinTRAVnotch), impactMaxTRAVnotch: n(formData.impactMaxTRAVnotch),
       impactMinTRAUnnotch: n(formData.impactMinTRAUnnotch), impactMaxTRAUnnotch: n(formData.impactMaxTRAUnnotch),
@@ -200,7 +209,8 @@ const PartNames = () => {
               <button className="btn btn-secondary btn-sm" onClick={() => setShowForm(false)}>Cancel</button>
             </div>
             <div className="card-body">
-              <form onSubmit={handleSubmit} noValidate>
+              {/* BUG-009: key forces full re-render when switching between add/edit */}
+              <form key={editingId ?? 'new'} onSubmit={handleSubmit} noValidate>
                 <div className="row g-3">
                   <div className="col-md-6">
                     <label className="form-label required">Part Name</label>
@@ -311,22 +321,35 @@ const PartNames = () => {
                   ))}
                 </div>
 
-                {/* Impact Notch Types */}
+                {/* Impact Notch Types with per-notch thresholds */}
                 <div className="form-section-title">Impact Notch Types</div>
-                <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', marginBottom: '1rem', background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                  {['Unnotch', 'Unotch', 'Vnotch'].map(notch => {
-                    const label = notch === 'Unnotch' ? 'Un-notch' : notch === 'Unotch' ? 'U-notch' : 'V-notch';
-                    const isChecked = formData.impactNotchTypes ? formData.impactNotchTypes.split(',').includes(notch) : false;
+                <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0', marginBottom: '1rem' }}>
+                  {[
+                    { key: 'Unnotch', label: 'Un-notch', min: 'impactMinUnnotch', max: 'impactMaxUnnotch' },
+                    { key: 'Unotch',  label: 'U-notch',  min: 'impactMinUnotch',  max: 'impactMaxUnotch'  },
+                    { key: 'Vnotch',  label: 'V-notch',  min: 'impactMinVnotch',  max: 'impactMaxVnotch'  },
+                  ].map(({ key, label, min, max }) => {
+                    const isChecked = formData.impactNotchTypes ? formData.impactNotchTypes.split(',').includes(key) : false;
                     return (
-                      <label key={notch} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontWeight: 600, color: '#334155' }}>
-                        <input type="checkbox" checked={isChecked}
-                          onChange={(e) => {
-                            const current = formData.impactNotchTypes ? formData.impactNotchTypes.split(',').filter(Boolean) : [];
-                            const next = e.target.checked ? [...current, notch] : current.filter(x => x !== notch);
-                            setFormData(prev => ({ ...prev, impactNotchTypes: next.join(',') }));
-                          }} />
-                        {label}
-                      </label>
+                      <div key={key} style={{ marginBottom: '0.75rem' }}>
+                        <label style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontWeight: 600, color: '#334155', marginBottom: '0.4rem' }}>
+                          <input type="checkbox" checked={isChecked}
+                            onChange={(e) => {
+                              const current = formData.impactNotchTypes ? formData.impactNotchTypes.split(',').filter(Boolean) : [];
+                              const next = e.target.checked ? [...current, key] : current.filter(x => x !== key);
+                              setFormData(prev => ({ ...prev, impactNotchTypes: next.join(',') }));
+                            }} />
+                          {label}
+                        </label>
+                        {isChecked && (
+                          <div className="range-row" style={{ marginLeft: '1.75rem', marginBottom: 0 }}>
+                            <span className="range-label" style={{ minWidth: '160px', fontSize: '12px', color: '#64748b' }}>Impact Strength (J)</span>
+                            <input type="number" step="0.1" name={min} value={formData[min] || ''} onChange={handleChange} className="form-control range-input" placeholder="Min" />
+                            <span className="range-sep">—</span>
+                            <input type="number" step="0.1" name={max} value={formData[max] || ''} onChange={handleChange} className="form-control range-input" placeholder="Max" />
+                          </div>
+                        )}
+                      </div>
                     );
                   })}
                 </div>

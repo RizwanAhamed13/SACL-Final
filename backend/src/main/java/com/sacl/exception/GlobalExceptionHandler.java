@@ -4,6 +4,9 @@ import com.sacl.dto.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -53,6 +56,21 @@ public class GlobalExceptionHandler {
         body.put("timestamp", Instant.now().toString());
         body.put("fieldErrors", fieldErrors);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
+    // BUG-002/003: Auth errors must return 401, not 500
+    @ExceptionHandler({BadCredentialsException.class, DisabledException.class})
+    public ResponseEntity<ErrorResponse> handleAuthFailure(Exception ex) {
+        // Generic message — do not reveal whether user exists or if password is wrong
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ErrorResponse("Unauthorized", "Invalid employee ID or password", Instant.now().toString()));
+    }
+
+    // BUG-016 supplement: handle @PreAuthorize 403
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(new ErrorResponse("Forbidden", "You do not have permission to perform this action", Instant.now().toString()));
     }
 
     @ExceptionHandler(Exception.class)

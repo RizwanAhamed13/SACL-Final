@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "rejected_records")
+@Table(name = "mcetbcs043_rejected_records")
 public class RejectedRecord {
 
     @Id
@@ -23,6 +23,8 @@ public class RejectedRecord {
     private String dataJson; // Full record data in JSON format
 
     private String rejectedBy;
+    private String rejectionStage; // "HOF" or "HOD"
+    private String originalCreatedBy; // who submitted the original record
     private LocalDateTime rejectedAt;
 
     @PrePersist

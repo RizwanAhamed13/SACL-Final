@@ -11,9 +11,5 @@ import java.util.List;
 @Repository
 public interface ImpactTestRepository extends JpaRepository<ImpactTest, Long> {
 
-    @Query("SELECT r FROM ImpactTest r WHERE " +
-           "(:partName IS NULL OR LOWER(r.partName) LIKE LOWER(CONCAT('%',:partName,'%'))) AND " +
-           "(:dateCode IS NULL OR LOWER(r.dateCode) LIKE LOWER(CONCAT('%',:dateCode,'%')))")
-    List<ImpactTest> findByFilters(@Param("partName") String partName,
-                                   @Param("dateCode") String dateCode);
+    List<ImpactTest> findAll();
 }

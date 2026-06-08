@@ -82,6 +82,9 @@ public class PartNameService {
         // Impact Thresholds
         existing.setImpactMinSpec(updates.getImpactMinSpec()); existing.setImpactMaxSpec(updates.getImpactMaxSpec());
         existing.setImpactNotchTypes(updates.getImpactNotchTypes());
+        existing.setImpactMinUnnotch(updates.getImpactMinUnnotch()); existing.setImpactMaxUnnotch(updates.getImpactMaxUnnotch());
+        existing.setImpactMinUnotch(updates.getImpactMinUnotch());   existing.setImpactMaxUnotch(updates.getImpactMaxUnotch());
+        existing.setImpactMinVnotch(updates.getImpactMinVnotch());   existing.setImpactMaxVnotch(updates.getImpactMaxVnotch());
         existing.setImpactMinTRAUnotch(updates.getImpactMinTRAUnotch()); existing.setImpactMaxTRAUnotch(updates.getImpactMaxTRAUnotch());
         existing.setImpactMinTRAVnotch(updates.getImpactMinTRAVnotch()); existing.setImpactMaxTRAVnotch(updates.getImpactMaxTRAVnotch());
         existing.setImpactMinTRAUnnotch(updates.getImpactMinTRAUnnotch()); existing.setImpactMaxTRAUnnotch(updates.getImpactMaxTRAUnnotch());

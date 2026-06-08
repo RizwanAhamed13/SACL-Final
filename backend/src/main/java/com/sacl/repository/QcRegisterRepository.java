@@ -11,11 +11,5 @@ import java.util.List;
 @Repository
 public interface QcRegisterRepository extends JpaRepository<QcRegister, Long> {
 
-    @Query("SELECT r FROM QcRegister r WHERE " +
-           "(:partName IS NULL OR LOWER(r.partName) LIKE LOWER(CONCAT('%',:partName,'%'))) AND " +
-           "(:dateCode IS NULL OR LOWER(r.dateCode) LIKE LOWER(CONCAT('%',:dateCode,'%'))) AND " +
-           "(:heatCode IS NULL OR LOWER(r.heatCode) LIKE LOWER(CONCAT('%',:heatCode,'%')))")
-    List<QcRegister> findByFilters(@Param("partName") String partName,
-                                   @Param("dateCode") String dateCode,
-                                   @Param("heatCode") String heatCode);
+    List<QcRegister> findAll();
 }

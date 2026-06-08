@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "part_names")
+@Table(name = "mcetbcs043_part_names")
 @SQLRestriction("deleted_at IS NULL")
 public class PartName {
 
@@ -69,6 +69,11 @@ public class PartName {
 
     // Impact Notch Types config (comma-separated: "Unotch,Vnotch,Unnotch")
     private String impactNotchTypes;
+
+    // Per-notch impact strength thresholds
+    private Double impactMinUnnotch;  private Double impactMaxUnnotch;
+    private Double impactMinUnotch;   private Double impactMaxUnotch;
+    private Double impactMinVnotch;   private Double impactMaxVnotch;
 
     // Impact per-combination thresholds (location x notch type)
     private Double impactMinTRAUnotch;  private Double impactMaxTRAUnotch;

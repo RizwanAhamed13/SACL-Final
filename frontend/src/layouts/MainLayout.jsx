@@ -57,7 +57,7 @@ export const MainLayout = () => {
               <img src={logo} alt="SACL" style={{ width: '32px', height: '32px', objectFit: 'contain' }} />
             </div>
             <div className="logo-text">
-              <span className="logo-title" style={{ color: 'var(--color-text-primary)' }}>SACL</span>
+              <span className="logo-title">SACL</span>
               <span className="logo-subtitle">Quality System</span>
             </div>
           </div>
@@ -146,44 +146,53 @@ export const MainLayout = () => {
                 </svg>
                 Logging & Reports
               </NavLink>
+              <NavLink to="/efficiency" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={closeMobileSidebar}>
+                <svg className="nav-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <polyline points="23 21 23 19 19 19" />
+                  <polyline points="16 15 19 18 22 15" />
+                </svg>
+                Employee Efficiency
+              </NavLink>
             </div>
           )}
         </nav>
         
-        <div style={{ padding: '1rem', borderTop: '1px solid var(--color-border)', marginTop: 'auto' }}>
-          <button 
+        {/* Sidebar footer — user info + logout */}
+        <div style={{ padding: '1rem .75rem', borderTop: '1px solid rgba(255,255,255,.1)', marginTop: 'auto', flexShrink: 0 }}>
+          {/* User info chip */}
+          <div style={{ display:'flex', alignItems:'center', gap:'.625rem', padding:'.625rem .75rem', marginBottom:'.5rem', background:'rgba(255,255,255,.07)', borderRadius:'10px' }}>
+            <div style={{ width:'30px', height:'30px', borderRadius:'8px', background:'linear-gradient(135deg,#ff7b21,#e86a14)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, fontSize:'12px', fontWeight:700, color:'#fff' }}>
+              {(user?.fullName || user?.username || 'U').charAt(0).toUpperCase()}
+            </div>
+            <div style={{ minWidth:0 }}>
+              <div style={{ fontSize:'.75rem', fontWeight:600, color:'#fff', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', lineHeight:1.2 }}>
+                {user?.fullName || user?.username}
+              </div>
+              <div style={{ fontSize:'.65rem', color:'rgba(255,255,255,.45)', lineHeight:1.2, textTransform:'uppercase', letterSpacing:'.04em' }}>
+                {(user?.role || '').replace('ROLE_', '')}
+              </div>
+            </div>
+          </div>
+          <button
             onClick={handleLogout}
-            className="logout-button"
-            style={{ 
-              width: '100%', 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '0.75rem', 
-              padding: '0.75rem 1rem', 
-              background: 'rgba(220, 38, 38, 0.05)', 
-              border: 'none', 
-              cursor: 'pointer', 
-              color: '#dc2626', 
-              borderRadius: '12px',
-              fontWeight: 600,
-              fontSize: '14px',
-              transition: 'all 0.2s ease'
+            style={{
+              width: '100%', display: 'flex', alignItems: 'center', gap: '.625rem',
+              padding: '.5rem .75rem', background: 'rgba(239,68,68,.12)', border: 'none',
+              cursor: 'pointer', color: '#fca5a5', borderRadius: '8px',
+              fontWeight: 600, fontSize: '.8rem', transition: 'all .15s ease',
+              letterSpacing:'-.01em',
             }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.background = 'rgba(220, 38, 38, 0.1)';
-              e.currentTarget.style.transform = 'translateY(-1px)';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.background = 'rgba(220, 38, 38, 0.05)';
-              e.currentTarget.style.transform = 'translateY(0)';
-            }}
+            onMouseOver={e => { e.currentTarget.style.background='rgba(239,68,68,.22)'; e.currentTarget.style.color='#fff'; }}
+            onMouseOut={e => { e.currentTarget.style.background='rgba(239,68,68,.12)'; e.currentTarget.style.color='#fca5a5'; }}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
               <polyline points="16 17 21 12 16 7"></polyline>
               <line x1="21" y1="12" x2="9" y2="12"></line>
             </svg>
-            Logout ({user?.username})
+            Sign Out
           </button>
         </div>
       </aside>
@@ -191,18 +200,25 @@ export const MainLayout = () => {
       <div className={`main-content ${sidebarCollapsed ? 'expanded' : ''}`}>
         <header className="header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem' }}>
-            <button className="sidebar-toggle" onClick={toggleSidebar} title="Toggle sidebar" style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', color: 'var(--color-text-primary)' }}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="3" y1="12" x2="21" y2="12" />
-                <line x1="3" y1="6" x2="21" y2="6" />
-                <line x1="3" y1="18" x2="21" y2="18" />
+            <button className="sidebar-toggle" onClick={toggleSidebar} title="Toggle sidebar">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"/>
+                <line x1="3" y1="6" x2="21" y2="6"/>
+                <line x1="3" y1="18" x2="21" y2="18"/>
               </svg>
             </button>
-            <span className="header-title">SACL Quality Management</span>
+            <div style={{ display:'flex', alignItems:'center', gap:'.5rem' }}>
+              <span style={{ width:'6px', height:'6px', borderRadius:'50%', background:'#ff7b21', display:'inline-block' }}></span>
+              <span className="header-title">SACL Quality Management</span>
+            </div>
           </div>
           <div className="header-actions">
             <div className="header-user">
-              {user?.role}
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              {(user?.role || '').replace('ROLE_', '')}
             </div>
           </div>
         </header>

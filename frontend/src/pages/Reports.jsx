@@ -160,7 +160,15 @@ const expandLocationValues = (records, type) => {
       return;
     }
     try {
-      const locValues = typeof r.locationValues === 'string' ? JSON.parse(r.locationValues) : r.locationValues;
+      // BUG-008: Guard against malformed JSON — fall back to showing the record as-is
+      let locValues;
+      try {
+        locValues = typeof r.locationValues === 'string' ? JSON.parse(r.locationValues) : r.locationValues;
+      } catch {
+        expanded.push(r);
+        return;
+      }
+      if (!locValues || typeof locValues !== 'object') { expanded.push(r); return; }
       Object.entries(locValues).forEach(([location, data]) => {
         if (type === 'impact') {
           // Impact Test has location × notch structure: {TRA: {Unotch: {v1, v2, v3}, ...}, ...}
@@ -287,12 +295,11 @@ const Reports = () => {
     setLoading(true);
     try {
       const res = await axios.get('/api/reports/search', { params: searchParams });
-      // Only show and export data approved by HOD
       const approvedResults = {
-        qcRegister: res.data.qcRegister.filter(r => r.status === 'HOD_APPROVED'),
-        microStructure: expandLocationValues(res.data.microStructure.filter(r => r.status === 'HOD_APPROVED'), 'micro'),
-        microTensile: expandLocationValues(res.data.microTensile.filter(r => r.status === 'HOD_APPROVED'), 'tensile'),
-        impactTest: expandLocationValues(res.data.impactTest.filter(r => r.status === 'HOD_APPROVED'), 'impact')
+        qcRegister: res.data.qcRegister,
+        microStructure: expandLocationValues(res.data.microStructure, 'micro'),
+        microTensile: expandLocationValues(res.data.microTensile, 'tensile'),
+        impactTest: expandLocationValues(res.data.impactTest, 'impact')
       };
       setResults(approvedResults);
     } catch {

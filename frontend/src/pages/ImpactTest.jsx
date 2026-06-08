@@ -74,17 +74,27 @@ const ImpactTest = () => {
     return false;
   };
 
+  // Get the threshold for a specific notch type (per-notch takes priority over generic)
+  const getNotchThreshold = (ts, notchKey) => {
+    const perNotch = {
+      Unnotch: { min: ts.impactMinUnnotch, max: ts.impactMaxUnnotch },
+      Unotch:  { min: ts.impactMinUnotch,  max: ts.impactMaxUnotch  },
+      Vnotch:  { min: ts.impactMinVnotch,  max: ts.impactMaxVnotch  },
+    };
+    const t = perNotch[notchKey];
+    if (t && (t.min !== null && t.min !== undefined && t.min !== '' ||
+              t.max !== null && t.max !== undefined && t.max !== '')) return t;
+    return { min: ts.impactMinSpec, max: ts.impactMaxSpec };
+  };
+
   const validateAll = (data, ts, locs, notches) => {
     const newErrors = {};
     if (!ts) return;
-    const minSpec = ts.impactMinSpec;
-    const maxSpec = ts.impactMaxSpec;
     if (!data.id && locs && locs.length > 0 && notches && notches.length > 0) {
-      // Per (location x notch) — use combo-specific threshold
+      // Per (location x notch) — use per-notch threshold
       locs.forEach(loc => {
         notches.forEach(notch => {
-          const cMin = ts[`impactMin${loc}${notch}`];
-          const cMax = ts[`impactMax${loc}${notch}`];
+          const { min: cMin, max: cMax } = getNotchThreshold(ts, notch);
           IMPACT_FIELDS.forEach(f => {
             const key = comboKey(loc, notch, f.name);
             if (isOutOfRange(data[key], cMin, cMax)) newErrors[key] = true;
@@ -92,17 +102,15 @@ const ImpactTest = () => {
         });
       });
     } else if (!data.id && locs && locs.length > 0) {
-      // Per location only — fallback to generic impactMinSpec/Max
       locs.forEach(loc => {
         IMPACT_FIELDS.forEach(f => {
-          if (isOutOfRange(data[`${loc}_${f.name}`], minSpec, maxSpec)) newErrors[`${loc}_${f.name}`] = true;
+          if (isOutOfRange(data[`${loc}_${f.name}`], ts.impactMinSpec, ts.impactMaxSpec)) newErrors[`${loc}_${f.name}`] = true;
         });
       });
     } else {
-      // Single mode
-      if (isOutOfRange(data.observedValue1, minSpec, maxSpec)) newErrors.observedValue1 = true;
-      if (isOutOfRange(data.observedValue2, minSpec, maxSpec)) newErrors.observedValue2 = true;
-      if (isOutOfRange(data.observedValue3, minSpec, maxSpec)) newErrors.observedValue3 = true;
+      if (isOutOfRange(data.observedValue1, ts.impactMinSpec, ts.impactMaxSpec)) newErrors.observedValue1 = true;
+      if (isOutOfRange(data.observedValue2, ts.impactMinSpec, ts.impactMaxSpec)) newErrors.observedValue2 = true;
+      if (isOutOfRange(data.observedValue3, ts.impactMinSpec, ts.impactMaxSpec)) newErrors.observedValue3 = true;
     }
     setErrors(newErrors);
   };
@@ -343,9 +351,8 @@ const ImpactTest = () => {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
                       {activeLocations.flatMap(loc => selectedNotches.map(notchKey => {
                         const notchLabel = NOTCH_LABEL[notchKey];
-                        const cMin = thresholds?.[`impactMin${loc}${notchKey}`];
-                        const cMax = thresholds?.[`impactMax${loc}${notchKey}`];
-                        const thHint = renderThreshold(cMin, cMax);
+                        const notchTh = thresholds ? getNotchThreshold(thresholds, notchKey) : { min: null, max: null };
+                        const thHint = renderThreshold(notchTh.min, notchTh.max);
                         return (
                           <div key={`${loc}_${notchKey}`} style={{ border: '1px solid #cbd5e1', borderRadius: '10px', padding: '1rem 1.25rem', background: '#f8fafc' }}>
                             <div style={{ fontWeight: 700, fontSize: '13px', color: '#0f172a', marginBottom: '0.75rem', paddingBottom: '0.5rem', borderBottom: '1px solid #e2e8f0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>

@@ -16,15 +16,26 @@ public class RejectedRecordService {
 
     @Transactional
     public void archiveAndReject(String formType, Long originalId, Object data, String rejectedBy) {
+        archiveAndReject(formType, originalId, data, rejectedBy, null, null);
+    }
+
+    @Transactional
+    public void archiveAndReject(String formType, Long originalId, Object data, String rejectedBy, String rejectionStage, String originalCreatedBy) {
         try {
             RejectedRecord rejected = new RejectedRecord();
             rejected.setFormType(formType);
             rejected.setOriginalId(originalId);
             rejected.setDataJson(objectMapper.writeValueAsString(data));
             rejected.setRejectedBy(rejectedBy);
+            rejected.setRejectionStage(rejectionStage);
+            rejected.setOriginalCreatedBy(originalCreatedBy);
             repository.save(rejected);
         } catch (Exception e) {
             throw new com.sacl.exception.BadRequestException("Failed to archive rejected record: " + e.getMessage());
         }
+    }
+
+    public java.util.List<RejectedRecord> findAll() {
+        return repository.findAll();
     }
 }
