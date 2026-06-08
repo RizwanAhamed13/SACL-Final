@@ -1,11 +1,8 @@
 version: '3.8'
 
-# ── SACL Quality Management System ─────────────────────────────
-# DB is the client's external SQL Server — NOT in Docker
-# Only 2 ports needed on the host:
-#   Port 80   → Frontend (Nginx serving React)
-#   Port 8080 → Backend  (Spring Boot API)
-# ────────────────────────────────────────────────────────────────
+# Ports:  9201 → Frontend   |   9202 → Backend
+# DB: External SQL Server (192.168.7.75) — NOT in Docker
+# Credentials loaded from .env file (never committed to git)
 
 services:
 
@@ -15,17 +12,8 @@ services:
     restart: always
     ports:
       - "9202:8080"
-    environment:
-      SPRING_PROFILES_ACTIVE: prod
-      DB_HOST: 192.168.7.75
-      DB_PORT: 1433
-      DB_NAME: SakthiWeb
-      DB_USERNAME: SakthiWeb
-      DB_PASSWORD: "S@kth!Web@2)2%"
-      DB_ENCRYPT: "false"
-      DB_TRUST_CERT: "false"
-      JWT_SECRET: "sacl-quality-jwt-secret-must-be-64chars-minimum-change-this-now!!"
-      CORS_ORIGINS: "http://localhost:9201,http://192.168.7.75:9201"
+    env_file:
+      - .env
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
