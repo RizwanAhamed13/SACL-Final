@@ -10,34 +10,6 @@ const FORM_COLORS = {
   impactCount:  { label: 'Impact',       color: '#3b0764', bg: '#f3e8ff' },
 };
 
-const RateBar = ({ value, color, bg }) => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-    <div style={{ flex: 1, height: '6px', background: '#f1f5f9', borderRadius: '99px', overflow: 'hidden' }}>
-      <div style={{
-        height: '100%', width: `${Math.min(value, 100)}%`,
-        background: color, borderRadius: '99px',
-        transition: 'width .6s ease',
-      }} />
-    </div>
-    <span style={{ fontSize: '12px', fontWeight: 700, color, minWidth: '38px', textAlign: 'right' }}>
-      {value}%
-    </span>
-  </div>
-);
-
-const ScoreBadge = ({ rate }) => {
-  let color, bg, label;
-  if (rate >= 80)      { color = '#059669'; bg = '#d1fae5'; label = 'Excellent'; }
-  else if (rate >= 60) { color = '#d97706'; bg = '#fef3c7'; label = 'Good'; }
-  else if (rate >= 40) { color = '#ea580c'; bg = '#ffedd5'; label = 'Average'; }
-  else                 { color = '#dc2626'; bg = '#fee2e2'; label = 'Needs Work'; }
-  return (
-    <span style={{ display:'inline-block', padding:'2px 10px', borderRadius:'99px', fontSize:'11px', fontWeight:700, background:bg, color }}>
-      {label}
-    </span>
-  );
-};
-
 const StatCard = ({ label, value, icon, color, bg, sub }) => (
   <div style={{
     background: '#fff', border: '1px solid #e5e7eb', borderRadius: '14px',
@@ -90,12 +62,10 @@ const EmployeeEfficiency = () => {
     });
 
   // Summary stats
-  const totalEmployees  = data.length;
+  const totalEmployees   = data.length;
   const totalSubmissions = data.reduce((s, e) => s + (e.totalSubmissions || 0), 0);
-  const totalApproved   = data.reduce((s, e) => s + (e.hodApproved || 0), 0);
-  const totalRejections = data.reduce((s, e) => s + (e.totalRejections || 0), 0);
-  const avgApprovalRate = data.length ? Math.round(data.reduce((s, e) => s + (e.approvalRate || 0), 0) / data.length * 10) / 10 : 0;
-  const topPerformer    = data.reduce((best, e) => (e.approvalRate > (best?.approvalRate || 0) ? e : best), null);
+  const totalApproved    = data.reduce((s, e) => s + (e.hodApproved || 0), 0);
+  const totalIssues      = data.reduce((s, e) => s + (e.issuesCount || 0), 0);
 
   const SortIcon = ({ col }) => {
     if (sortBy !== col) return <span style={{ opacity:.3, fontSize:'10px' }}>↕</span>;
@@ -121,17 +91,19 @@ const EmployeeEfficiency = () => {
           margin-right:4px;margin-bottom:2px;
         }
         .eff-metric-cell { font-variant-numeric: tabular-nums; }
+        .remarks-table th { padding: 8px; text-align: left; background: #f3f4f6; color: #374151; font-size: 11px; font-weight: 700; text-transform: uppercase; border-bottom: 1px solid #e5e7eb; }
+        .remarks-table td { padding: 8px; font-size: 12px; color: #4b5563; border-bottom: 1px solid #f3f4f6; vertical-align: top; }
       `}</style>
 
       <div className="breadcrumb">
         <NavLink to="/" className="breadcrumb-item">Home</NavLink>
-        <span className="breadcrumb-item active">Employee Efficiency</span>
+        <span className="breadcrumb-item active">Employee Remarks Log</span>
       </div>
 
       <div className="page-header">
         <div>
-          <h1 className="page-title">Employee Efficiency</h1>
-          <p className="page-subtitle">Quality submission metrics, approval rates, and rejection analysis per employee</p>
+          <h1 className="page-title">Employee Remarks Log</h1>
+          <p className="page-subtitle">Search employees by User ID to retrieve all remarks and observations on their submissions</p>
         </div>
       </div>
 
@@ -140,25 +112,14 @@ const EmployeeEfficiency = () => {
         <StatCard label="Total Employees" value={totalEmployees} icon="👥" color="#ff7b21" bg="#fff3e8" />
         <StatCard label="Total Submissions" value={totalSubmissions} icon="📋" color="#2563eb" bg="#dbeafe" sub="Across all forms" />
         <StatCard label="HOD Approved" value={totalApproved} icon="✅" color="#059669" bg="#d1fae5" sub="Fully approved records" />
-        <StatCard label="Total Rejections" value={totalRejections} icon="🔴" color="#dc2626" bg="#fee2e2" sub="HOF + HOD stage" />
-        <StatCard label="Avg Approval Rate" value={`${avgApprovalRate}%`} icon="📈" color="#7c3aed" bg="#f3e8ff" />
-        {topPerformer && (
-          <StatCard
-            label="Top Performer"
-            value={topPerformer.employeeId}
-            icon="🏆"
-            color="#d97706"
-            bg="#fef3c7"
-            sub={`${topPerformer.approvalRate}% approval`}
-          />
-        )}
+        <StatCard label="Total Issues" value={totalIssues} icon="⚠️" color="#ea580c" bg="#ffedd5" sub="Forms with remarks" />
       </div>
 
       {/* Main Table Card */}
       <div className="card">
         <div className="card-header">
           <h2 className="card-title" style={{ display:'flex', alignItems:'center', gap:'.5rem' }}>
-            <span>Employee Performance</span>
+            <span>Employee Data</span>
             <span style={{ background:'#f1f5f9', color:'#6b7280', borderRadius:'99px', padding:'2px 10px', fontSize:'12px', fontWeight:600 }}>
               {filtered.length} employees
             </span>
@@ -166,7 +127,7 @@ const EmployeeEfficiency = () => {
           <div style={{ display:'flex', gap:'.75rem', alignItems:'center' }}>
             <input
               type="text"
-              placeholder="Search employee ID or name…"
+              placeholder="Search by UID or Name…"
               value={search}
               onChange={e => setSearch(e.target.value)}
               style={{
@@ -191,16 +152,13 @@ const EmployeeEfficiency = () => {
             <table className="eff-table" style={{ width:'100%', borderCollapse:'collapse', fontSize:'13px' }}>
               <thead>
                 <tr>
-                  <th style={thStyle('employeeId')} onClick={() => handleSort('employeeId')}>Employee <SortIcon col="employeeId" /></th>
+                  <th style={thStyle('employeeId')} onClick={() => handleSort('employeeId')}>Employee UID <SortIcon col="employeeId" /></th>
                   <th style={thStyle('totalSubmissions')} onClick={() => handleSort('totalSubmissions')}>Submissions <SortIcon col="totalSubmissions" /></th>
                   <th style={{ ...thStyle(''), cursor:'default' }}>By Form</th>
                   <th style={thStyle('hofApproved')} onClick={() => handleSort('hofApproved')}>HOF Approved <SortIcon col="hofApproved" /></th>
                   <th style={thStyle('hodApproved')} onClick={() => handleSort('hodApproved')}>HOD Approved <SortIcon col="hodApproved" /></th>
-                  <th style={thStyle('hofRejections')} onClick={() => handleSort('hofRejections')}>HOF Rejected <SortIcon col="hofRejections" /></th>
-                  <th style={thStyle('hodRejections')} onClick={() => handleSort('hodRejections')}>HOD Rejected <SortIcon col="hodRejections" /></th>
                   <th style={thStyle('pending')} onClick={() => handleSort('pending')}>Pending <SortIcon col="pending" /></th>
-                  <th style={{ ...thStyle('approvalRate'), minWidth:'160px' }} onClick={() => handleSort('approvalRate')}>Approval Rate <SortIcon col="approvalRate" /></th>
-                  <th style={{ ...thStyle(''), cursor:'default' }}>Score</th>
+                  <th style={thStyle('issuesCount')} onClick={() => handleSort('issuesCount')}>Forms w/ Remarks <SortIcon col="issuesCount" /></th>
                   <th style={thStyle('lastActivity')} onClick={() => handleSort('lastActivity')}>Last Activity <SortIcon col="lastActivity" /></th>
                 </tr>
               </thead>
@@ -266,28 +224,6 @@ const EmployeeEfficiency = () => {
                         </span>
                       </td>
 
-                      {/* HOF Rejected */}
-                      <td style={{ padding:'12px 14px', textAlign:'center' }} className="eff-metric-cell">
-                        <span style={{
-                          background: emp.hofRejections > 0 ? '#fef2f2' : '#f9fafb',
-                          color: emp.hofRejections > 0 ? '#dc2626' : '#9ca3af',
-                          padding:'3px 10px', borderRadius:'99px', fontSize:'12px', fontWeight:700
-                        }}>
-                          {emp.hofRejections}
-                        </span>
-                      </td>
-
-                      {/* HOD Rejected */}
-                      <td style={{ padding:'12px 14px', textAlign:'center' }} className="eff-metric-cell">
-                        <span style={{
-                          background: emp.hodRejections > 0 ? '#fff7ed' : '#f9fafb',
-                          color: emp.hodRejections > 0 ? '#ea580c' : '#9ca3af',
-                          padding:'3px 10px', borderRadius:'99px', fontSize:'12px', fontWeight:700
-                        }}>
-                          {emp.hodRejections}
-                        </span>
-                      </td>
-
                       {/* Pending */}
                       <td style={{ padding:'12px 14px', textAlign:'center' }} className="eff-metric-cell">
                         <span style={{
@@ -299,18 +235,15 @@ const EmployeeEfficiency = () => {
                         </span>
                       </td>
 
-                      {/* Approval Rate bar */}
-                      <td style={{ padding:'12px 14px', minWidth:'160px' }}>
-                        <RateBar
-                          value={emp.approvalRate}
-                          color={emp.approvalRate >= 80 ? '#059669' : emp.approvalRate >= 60 ? '#d97706' : '#dc2626'}
-                          bg="#f1f5f9"
-                        />
-                      </td>
-
-                      {/* Score badge */}
-                      <td style={{ padding:'12px 14px' }}>
-                        <ScoreBadge rate={emp.approvalRate} />
+                      {/* Issues Count */}
+                      <td style={{ padding:'12px 14px', textAlign:'center' }} className="eff-metric-cell">
+                        <span style={{
+                          background: emp.issuesCount > 0 ? '#fff7ed' : '#f9fafb',
+                          color: emp.issuesCount > 0 ? '#ea580c' : '#9ca3af',
+                          padding:'3px 10px', borderRadius:'99px', fontSize:'12px', fontWeight:700
+                        }}>
+                          {emp.issuesCount}
+                        </span>
                       </td>
 
                       {/* Last Activity */}
@@ -322,67 +255,43 @@ const EmployeeEfficiency = () => {
                     {/* Expanded row with detail breakdown */}
                     {expanded === emp.employeeId && (
                       <tr className="eff-expand-row">
-                        <td colSpan={11} style={{ padding:'0 14px 14px 58px', background:'#fafbff', borderBottom:'2px solid #e5e7eb' }}>
-                          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))', gap:'1rem', paddingTop:'1rem' }}>
-
-                            {/* Form breakdown detail */}
-                            <div style={{ background:'#fff', border:'1px solid #e5e7eb', borderRadius:'10px', padding:'1rem' }}>
-                              <div style={{ fontSize:'11px', fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'.06em', marginBottom:'.75rem' }}>Form Breakdown</div>
-                              {Object.entries(FORM_COLORS).map(([key, { label, color, bg }]) => (
-                                <div key={key} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'.5rem' }}>
-                                  <span style={{ fontSize:'12px', color:'#374151', fontWeight:500 }}>{label}</span>
-                                  <span className="eff-form-chip" style={{ background:bg, color }}>{emp[key]}</span>
+                        <td colSpan={8} style={{ padding:'0 14px 14px 58px', background:'#fafbff', borderBottom:'2px solid #e5e7eb' }}>
+                          
+                          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(250px,1fr))', gap:'1rem', paddingTop:'1rem' }}>
+                            {/* Issues Breakdown */}
+                            <div style={{ background:'#fff', border:'1px solid #e5e7eb', borderRadius:'10px', padding:'1rem', gridColumn: '1 / -1' }}>
+                              <div style={{ fontSize:'11px', fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'.06em', marginBottom:'.75rem' }}>
+                                Remarks / Issues Log
+                              </div>
+                              {emp.remarksList && emp.remarksList.length > 0 ? (
+                                <table className="remarks-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                  <thead>
+                                    <tr>
+                                      <th>Date</th>
+                                      <th>Form Type</th>
+                                      <th>Remarks</th>
+                                      <th>Reviewer</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {emp.remarksList.map((r, idx) => (
+                                      <tr key={idx}>
+                                        <td style={{ whiteSpace: 'nowrap' }}>{r.date}</td>
+                                        <td><span className="eff-form-chip" style={{ background: '#f3f4f6', color: '#4b5563', margin: 0 }}>{r.form}</span></td>
+                                        <td style={{ width: '50%', color: '#dc2626', fontWeight: 500 }}>{r.text}</td>
+                                        <td>{r.reviewer}</td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              ) : (
+                                <div style={{ fontSize: '12px', color: '#6b7280', padding: '1rem', textAlign: 'center', background: '#f9fafb', borderRadius: '6px' }}>
+                                  No remarks found.
                                 </div>
-                              ))}
+                              )}
                             </div>
-
-                            {/* Rejection breakdown */}
-                            <div style={{ background:'#fff', border:'1px solid #e5e7eb', borderRadius:'10px', padding:'1rem' }}>
-                              <div style={{ fontSize:'11px', fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'.06em', marginBottom:'.75rem' }}>Rejection Breakdown</div>
-                              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'.5rem' }}>
-                                <span style={{ fontSize:'12px', color:'#374151' }}>Rejected at HOF level</span>
-                                <span style={{ background:'#fef2f2', color:'#dc2626', padding:'2px 8px', borderRadius:'99px', fontSize:'11px', fontWeight:700 }}>{emp.hofRejections}</span>
-                              </div>
-                              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'.5rem' }}>
-                                <span style={{ fontSize:'12px', color:'#374151' }}>Rejected at HOD level</span>
-                                <span style={{ background:'#fff7ed', color:'#ea580c', padding:'2px 8px', borderRadius:'99px', fontSize:'11px', fontWeight:700 }}>{emp.hodRejections}</span>
-                              </div>
-                              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'.5rem' }}>
-                                <span style={{ fontSize:'12px', color:'#374151', fontWeight:600 }}>Total Rejections</span>
-                                <span style={{ background:'#f3f4f6', color:'#374151', padding:'2px 8px', borderRadius:'99px', fontSize:'11px', fontWeight:700 }}>{emp.totalRejections}</span>
-                              </div>
-                              <div style={{ marginTop:'.75rem', paddingTop:'.75rem', borderTop:'1px solid #f3f4f6' }}>
-                                <div style={{ fontSize:'11px', color:'#9ca3af', marginBottom:'.25rem' }}>Rejection Rate</div>
-                                <RateBar value={emp.rejectionRate} color="#dc2626" bg="#f9fafb" />
-                              </div>
-                            </div>
-
-                            {/* Approval pipeline */}
-                            <div style={{ background:'#fff', border:'1px solid #e5e7eb', borderRadius:'10px', padding:'1rem' }}>
-                              <div style={{ fontSize:'11px', fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'.06em', marginBottom:'.75rem' }}>Approval Pipeline</div>
-                              {[
-                                { label:'Submitted',    value:emp.totalSubmissions, color:'#6b7280', bg:'#f3f4f6' },
-                                { label:'HOF Approved', value:emp.hofApproved,      color:'#059669', bg:'#d1fae5' },
-                                { label:'HOD Approved', value:emp.hodApproved,      color:'#2563eb', bg:'#dbeafe' },
-                                { label:'Pending',      value:emp.pending,          color:'#d97706', bg:'#fef3c7' },
-                              ].map(({ label, value, color, bg }) => (
-                                <div key={label} style={{ display:'flex', alignItems:'center', gap:'8px', marginBottom:'.5rem' }}>
-                                  <div style={{ width:'6px', height:'6px', borderRadius:'50%', background:color, flexShrink:0 }} />
-                                  <span style={{ flex:1, fontSize:'12px', color:'#374151' }}>{label}</span>
-                                  <span style={{ background:bg, color, padding:'2px 8px', borderRadius:'99px', fontSize:'11px', fontWeight:700 }}>{value}</span>
-                                </div>
-                              ))}
-                              <div style={{ marginTop:'.75rem', paddingTop:'.75rem', borderTop:'1px solid #f3f4f6' }}>
-                                <div style={{ fontSize:'11px', color:'#9ca3af', marginBottom:'.25rem' }}>Approval Rate</div>
-                                <RateBar
-                                  value={emp.approvalRate}
-                                  color={emp.approvalRate >= 80 ? '#059669' : emp.approvalRate >= 60 ? '#d97706' : '#dc2626'}
-                                  bg="#f9fafb"
-                                />
-                              </div>
-                            </div>
-
                           </div>
+
                         </td>
                       </tr>
                     )}
@@ -395,14 +304,7 @@ const EmployeeEfficiency = () => {
 
         {/* Legend */}
         <div style={{ padding:'1rem 1.5rem', borderTop:'1px solid #f3f4f6', background:'#fafbff', display:'flex', gap:'2rem', flexWrap:'wrap' }}>
-          <span style={{ fontSize:'11px', color:'#9ca3af' }}>💡 Click any row to expand detailed breakdown</span>
-          <span style={{ fontSize:'11px', color:'#9ca3af' }}>
-            Score: &nbsp;
-            <span style={{ background:'#d1fae5', color:'#059669', padding:'1px 7px', borderRadius:'99px', fontWeight:700 }}>Excellent ≥80%</span>&nbsp;
-            <span style={{ background:'#fef3c7', color:'#d97706', padding:'1px 7px', borderRadius:'99px', fontWeight:700 }}>Good ≥60%</span>&nbsp;
-            <span style={{ background:'#ffedd5', color:'#ea580c', padding:'1px 7px', borderRadius:'99px', fontWeight:700 }}>Average ≥40%</span>&nbsp;
-            <span style={{ background:'#fee2e2', color:'#dc2626', padding:'1px 7px', borderRadius:'99px', fontWeight:700 }}>Needs Work &lt;40%</span>
-          </span>
+          <span style={{ fontSize:'11px', color:'#9ca3af' }}>💡 Click any row to expand detailed breakdown and see specific remarks</span>
         </div>
       </div>
     </>

@@ -20,18 +20,6 @@ import org.springframework.web.bind.annotation.*;
 public class ImpactTestController {
 
     private final ImpactTestService service;
-    private final com.sacl.service.RejectedRecordService rejectedService;
-
-    @PreAuthorize("hasAnyRole('HOF','HOD','ADMIN')")
-    @PostMapping("/reject/{id}")
-    public ResponseEntity<Void> reject(@PathVariable Long id, @RequestParam String rejectedBy) {
-        ImpactTest entry = service.findById(id);
-        if (entry != null) {
-            rejectedService.archiveAndReject("IMPACT_TEST", id, entry, rejectedBy, entry.getStatus() != null && entry.getStatus().name().equals("QC_ENTRY") ? "HOF" : "HOD", entry.getCreatedBy());
-            service.deleteById(id);
-        }
-        return ResponseEntity.noContent().build();
-    }
 
     @PostMapping
     public ResponseEntity<ImpactTest> create(@Valid @RequestBody ImpactTest entry) {

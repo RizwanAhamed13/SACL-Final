@@ -35,14 +35,17 @@ public class AuthController {
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         rateLimitService.checkRateLimit(request.getRemoteAddr());
 
-        // Resolve employeeId → username. Use BadCredentialsException (not ResourceNotFoundException)
-        // so the same 401 is returned whether the ID doesn't exist or password is wrong (BUG-003/006)
+        
+
+        // Resolve employeeId → username. Use BadCredentialsException (not
+        // ResourceNotFoundException)
+        // so the same 401 is returned whether the ID doesn't exist or password is wrong
+        // (BUG-003/006)
         User userByEmpId = userRepository.findByEmployeeId(authRequest.getEmployeeId())
                 .orElseThrow(() -> new BadCredentialsException("Invalid employee ID or password"));
 
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(userByEmpId.getUsername(), authRequest.getPassword())
-        );
+                new UsernamePasswordAuthenticationToken(userByEmpId.getUsername(), authRequest.getPassword()));
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         User user = userRepository.findByUsername(userDetails.getUsername())
@@ -67,7 +70,8 @@ public class AuthController {
             try {
                 java.util.Date expiry = jwtUtil.extractExpiration(token);
                 tokenBlacklistService.blacklist(token, expiry);
-            } catch (Exception ignored) { }
+            } catch (Exception ignored) {
+            }
         }
         return ResponseEntity.noContent().build();
     }

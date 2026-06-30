@@ -26,7 +26,7 @@ public class MicroStructureAnalysis {
     private String microLocation;
 
     // JSON blob storing per-location values for multi-location records
-    @JdbcTypeCode(SqlTypes.LONG32VARCHAR) @Column
+    @Column(length = 4000)
     private String locationValues;
 
     // Micro Structure
@@ -46,7 +46,7 @@ public class MicroStructureAnalysis {
     private Double sizeMin;
     private Double sizeMax;
 
-    @JdbcTypeCode(SqlTypes.LONG32VARCHAR) @Column
+    @Column(length = 4000)
     private String remarks;
 
     private String approvedBy;

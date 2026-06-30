@@ -31,6 +31,7 @@ public class ImpactTestService {
             log.info("Impact Test updated: {}", saved.getId());
             return saved;
         }
+        entry.setStatus(RecordStatus.QC_ENTRY);
         ImpactTest saved = repository.save(entry);
         log.info("Impact Test created: {}", saved.getId());
         return saved;

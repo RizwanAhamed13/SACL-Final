@@ -23,6 +23,7 @@ public class ImpactTest {
     private String partName;
     private String dateCode;
     private String specification;
+    private String mechLocation;
 
     private Double observedValue1;
     private Double observedValue2;
@@ -32,10 +33,10 @@ public class ImpactTest {
 
     // JSON blob storing per-location/notch observed values for multi-combo records
     // Format: {"TRA":{"Unotch":{"v1":14.5,"v2":13.8,"v3":15.2}}, "SBA":{...}}
-    @JdbcTypeCode(SqlTypes.LONG32VARCHAR) @Column
+    @Column(length = 4000)
     private String locationValues;
 
-    @JdbcTypeCode(SqlTypes.LONG32VARCHAR) @Column
+    @Column(length = 4000)
     private String remarks;
 
     private String approvedBy;

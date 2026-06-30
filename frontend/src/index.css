@@ -617,10 +617,11 @@ p { color:var(--text-secondary); line-height:var(--line-height-relaxed); }
 }
 .table td {
   color: var(--text-body);
-  border-bottom: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border);
 }
+.table tbody tr:nth-child(even) { background-color: #fbfcfd; }
 .table tbody tr { transition: background-color .1s ease; }
-.table tbody tr:hover { background: #fafbff; }
+.table tbody tr:hover { background: #f0f4f8; }
 .table tbody tr:last-child td { border-bottom: none; }
 .table td strong { font-weight: 600; color: var(--text-heading); }
 

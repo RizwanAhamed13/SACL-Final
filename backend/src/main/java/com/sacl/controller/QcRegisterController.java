@@ -20,18 +20,6 @@ import org.springframework.web.bind.annotation.*;
 public class QcRegisterController {
 
     private final QcRegisterService service;
-    private final com.sacl.service.RejectedRecordService rejectedService;
-
-    @PreAuthorize("hasAnyRole('HOF','HOD','ADMIN')")
-    @PostMapping("/reject/{id}")
-    public ResponseEntity<Void> reject(@PathVariable Long id, @RequestParam String rejectedBy) {
-        QcRegister entry = service.findById(id);
-        if (entry != null) {
-            rejectedService.archiveAndReject("QC_REGISTER", id, entry, rejectedBy, entry.getStatus() != null && entry.getStatus().name().equals("QC_ENTRY") ? "HOF" : "HOD", entry.getCreatedBy());
-            service.deleteById(id);
-        }
-        return ResponseEntity.noContent().build();
-    }
 
     @PostMapping
     public ResponseEntity<QcRegister> create(@Valid @RequestBody QcRegister entry) {

@@ -31,6 +31,7 @@ public class MicroTensileService {
             log.info("Micro Tensile updated: {}", saved.getId());
             return saved;
         }
+        entry.setStatus(RecordStatus.QC_ENTRY);
         MicroTensileTest saved = repository.save(entry);
         log.info("Micro Tensile created: {}", saved.getId());
         return saved;

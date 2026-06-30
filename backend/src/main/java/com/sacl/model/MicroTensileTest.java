@@ -26,7 +26,7 @@ public class MicroTensileTest {
     private String mechLocation;
 
     // JSON blob storing per-location values for multi-location records
-    @JdbcTypeCode(SqlTypes.LONG32VARCHAR) @Column
+    @Column(length = 4000)
     private String locationValues;
 
     private Double barDiaMm;
@@ -38,7 +38,7 @@ public class MicroTensileTest {
     private Double yieldStrength05;
     private Double elongationPercent;
 
-    @JdbcTypeCode(SqlTypes.LONG32VARCHAR) @Column
+    @Column(length = 4000)
     private String remarks;
 
     private String approvedBy;

@@ -1,5 +1,7 @@
 package com.sacl.model;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -37,12 +39,14 @@ public class QcRegister {
     private Double compositionMn;
     private Double compositionP;
     private Double compositionS;
-    private Double compositionMgFl;
+    private Double compositionMgFirst;
+    private Double compositionMgLast;
     private Double compositionCu;
     private Double compositionCr;
     private Double compositionSn;
 
-    private String timeOfPouring;
+    private String timeOfPouringStart;
+    private String timeOfPouringEnd;
     private Double pouringTemp;
     private String ppCode;
     private String treatmentNo;
@@ -64,13 +68,22 @@ public class QcRegister {
     private Double resMgConvertorPercent;
     private Double recMgPercent;
     private Double streamInnoculant;
+
+    @JsonProperty("pTimeSec")
+    @JsonAlias("ptimeSec")
     private Double pTimeSec;
     private Double pouringTempStart;
     private Double pouringTempEnd;
+
+    @JsonProperty("pTimeSecStart")
+    @JsonAlias("ptimeSecStart")
     private Double pTimeSecStart;
+
+    @JsonProperty("pTimeSecEnd")
+    @JsonAlias("ptimeSecEnd")
     private Double pTimeSecEnd;
 
-    @JdbcTypeCode(SqlTypes.LONG32VARCHAR) @Column
+    @Column(length = 4000)
     private String remarks;
 
     private String hodQc;

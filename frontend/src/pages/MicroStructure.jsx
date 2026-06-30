@@ -50,7 +50,7 @@ const MicroStructure = () => {
   });
 
   const [loading, setLoading] = useState(true);
-  const [rejectModal, setRejectModal] = useState({ isOpen: false, record: null });
+  const [tableRemarks, setTableRemarks] = useState({});
   const [thresholds, setThresholds] = useState(null);
   const [errors, setErrors] = useState({});
 
@@ -139,23 +139,39 @@ const MicroStructure = () => {
   };
 
   const openEdit = (record) => {
+    let flatLocData = {};
+    if (record.locationValues) {
+      try {
+        const parsed = JSON.parse(record.locationValues);
+        Object.keys(parsed).forEach(loc => {
+          const lk = locKey(loc);
+          Object.keys(parsed[loc]).forEach(k => {
+            flatLocData[`${lk}_${k}`] = parsed[loc][k];
+          });
+        });
+      } catch (e) { console.error("Error parsing locationValues", e); }
+    }
     setFormData({
       ...record,
+      ...flatLocData,
       inspectionDate: record.inspectionDate ? record.inspectionDate.split('T')[0] : ''
     });
     fetchThresholds(record.partName, {
       ...record,
+      ...flatLocData,
       inspectionDate: record.inspectionDate ? record.inspectionDate.split('T')[0] : ''
     });
     setShowForm(true);
   };
 
-  const handleApprove = async (record, nextStatus) => {
+  const handleApprove = async (record, nextStatus, customRemarks = null) => {
     try {
       const approvalField = nextStatus === 'HOF_APPROVED' ? 'hofApprovedBy' : 'hodApprovedBy';
+      const finalRemarks = customRemarks !== null ? customRemarks : record.remarks;
       const payload = {
         ...record,
         status: nextStatus,
+        remarks: finalRemarks,
         [approvalField]: user.employeeId || user.fullName
       };
       await axios.put(`/api/micro-structure/${record.id}`, payload);
@@ -166,21 +182,7 @@ const MicroStructure = () => {
     }
   };
 
-  const handleReject = async () => {
-    const record = rejectModal.record;
-    if (!record) return;
-    try {
-      await axios.post(`/api/micro-structure/reject/${record.id}?rejectedBy=${user.employeeId || user.fullName}`);
-      fetchRecords();
-      setShowForm(false);
-      setRejectModal({ isOpen: false, record: null });
-      toast.success('Record rejected and archived');
-    } catch (err) {
-      toast.error('Rejection failed');
-    }
-  };
-
-  const handleChange = (e) => {
+    const handleChange = (e) => {
     const { name, value } = e.target;
     const nextData = { ...formData, [name]: value };
     setFormData(nextData);
@@ -511,14 +513,7 @@ const MicroStructure = () => {
                       </button>
                     )}
 
-                    {formData.id && (
-                      ((user?.role?.toUpperCase()?.includes('HOF') && (formData.status || 'QC_ENTRY') === 'QC_ENTRY')) ||
-                      ((user?.role?.toUpperCase()?.includes('HOD') || user?.role?.toUpperCase()?.includes('ADMIN')) && (formData.status || 'QC_ENTRY') === 'HOF_APPROVED')
-                    ) && (
-                      <button type="button" className="btn" style={{ background: '#dc2626', color: 'white' }} onClick={() => setRejectModal({ isOpen: true, record: formData })}>
-                        Reject
-                      </button>
-                    )}
+                    
                   </div>
                 </div>
               </form>
@@ -534,110 +529,184 @@ const MicroStructure = () => {
         </div>
         <div className="card-body" style={{ padding: 0 }}>
           <div className="table-container" style={{ border: 'none' }}>
-            <table className="table">
+            <table className="table table-bordered">
               <thead>
                 <tr>
-                   <th>Inspection Date</th>
-                  <th>Part Name</th>
-                  <th>Date/Heat Code</th>
-                   <th>Status</th>
-                   <th>Approval Info</th>
-                   {isStaff && <th>Actions</th>}
+                   <th rowSpan="2" style={{ whiteSpace: 'nowrap' }}>Inspection Date</th>
+                   <th rowSpan="2">Part Name</th>
+                   <th rowSpan="2">Date/Heat Code</th>
+                   <th rowSpan="2">Loc</th>
+                   <th rowSpan="2">Nodularity (%)</th>
+                   <th rowSpan="2">Graphite Type</th>
+                   <th rowSpan="2">Count / mm²</th>
+                   <th rowSpan="2">Size</th>
+                   <th colSpan="3" style={{ textAlign: 'center' }}>Matrix (%)</th>
+                   <th rowSpan="2">Remarks</th>
+                   <th rowSpan="2">Status</th>
+                   <th rowSpan="2">Approval Info</th>
+                   {isStaff && <th rowSpan="2">Actions</th>}
+                 </tr>
+                 <tr>
+                   <th style={{ fontSize: '10px' }}>Ferrite</th>
+                   <th style={{ fontSize: '10px' }}>Pearlite</th>
+                   <th style={{ fontSize: '10px' }}>Carbide</th>
                  </tr>
               </thead>
               <tbody>
                 {loading ? (
                   Array(5).fill(0).map((_, i) => (
                     <tr key={i}>
-                      <td colSpan="7"><Skeleton width="100%" height="40px" /></td>
+                      <td colSpan="14"><Skeleton width="100%" height="40px" /></td>
                     </tr>
                   ))
                 ) : records.length === 0 ? (
                   <tr>
-                    <td colSpan="7" style={{ textAlign: 'center', padding: '2rem', color: 'var(--color-text-secondary)' }}>No records found</td>
+                    <td colSpan="14" style={{ textAlign: 'center', padding: '2rem', color: 'var(--color-text-secondary)' }}>No records found</td>
                   </tr>
-                ) : records.map((r) => (
-                  <tr key={r.id}>
-                    <td>{r.inspectionDate?.split('T')[0] || '—'}</td>
-                    <td><strong>{dash(r.partName)}</strong></td>
-                    <td>{dash(r.dateCode)}</td>
-                    <td>
-                      <span className={`status-badge status-${(r.status || 'QC_ENTRY').toLowerCase()}`}>
-                        {(r.status || 'QC_ENTRY').replace('_', ' ')}
-                      </span>
-                    </td>
-                    <td style={{ fontSize: '11px', lineHeight: '1.4' }}>
-                      <div style={{ marginBottom: '6px' }}>
-                        <span style={{ color: 'var(--color-text-secondary)', display: 'block', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.02em' }}>Entered By</span>
-                        <span style={{ fontWeight: '600', color: 'var(--color-text-primary)' }}>{r.createdBy || '—'}</span>
-                      </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                        {r.hofApprovedBy ? (
-                          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: '#ecfdf5', color: '#059669', padding: '2px 6px', borderRadius: '4px', fontWeight: '500' }}>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                            HOF: {r.hofApprovedBy}
-                          </div>
-                        ) : (
-                          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: '#f3f4f6', color: '#6b7280', padding: '2px 6px', borderRadius: '4px', fontWeight: '500' }}>
-                            Awaiting HOF
-                          </div>
-                        )}
-                        {r.hodApprovedBy ? (
-                          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: '#eff6ff', color: '#2563eb', padding: '2px 6px', borderRadius: '4px', fontWeight: '500' }}>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="7 13 12 18 22 8"/><polyline points="2 13 7 18 13 12"/></svg>
-                            HOD: {r.hodApprovedBy}
-                          </div>
-                        ) : r.hofApprovedBy && (
-                          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: '#f3f4f6', color: '#6b7280', padding: '2px 6px', borderRadius: '4px', fontWeight: '500' }}>
-                            Awaiting HOD
-                          </div>
-                        )}
-                      </div>
-                    </td>
-                    {isStaff && (
-                       <td style={{ whiteSpace: 'nowrap' }}>
-                         {((user?.role?.toUpperCase()?.includes('HOF') && (r.status || 'QC_ENTRY') === 'QC_ENTRY') ||
-                           user?.role?.toUpperCase()?.includes('ADMIN') || user?.role?.toUpperCase()?.includes('HOD')) && (
-                           <button className="btn btn-primary btn-sm" onClick={() => openEdit(r)} style={{ padding: '0.2rem 0.6rem', fontSize: '12px', background: 'var(--color-primary)', border: 'none' }}>
-                             Edit
-                           </button>
-                         )}
+                ) : records.map((r) => {
+                  let locations = [];
+                  if (r.locationValues) {
+                    try {
+                      locations = Object.entries(JSON.parse(r.locationValues));
+                    } catch (e) {}
+                  }
+                  if (locations.length === 0) {
+                    locations = [['—', {
+                      nodularityPercent: r.nodularityPercent,
+                      graphiteType: r.graphiteType,
+                      countNosPerMm2: r.countNosPerMm2,
+                      size: r.size,
+                      ferritePercent: r.ferritePercent,
+                      pearlitePercent: r.pearlitePercent,
+                      carbidePercent: r.carbidePercent,
+                      ferritePercentMin: r.ferritePercentMin,
+                      ferritePercentMax: r.ferritePercentMax,
+                      pearlitePercentMin: r.pearlitePercentMin,
+                      pearlitePercentMax: r.pearlitePercentMax,
+                      carbidePercentMin: r.carbidePercentMin,
+                      carbidePercentMax: r.carbidePercentMax,
+                      sizeMin: r.sizeMin,
+                      sizeMax: r.sizeMax,
+                    }]];
+                  }
 
-                         {user?.role?.toUpperCase()?.includes('HOF') && (r.status || 'QC_ENTRY') === 'QC_ENTRY' && (
-                           <button className="btn btn-primary btn-sm" onClick={() => handleApprove(r, 'HOF_APPROVED')} style={{ marginLeft: '0.5rem', padding: '0.2rem 0.6rem', fontSize: '12px', background: '#059669', border: 'none' }}>
-                             Approve HOF
-                           </button>
-                         )}
+                  const rowCount = locations.length;
+                  return (
+                    <React.Fragment key={r.id}>
+                      {locations.map(([loc, vals], idx) => (
+                        <tr key={`${r.id}-${loc}`}>
+                          {idx === 0 && (
+                            <>
+                              <td rowSpan={rowCount}>{r.inspectionDate?.split('T')[0] || '—'}</td>
+                              <td rowSpan={rowCount}><strong>{dash(r.partName)}</strong></td>
+                              <td rowSpan={rowCount}>{dash(r.dateCode)}</td>
+                            </>
+                          )}
+                          <td style={{ fontWeight: 600, color: '#4b5563', fontSize: '12px' }}>{loc}</td>
+                          <td style={{ fontSize: '12px' }}>{dash(vals.nodularityPercent)}</td>
+                          <td style={{ fontSize: '12px' }}>{dash(vals.graphiteType)}</td>
+                          <td style={{ fontSize: '12px' }}>{dash(vals.countNosPerMm2)}</td>
+                          <td style={{ fontSize: '12px' }}>
+                            {vals.sizeMin && vals.sizeMax ? `${vals.sizeMin}-${vals.sizeMax}` : dash(vals.size)}
+                          </td>
+                          <td style={{ fontSize: '12px' }}>
+                            {vals.ferritePercentMin && vals.ferritePercentMax ? `${vals.ferritePercentMin}-${vals.ferritePercentMax}` : dash(vals.ferritePercent)}
+                          </td>
+                          <td style={{ fontSize: '12px' }}>
+                            {vals.pearlitePercentMin && vals.pearlitePercentMax ? `${vals.pearlitePercentMin}-${vals.pearlitePercentMax}` : dash(vals.pearlitePercent)}
+                          </td>
+                          <td style={{ fontSize: '12px' }}>
+                            {vals.carbidePercentMin && vals.carbidePercentMax ? `${vals.carbidePercentMin}-${vals.carbidePercentMax}` : dash(vals.carbidePercent)}
+                          </td>
+                          
+                          {idx === 0 && (
+                            <>
+                              <td rowSpan={rowCount} style={{ fontSize: '11px', maxWidth: '200px', whiteSpace: 'normal' }}>
+                                {((user?.role?.toUpperCase()?.includes('HOF') && (r.status || 'QC_ENTRY') === 'QC_ENTRY') ||
+                                  ((user?.role?.toUpperCase()?.includes('HOD') || user?.role?.toUpperCase()?.includes('ADMIN')) && (r.status || 'QC_ENTRY') === 'HOF_APPROVED')) ? (
+                                    <textarea 
+                                      className="form-control" 
+                                      style={{ fontSize: '11px', padding: '4px', width: '100%', minWidth: '120px' }}
+                                      rows="2"
+                                      value={tableRemarks[r.id] !== undefined ? tableRemarks[r.id] : (r.remarks || '')}
+                                      onChange={e => setTableRemarks({...tableRemarks, [r.id]: e.target.value})}
+                                      placeholder="Add remarks..."
+                                    />
+                                ) : (
+                                  dash(r.remarks)
+                                )}
+                              </td>
+                              <td rowSpan={rowCount}>
+                                <span className={`status-badge status-${(r.status || 'QC_ENTRY').toLowerCase()}`}>
+                                  {(r.status || 'QC_ENTRY').replace('_', ' ')}
+                                </span>
+                              </td>
+                              <td rowSpan={rowCount} style={{ fontSize: '11px', lineHeight: '1.4' }}>
+                                <div style={{ marginBottom: '6px' }}>
+                                  <span style={{ color: 'var(--color-text-secondary)', display: 'block', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.02em' }}>Entered By</span>
+                                  <span style={{ fontWeight: '600', color: 'var(--color-text-primary)' }}>{r.createdBy || '—'}</span>
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                  {r.hofApprovedBy ? (
+                                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: '#ecfdf5', color: '#059669', padding: '2px 6px', borderRadius: '4px', fontWeight: '500' }}>
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                      HOF: {r.hofApprovedBy}
+                                    </div>
+                                  ) : (
+                                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: '#f3f4f6', color: '#6b7280', padding: '2px 6px', borderRadius: '4px', fontWeight: '500' }}>
+                                      Awaiting HOF
+                                    </div>
+                                  )}
+                                  {r.hodApprovedBy ? (
+                                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: '#eff6ff', color: '#2563eb', padding: '2px 6px', borderRadius: '4px', fontWeight: '500' }}>
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="7 13 12 18 22 8"/><polyline points="2 13 7 18 13 12"/></svg>
+                                      HOD: {r.hodApprovedBy}
+                                    </div>
+                                  ) : r.hofApprovedBy && (
+                                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: '#f3f4f6', color: '#6b7280', padding: '2px 6px', borderRadius: '4px', fontWeight: '500' }}>
+                                      Awaiting HOD
+                                    </div>
+                                  )}
+                                </div>
+                              </td>
+                              {isStaff && (
+                                <td rowSpan={rowCount} style={{ whiteSpace: 'nowrap' }}>
+                                  <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
+                                  {((user?.role?.toUpperCase()?.includes('HOF') && (r.status || 'QC_ENTRY') === 'QC_ENTRY') ||
+                                    user?.role?.toUpperCase()?.includes('ADMIN') || user?.role?.toUpperCase()?.includes('HOD')) && (
+                                    <button className="btn btn-primary btn-sm" onClick={() => openEdit(r)} style={{ padding: '0.2rem 0.6rem', fontSize: '12px', background: 'var(--color-primary)', border: 'none' }}>
+                                      Edit
+                                    </button>
+                                  )}
 
-                         {(user?.role?.toUpperCase()?.includes('HOD') || user?.role?.toUpperCase()?.includes('ADMIN')) && (r.status || 'QC_ENTRY') === 'HOF_APPROVED' && (
-                           <button className="btn btn-primary btn-sm" onClick={() => handleApprove(r, 'HOD_APPROVED')} style={{ marginLeft: '0.5rem', padding: '0.2rem 0.6rem', fontSize: '12px', background: '#2563eb', border: 'none' }}>
-                             Approve HOD
-                           </button>
-                         )}
+                                  {user?.role?.toUpperCase()?.includes('HOF') && (r.status || 'QC_ENTRY') === 'QC_ENTRY' && (
+                                    <button className="btn btn-primary btn-sm" onClick={() => handleApprove(r, 'HOF_APPROVED', tableRemarks[r.id])} style={{ padding: '0.2rem 0.6rem', fontSize: '12px', background: '#059669', border: 'none' }}>
+                                      Approve HOF
+                                    </button>
+                                  )}
 
-                         {((user?.role?.toUpperCase()?.includes('HOF') && (r.status || 'QC_ENTRY') === 'QC_ENTRY') ||
-                           ((user?.role?.toUpperCase()?.includes('HOD') || user?.role?.toUpperCase()?.includes('ADMIN')) && (r.status || 'QC_ENTRY') === 'HOF_APPROVED')) && (
-                           <button className="btn btn-primary btn-sm" onClick={() => setRejectModal({ isOpen: true, record: r })} style={{ marginLeft: '0.5rem', padding: '0.2rem 0.6rem', fontSize: '12px', background: '#dc2626', border: 'none' }}>
-                             Reject
-                           </button>
-                         )}
-                       </td>
-                     )}
-                  </tr>
-                ))}
+                                  {(user?.role?.toUpperCase()?.includes('HOD') || user?.role?.toUpperCase()?.includes('ADMIN')) && (r.status || 'QC_ENTRY') === 'HOF_APPROVED' && (
+                                    <button className="btn btn-primary btn-sm" onClick={() => handleApprove(r, 'HOD_APPROVED', tableRemarks[r.id])} style={{ padding: '0.2rem 0.6rem', fontSize: '12px', background: '#2563eb', border: 'none' }}>
+                                      Approve HOD
+                                    </button>
+                                  )}
+
+                                  </div>
+                                </td>
+                              )}
+                            </>
+                          )}
+                        </tr>
+                      ))}
+                    </React.Fragment>
+                  );
+                })}
               </tbody>
             </table>
           </div>
         </div>
       </div>
-       <ConfirmModal
-         isOpen={rejectModal.isOpen}
-         onClose={() => setRejectModal({ isOpen: false, record: null })}
-         onConfirm={handleReject}
-         title="Reject Record?"
-         message="Are you sure you want to REJECT this record? This action will archive and remove it from the active list."
-         confirmText="Confirm Rejection"
-       />
+       
     </>
   );
 };

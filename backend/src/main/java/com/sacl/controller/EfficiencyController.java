@@ -2,7 +2,6 @@ package com.sacl.controller;
 
 import com.sacl.model.*;
 import com.sacl.repository.*;
-import com.sacl.service.RejectedRecordService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +23,6 @@ public class EfficiencyController {
     private final MicroStructureRepository microRepo;
     private final MicroTensileRepository tensileRepo;
     private final ImpactTestRepository impactRepo;
-    private final RejectedRecordService rejectedService;
 
     @PreAuthorize("hasAnyRole('HOD','ADMIN')")
     @GetMapping("/employees")
@@ -35,7 +33,6 @@ public class EfficiencyController {
         List<MicroStructureAnalysis> microAll = microRepo.findAll();
         List<MicroTensileTest>    tensileAll  = tensileRepo.findAll();
         List<ImpactTest>          impactAll   = impactRepo.findAll();
-        List<RejectedRecord>      rejections  = rejectedService.findAll();
 
         // Build a map: employeeId → metrics
         Map<String, Map<String, Object>> metricsMap = new LinkedHashMap<>();
@@ -52,8 +49,8 @@ public class EfficiencyController {
             m.put("impactCount",   0);
             m.put("hofApproved",   0);
             m.put("hodApproved",   0);
-            m.put("hofRejections", 0);
-            m.put("hodRejections", 0);
+            m.put("issuesCount",   0);
+            m.put("remarksList",   new ArrayList<Map<String, String>>());
             m.put("lastActivity",  null);
             return m;
         };
@@ -72,6 +69,13 @@ public class EfficiencyController {
             if (current == null || date.isAfter(current)) m.put("lastActivity", date);
         };
 
+        java.util.function.BiConsumer<String, Map<String, String>> addRemark = (empId, remarkData) -> {
+            metricsMap.computeIfAbsent(empId, initEntry);
+            Map<String, Object> m = metricsMap.get(empId);
+            ((List<Map<String, String>>) m.get("remarksList")).add(remarkData);
+            m.put("issuesCount", ((Number) m.get("issuesCount")).intValue() + 1);
+        };
+
         // --- QC Register ---
         for (QcRegister r : qcAll) {
             String emp = r.getCreatedBy(); if (emp == null || emp.isBlank()) continue;
@@ -82,6 +86,15 @@ public class EfficiencyController {
                 increment.accept(emp, "hofApproved");
             if (r.getStatus() == RecordStatus.HOD_APPROVED) increment.accept(emp, "hodApproved");
             trackDate.accept(emp, r.getDate());
+
+            if (r.getRemarks() != null && !r.getRemarks().trim().isEmpty()) {
+                Map<String, String> remarkData = new HashMap<>();
+                remarkData.put("form", "QC Register");
+                remarkData.put("date", r.getDate() != null ? r.getDate().toString() : "N/A");
+                remarkData.put("text", r.getRemarks());
+                remarkData.put("reviewer", r.getHofApprovedBy() != null && !r.getHofApprovedBy().isEmpty() ? r.getHofApprovedBy() : (r.getHodApprovedBy() != null ? r.getHodApprovedBy() : "Reviewer"));
+                addRemark.accept(emp, remarkData);
+            }
         }
 
         // --- Micro Structure ---
@@ -94,6 +107,15 @@ public class EfficiencyController {
                 increment.accept(emp, "hofApproved");
             if (r.getStatus() == RecordStatus.HOD_APPROVED) increment.accept(emp, "hodApproved");
             trackDate.accept(emp, r.getInspectionDate());
+
+            if (r.getRemarks() != null && !r.getRemarks().trim().isEmpty()) {
+                Map<String, String> remarkData = new HashMap<>();
+                remarkData.put("form", "Micro Structure");
+                remarkData.put("date", r.getInspectionDate() != null ? r.getInspectionDate().toString() : "N/A");
+                remarkData.put("text", r.getRemarks());
+                remarkData.put("reviewer", r.getHofApprovedBy() != null && !r.getHofApprovedBy().isEmpty() ? r.getHofApprovedBy() : (r.getHodApprovedBy() != null ? r.getHodApprovedBy() : "Reviewer"));
+                addRemark.accept(emp, remarkData);
+            }
         }
 
         // --- Tensile Test ---
@@ -106,6 +128,15 @@ public class EfficiencyController {
                 increment.accept(emp, "hofApproved");
             if (r.getStatus() == RecordStatus.HOD_APPROVED) increment.accept(emp, "hodApproved");
             trackDate.accept(emp, r.getDateOfInspection());
+
+            if (r.getRemarks() != null && !r.getRemarks().trim().isEmpty()) {
+                Map<String, String> remarkData = new HashMap<>();
+                remarkData.put("form", "Tensile Test");
+                remarkData.put("date", r.getDateOfInspection() != null ? r.getDateOfInspection().toString() : "N/A");
+                remarkData.put("text", r.getRemarks());
+                remarkData.put("reviewer", r.getHofApprovedBy() != null && !r.getHofApprovedBy().isEmpty() ? r.getHofApprovedBy() : (r.getHodApprovedBy() != null ? r.getHodApprovedBy() : "Reviewer"));
+                addRemark.accept(emp, remarkData);
+            }
         }
 
         // --- Impact Test ---
@@ -118,14 +149,15 @@ public class EfficiencyController {
                 increment.accept(emp, "hofApproved");
             if (r.getStatus() == RecordStatus.HOD_APPROVED) increment.accept(emp, "hodApproved");
             trackDate.accept(emp, r.getDateOfInspection());
-        }
 
-        // --- Rejections ---
-        for (RejectedRecord r : rejections) {
-            String emp = r.getOriginalCreatedBy(); if (emp == null || emp.isBlank()) continue;
-            metricsMap.computeIfAbsent(emp, initEntry);
-            if ("HOF".equals(r.getRejectionStage())) increment.accept(emp, "hofRejections");
-            else if ("HOD".equals(r.getRejectionStage())) increment.accept(emp, "hodRejections");
+            if (r.getRemarks() != null && !r.getRemarks().trim().isEmpty()) {
+                Map<String, String> remarkData = new HashMap<>();
+                remarkData.put("form", "Impact Test");
+                remarkData.put("date", r.getDateOfInspection() != null ? r.getDateOfInspection().toString() : "N/A");
+                remarkData.put("text", r.getRemarks());
+                remarkData.put("reviewer", r.getHofApprovedBy() != null && !r.getHofApprovedBy().isEmpty() ? r.getHofApprovedBy() : (r.getHodApprovedBy() != null ? r.getHodApprovedBy() : "Reviewer"));
+                addRemark.accept(emp, remarkData);
+            }
         }
 
         // --- Enrich with full names from user table ---
@@ -143,21 +175,13 @@ public class EfficiencyController {
 
             int total     = ((Number) m.get("totalSubmissions")).intValue();
             int hodApp    = ((Number) m.get("hodApproved")).intValue();
-            int hofRej    = ((Number) m.get("hofRejections")).intValue();
-            int hodRej    = ((Number) m.get("hodRejections")).intValue();
-            int totalRej  = hofRej + hodRej;
+            int issues    = ((Number) m.get("issuesCount")).intValue();
 
-            // BUG-007: Guard division by zero
-            double approvalRate = (total + totalRej) > 0 ? (hodApp * 100.0 / (total + totalRej)) : 0.0;
-            // Rejection rate
-            double rejectionRate = (total + totalRej) > 0 ? (totalRej * 100.0 / (total + totalRej)) : 0;
-            // Pending (submitted but not yet HOD approved)
+            double efficiency = total > 0 ? ((total - issues) * 100.0 / total) : 0.0;
             int pending = total - hodApp;
 
-            m.put("totalRejections", totalRej);
             m.put("pending",         Math.max(0, pending));
-            m.put("approvalRate",    Math.round(approvalRate * 10.0) / 10.0);
-            m.put("rejectionRate",   Math.round(rejectionRate * 10.0) / 10.0);
+            m.put("efficiencyScore", Math.round(efficiency * 10.0) / 10.0);
 
             result.add(m);
         }

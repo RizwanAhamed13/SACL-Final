@@ -31,6 +31,7 @@ public class QcRegisterService {
             log.info("QC Register updated: {}", saved.getId());
             return saved;
         }
+        entry.setStatus(RecordStatus.QC_ENTRY);
         QcRegister saved = repository.save(entry);
         log.info("QC Register created: {}", saved.getId());
         return saved;

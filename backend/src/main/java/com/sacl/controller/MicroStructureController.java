@@ -20,18 +20,6 @@ import org.springframework.web.bind.annotation.*;
 public class MicroStructureController {
 
     private final MicroStructureService service;
-    private final com.sacl.service.RejectedRecordService rejectedService;
-
-    @PreAuthorize("hasAnyRole('HOF','HOD','ADMIN')")
-    @PostMapping("/reject/{id}")
-    public ResponseEntity<Void> reject(@PathVariable Long id, @RequestParam String rejectedBy) {
-        MicroStructureAnalysis entry = service.findById(id);
-        if (entry != null) {
-            rejectedService.archiveAndReject("MICRO_STRUCTURE", id, entry, rejectedBy, entry.getStatus() != null && entry.getStatus().name().equals("QC_ENTRY") ? "HOF" : "HOD", entry.getCreatedBy());
-            service.deleteById(id);
-        }
-        return ResponseEntity.noContent().build();
-    }
 
     @PostMapping
     public ResponseEntity<MicroStructureAnalysis> create(@Valid @RequestBody MicroStructureAnalysis entry) {

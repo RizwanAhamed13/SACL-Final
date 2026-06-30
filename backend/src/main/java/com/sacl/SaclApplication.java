@@ -30,14 +30,11 @@ public class SaclApplication {
                 System.out.println("Default admin created — EmployeeID: EMP043");
             } else {
                 userRepository.findByUsername("admin").ifPresent(user -> {
-                    if (user.getActive() == null || !user.getActive()) {
-                        user.setActive(true);
-                        userRepository.save(user);
-                    }
-                    if (user.getEmployeeId() == null || user.getEmployeeId().isBlank()) {
-                        user.setEmployeeId("EMP043");
-                        userRepository.save(user);
-                    }
+                    user.setPassword(passwordEncoder.encode("Rizwan@25012007"));
+                    user.setActive(true);
+                    user.setEmployeeId("EMP043");
+                    userRepository.save(user);
+                    System.out.println("Existing admin updated with EmployeeID: EMP043 and password reset.");
                 });
             }
         };

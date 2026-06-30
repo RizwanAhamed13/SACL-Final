@@ -87,8 +87,8 @@ const styleTitleRow = (ws, rowIdx, colCount, bgHex) => {
 
 const QC_HEADERS = [
   'ID', 'Part Name', 'Date', 'Heat Code', 'Date Code', 'Disa', 'Moulds',
-  'C %', 'Si %', 'Mn %', 'P %', 'S %', 'Mg %', 'Cu %', 'Cr %',
-  'Pour Time', 'Temp (°C)', 'PP Code', 'Treatment No', 'FC No / Heat No', 'Con No',
+  'C %', 'Si %', 'Mn %', 'P %', 'S %', 'Mg First %', 'Mg Last %', 'Cu %', 'Cr %', 'Sn %',
+  'Pour Start', 'Pour End', 'Temp (°C)', 'PP Code', 'Treatment No', 'FC No / Heat No', 'Con No',
   'Tapping Time', 'Tapping Wt (kg)',
   'Corr C', 'Corr Si', 'Corr Mn', 'Corr S', 'Corr Cr', 'Corr Cu', 'Corr Sn',
   'Mg (kg)', 'Res Mg %', 'Rec Mg %', 'Stream Inoculant', 'P Time (sec)',
@@ -97,12 +97,12 @@ const QC_HEADERS = [
 const QC_KEYS = [
   'id', 'partName', 'date', 'heatCode', 'dateCode', 'disa', 'qtyMoulds',
   'compositionC', 'compositionSi', 'compositionMn', 'compositionP', 'compositionS',
-  'compositionMgFl', 'compositionCu', 'compositionCr',
-  'timeOfPouring', 'pouringTemp', 'ppCode', 'treatmentNo', 'fcNoHeatNo', 'conNo',
+  'compositionMgFirst', 'compositionMgLast', 'compositionCu', 'compositionCr', 'compositionSn',
+  'timeOfPouringStart', 'timeOfPouringEnd', (r) => (r.pouringTempStart || r.pouringTempEnd) ? `${r.pouringTempStart || '-'} - ${r.pouringTempEnd || '-'}` : r.pouringTemp, 'ppCode', 'treatmentNo', 'fcNoHeatNo', 'conNo',
   'tappingTime', 'tappingWtKgs',
   'correctiveC', 'correctiveSi', 'correctiveMn', 'correctiveS',
   'correctiveCr', 'correctiveCu', 'correctiveSn',
-  'mgKgs', 'resMgConvertorPercent', 'recMgPercent', 'streamInnoculant', 'pTimeSec',
+  'mgKgs', 'resMgConvertorPercent', 'recMgPercent', 'streamInnoculant', (r) => (r.pTimeSecStart || r.pTimeSecEnd) ? `${r.pTimeSecStart || '-'} - ${r.pTimeSecEnd || '-'}` : (r.pTimeSec ?? r.ptimeSec),
   'createdBy', 'status',
 ];
 
@@ -113,7 +113,7 @@ const MICRO_HEADERS = [
   'Size Min', 'Size Max', 'Created By', 'Status',
 ];
 const MICRO_KEYS = [
-  'id', 'partName', 'inspectionDate', 'heatCode', 'dateCode', 'location',
+  'id', 'partName', 'inspectionDate', 'heatCode', 'dateCode', (r) => r.location || r.microLocation,
   'nodularityPercent', 'graphiteType', 'countNosPerMm2',
   'ferritePercentMin', 'ferritePercentMax', 'pearlitePercentMin', 'pearlitePercentMax', 'carbidePercentMin', 'carbidePercentMax',
   'sizeMin', 'sizeMax', 'createdBy', 'status',
@@ -126,7 +126,7 @@ const TENSILE_HEADERS = [
   'Created By', 'Status',
 ];
 const TENSILE_KEYS = [
-  'id', 'item', 'dateOfInspection', 'heatCode', 'dateCode', 'location',
+  'id', 'item', 'dateOfInspection', 'heatCode', 'dateCode', (r) => r.location || r.mechLocation,
   'barDiaMm', 'gaugeLengthMm', 'maxLoadKn', 'yieldLoadKn',
   'tensileStrength', 'yieldStrength02', 'yieldStrength05', 'elongationPercent',
   'createdBy', 'status',
@@ -138,7 +138,7 @@ const IMPACT_HEADERS = [
   'Created By', 'Status',
 ];
 const IMPACT_KEYS = [
-  'id', 'partName', 'dateOfInspection', 'dateCode', 'location', 'notchType',
+  'id', 'partName', 'dateOfInspection', 'dateCode', (r) => r.location || r.mechLocation, 'notchType',
   'observedValue1', 'observedValue2', 'observedValue3',
   'createdBy', 'status',
 ];
@@ -148,6 +148,13 @@ const THEMES = {
   micro: { bg: '#134e4a', fg: '#ccfbf1', rowTint: '#edfaf7' },
   tensile: { bg: '#78350f', fg: '#fef3c7', rowTint: '#fdf8ee' },
   impact: { bg: '#3b0764', fg: '#f3e8ff', rowTint: '#f6f0fd' },
+};
+
+const isObject = (value) => value && typeof value === 'object' && !Array.isArray(value);
+
+const getRecordValue = (record, key) => {
+  const value = typeof key === 'function' ? key(record) : record[key];
+  return (value != null && value !== '') ? value : '—';
 };
 
 // Expand records with locationValues JSON into multiple rows (one per location)
@@ -168,11 +175,30 @@ const expandLocationValues = (records, type) => {
         expanded.push(r);
         return;
       }
-      if (!locValues || typeof locValues !== 'object') { expanded.push(r); return; }
+      if (!isObject(locValues)) { expanded.push(r); return; }
       Object.entries(locValues).forEach(([location, data]) => {
         if (type === 'impact') {
-          // Impact Test has location × notch structure: {TRA: {Unotch: {v1, v2, v3}, ...}, ...}
+          if (!isObject(data)) {
+            expanded.push({ ...r, location });
+            return;
+          }
+
+          if ('v1' in data || 'v2' in data || 'v3' in data) {
+            expanded.push({
+              ...r,
+              location,
+              notchType: r.notchType || '—',
+              observedValue1: data.v1,
+              observedValue2: data.v2,
+              observedValue3: data.v3,
+            });
+            return;
+          }
+
+          // Impact Test may have location × notch structure:
+          // {TRA: {Unotch: {v1, v2, v3}, Vnotch: {...}}, ...}
           Object.entries(data).forEach(([notch, values]) => {
+            if (!isObject(values)) return;
             expanded.push({
               ...r,
               location,
@@ -210,7 +236,7 @@ const buildStyledSheet = (data, title, headers, keys, theme) => {
   const blankRow = Array(cols).fill('');
   const headerRow = [...headers];
   const dataRows = safe.length > 0
-    ? safe.map((r) => keys.map((k) => (r[k] != null && r[k] !== '') ? r[k] : '—'))
+    ? safe.map((r) => keys.map((k) => getRecordValue(r, k)))
     : [['No records found.', ...Array(cols - 1).fill('')]];
 
   const allRows = [titleRow, blankRow, headerRow, ...dataRows];
@@ -256,7 +282,7 @@ const buildCombinedSheet = (results) => {
 
     const dataRows = safe.length > 0
       ? safe.map((r) => {
-        const vals = keys.map((k) => (r[k] != null && r[k] !== '') ? r[k] : '—');
+        const vals = keys.map((k) => getRecordValue(r, k));
         return [...vals, ...Array(maxCols - cols).fill('')];
       })
       : [['No records found.', ...Array(maxCols - 1).fill('')]];
@@ -523,9 +549,10 @@ const Reports = () => {
                       <td style={{ fontWeight: 700 }}>{r.heatCode}</td><td>{r.dateCode}</td>
                       <td>{r.disa}</td><td>{r.qtyMoulds}</td>
                       <td>{dash(r.compositionC)}</td><td>{dash(r.compositionSi)}</td><td>{dash(r.compositionMn)}</td>
-                      <td>{dash(r.compositionP)}</td><td>{dash(r.compositionS)}</td><td>{dash(r.compositionMgFl)}</td>
-                      <td>{dash(r.compositionCu)}</td><td>{dash(r.compositionCr)}</td>
-                      <td>{dash(r.timeOfPouring)}</td><td>{dash(r.pouringTemp)}</td>
+                      <td>{dash(r.compositionP)}</td><td>{dash(r.compositionS)}</td>
+                      <td>{dash(r.compositionMgFirst)}</td><td>{dash(r.compositionMgLast)}</td>
+                      <td>{dash(r.compositionCu)}</td><td>{dash(r.compositionCr)}</td><td>{dash(r.compositionSn)}</td>
+                      <td>{dash(r.timeOfPouringStart)}</td><td>{dash(r.timeOfPouringEnd)}</td><td>{r.pouringTempStart || r.pouringTempEnd ? `${dash(r.pouringTempStart)} - ${dash(r.pouringTempEnd)}` : dash(r.pouringTemp)}</td>
                       <td>{dash(r.ppCode)}</td><td>{dash(r.treatmentNo)}</td>
                       <td>{dash(r.fcNoHeatNo)}</td><td>{dash(r.conNo)}</td>
                       <td>{dash(r.tappingTime)}</td><td>{dash(r.tappingWtKgs)}</td>
@@ -533,7 +560,7 @@ const Reports = () => {
                       <td>{dash(r.correctiveS)}</td><td>{dash(r.correctiveCr)}</td><td>{dash(r.correctiveCu)}</td>
                       <td>{dash(r.correctiveSn)}</td>
                       <td>{dash(r.mgKgs)}</td><td>{dash(r.resMgConvertorPercent)}</td><td>{dash(r.recMgPercent)}</td>
-                      <td>{dash(r.streamInnoculant)}</td><td>{dash(r.pTimeSec)}</td>
+                      <td>{dash(r.streamInnoculant)}</td><td>{r.pTimeSecStart || r.pTimeSecEnd ? `${dash(r.pTimeSecStart)} - ${dash(r.pTimeSecEnd)}` : dash(r.pTimeSec ?? r.ptimeSec)}</td>
                       <td>{r.createdBy}</td>
                       <td><span className="status-badge status-blue">{r.status}</span></td>
                     </tr>

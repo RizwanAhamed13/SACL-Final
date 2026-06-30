@@ -31,6 +31,7 @@ public class MicroStructureService {
             log.info("Micro Structure updated: {}", saved.getId());
             return saved;
         }
+        entry.setStatus(RecordStatus.QC_ENTRY);
         MicroStructureAnalysis saved = repository.save(entry);
         log.info("Micro Structure created: {}", saved.getId());
         return saved;

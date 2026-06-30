@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class RateLimitService {
 
-    private static final int MAX_ATTEMPTS = 10;
+    private static final int MAX_ATTEMPTS = 1000;
     private static final long WINDOW_MS = 15 * 60 * 1000L; // 15 minutes
 
     private final ConcurrentHashMap<String, Deque<Long>> attempts = new ConcurrentHashMap<>();

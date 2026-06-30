@@ -154,7 +154,7 @@ const Dashboard = () => {
   const hasAccess = (formId) => {
     if (!user) return false;
     const role = user.role?.toUpperCase() || '';
-    if (role.includes('ADMIN') || role.includes('HOD')) return true;
+    if (role.includes('ADMIN') || role.includes('HOD') || role.includes('HOF')) return true;
     return user.formPermissions?.includes(formId);
   };
 
@@ -365,7 +365,7 @@ const Dashboard = () => {
           {[
             { label: 'System', value: 'SACL Quality Management' },
             { label: 'Version', value: '2.0.0' },
-            { label: 'Standard', value: 'ISO/TS 16949' },
+            { label: 'Standard', value: 'IATF 16949:2016' },
           ].map(({ label, value }) => (
             <div key={label}>
               <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '.07em' }}>{label}</div>

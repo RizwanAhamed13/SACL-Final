@@ -4,6 +4,7 @@ import com.sacl.model.PartName;
 import com.sacl.service.PartNameService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,16 +31,19 @@ public class PartNameController {
         return ResponseEntity.ok(service.findByName(name));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','HOD')")
     @PostMapping
     public ResponseEntity<PartName> create(@RequestBody PartName part) {
         return ResponseEntity.ok(service.create(part));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','HOD')")
     @PutMapping("/{id}")
     public ResponseEntity<PartName> update(@PathVariable Long id, @RequestBody PartName part) {
         return ResponseEntity.ok(service.update(id, part));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','HOD')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.deleteById(id);

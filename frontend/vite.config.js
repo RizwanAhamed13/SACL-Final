@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     host: true,
     strictPort: true,
-    allowedHosts: ['numeric-bernardine-butlerlike.ngrok-free.dev', '.ngrok-free.dev'],
+    allowedHosts: ['numeric-bernardine-butlerlike.ngrok-free.dev', '.ngrok-free.dev', '.trycloudflare.com'],
     proxy: {
       '/api': {
         target: 'http://localhost:8080',

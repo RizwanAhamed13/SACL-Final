@@ -10,16 +10,17 @@ export const ProtectedRoute = ({ children, requiredRole, requiredPermission }) =
   }
 
   const userRole = user.role.toUpperCase();
-  const isAdmin = userRole === 'ADMIN' || userRole === 'ROLE_ADMIN' || userRole === 'HOD' || userRole === 'ROLE_HOD';
+  const isSuperAdmin = userRole === 'ADMIN' || userRole === 'ROLE_ADMIN';
+  const hasGlobalFormAccess = isSuperAdmin || userRole.includes('HOD') || userRole.includes('HOF');
 
-  if (requiredRole && !isAdmin) {
-    if (user.role.toUpperCase() !== requiredRole.toUpperCase()) {
+  if (requiredRole) {
+    if (!isSuperAdmin && userRole !== requiredRole.toUpperCase() && userRole !== `ROLE_${requiredRole.toUpperCase()}`) {
       return <Navigate to="/" replace />;
     }
   }
 
-  if (requiredPermission && !isAdmin) {
-    if (!user.formPermissions?.includes(requiredPermission)) {
+  if (requiredPermission) {
+    if (!hasGlobalFormAccess && !user.formPermissions?.includes(requiredPermission)) {
       return <Navigate to="/" replace />;
     }
   }
