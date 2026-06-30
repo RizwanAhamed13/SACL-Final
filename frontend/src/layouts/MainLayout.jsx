@@ -43,8 +43,8 @@ export const MainLayout = () => {
   const hasAccess = (formId) => {
     if (!user) return false;
     const role = user.role?.toUpperCase() || '';
-    // Only Admin, HOD and HOF have global access. QC must have explicit permissions.
-    if (role.includes('ADMIN') || role.includes('HOD') || role.includes('HOF')) return true;
+    // Only Admin and HOD have global access. HOF and QC must have explicit permissions.
+    if (role.includes('ADMIN') || role.includes('HOD')) return true;
     return user.formPermissions?.includes(formId);
   };
 

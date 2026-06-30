@@ -11,7 +11,7 @@ export const ProtectedRoute = ({ children, requiredRole, requiredPermission }) =
 
   const userRole = user.role.toUpperCase();
   const isSuperAdmin = userRole === 'ADMIN' || userRole === 'ROLE_ADMIN';
-  const hasGlobalFormAccess = isSuperAdmin || userRole.includes('HOD') || userRole.includes('HOF');
+  const hasGlobalFormAccess = isSuperAdmin || userRole.includes('HOD');
 
   if (requiredRole) {
     if (!isSuperAdmin && userRole !== requiredRole.toUpperCase() && userRole !== `ROLE_${requiredRole.toUpperCase()}`) {

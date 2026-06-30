@@ -228,28 +228,30 @@ const UserManagement = () => {
                   </div>
                 </div>
 
-                <div className="form-section">
-                  <div className="form-section-title">Form Access Permissions</div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1px))', gap: '1rem', marginTop: '1rem' }}>
-                    {[
-                      { id: 'QC_REGISTER', label: 'QC Register' },
-                      { id: 'MICRO_STRUCTURE', label: 'Micro Structure' },
-                      { id: 'TENSILE_TEST', label: 'Tensile Test' },
-                      { id: 'IMPACT_TEST', label: 'Impact Test' }
-                    ].map(p => (
-                      <label key={p.id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', padding: '0.5rem', border: '1px solid var(--color-border)', borderRadius: '8px', background: formData.permissions.includes(p.id) ? 'var(--color-primary-light)' : 'none' }}>
-                        <input 
-                          type="checkbox" 
-                          checked={formData.permissions.includes(p.id)} 
-                          onChange={() => handlePermissionChange(p.id)}
-                          style={{ width: '18px', height: '18px', accentColor: 'var(--color-primary)' }}
-                        />
-                        <span style={{ fontSize: '14px', fontWeight: 500 }}>{p.label}</span>
-                      </label>
-                    ))}
+                {formData.role !== 'ROLE_ADMIN' && (
+                  <div className="form-section">
+                    <div className="form-section-title">Form Access Permissions</div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1px))', gap: '1rem', marginTop: '1rem' }}>
+                      {[
+                        { id: 'QC_REGISTER', label: 'QC Register' },
+                        { id: 'MICRO_STRUCTURE', label: 'Micro Structure' },
+                        { id: 'TENSILE_TEST', label: 'Tensile Test' },
+                        { id: 'IMPACT_TEST', label: 'Impact Test' }
+                      ].map(p => (
+                        <label key={p.id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', padding: '0.5rem', border: '1px solid var(--color-border)', borderRadius: '8px', background: formData.permissions.includes(p.id) ? 'var(--color-primary-light)' : 'none' }}>
+                          <input 
+                            type="checkbox" 
+                            checked={formData.permissions.includes(p.id)} 
+                            onChange={() => handlePermissionChange(p.id)}
+                            style={{ width: '18px', height: '18px', accentColor: 'var(--color-primary)' }}
+                          />
+                          <span style={{ fontSize: '14px', fontWeight: 500 }}>{p.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                    <p style={{ marginTop: '0.75rem', fontSize: '12px', color: 'var(--color-text-secondary)' }}>Note: Admin users automatically have access to all forms regardless of these settings.</p>
                   </div>
-                  <p style={{ marginTop: '0.75rem', fontSize: '12px', color: 'var(--color-text-secondary)' }}>Note: Admin users automatically have access to all forms regardless of these settings.</p>
-                </div>
+                )}
 
                 <div className="card-footer" style={{ margin: '0 -1.5rem -1.5rem', borderRadius: '0 0 var(--radius-xl) var(--radius-xl)' }}>
                   <div style={{ display: 'flex', gap: '1rem' }}>

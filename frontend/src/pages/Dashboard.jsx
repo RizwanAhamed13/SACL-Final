@@ -154,7 +154,7 @@ const Dashboard = () => {
   const hasAccess = (formId) => {
     if (!user) return false;
     const role = user.role?.toUpperCase() || '';
-    if (role.includes('ADMIN') || role.includes('HOD') || role.includes('HOF')) return true;
+    if (role.includes('ADMIN') || role.includes('HOD')) return true;
     return user.formPermissions?.includes(formId);
   };
 
