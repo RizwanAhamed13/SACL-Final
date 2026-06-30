@@ -455,10 +455,6 @@ const QcRegister = () => {
 
                 <div className="form-section">
                   <div className="form-section-title">Remarks &amp; Signatures</div>
-                  <div className="form-group">
-                    <label className="form-label">Remarks</label>
-                    <textarea name="remarks" value={formData.remarks} onChange={handleChange} className="form-control" rows="2" placeholder="Any observations..."></textarea>
-                  </div>
                   <div className="form-row form-row-1">
                     <div className="form-group">
                       <label className="form-label">Status</label>
@@ -607,8 +603,7 @@ const QcRegister = () => {
                     <td>{r.pTimeSecStart || r.pTimeSecEnd ? `${dash(r.pTimeSecStart)} - ${dash(r.pTimeSecEnd)}` : dash(r.pTimeSec)}</td>
 
                     <td style={{ fontSize: '11px', maxWidth: '200px', whiteSpace: 'normal' }}>
-                    {((user?.role?.toUpperCase()?.includes('HOF') && (r.status || 'QC_ENTRY') === 'QC_ENTRY') ||
-                      ((user?.role?.toUpperCase()?.includes('HOD') || user?.role?.toUpperCase()?.includes('ADMIN')) && (r.status || 'QC_ENTRY') === 'HOF_APPROVED')) ? (
+                    {user?.role?.toUpperCase()?.includes('HOF') && (r.status || 'QC_ENTRY') === 'QC_ENTRY' ? (
                         <textarea 
                           className="form-control" 
                           style={{ fontSize: '11px', padding: '4px', width: '100%', minWidth: '120px' }}
