@@ -11,15 +11,15 @@ if ! command -v docker &> /dev/null; then
 fi
 
 echo "Pulling latest images from Docker Hub..."
-docker-compose pull
+sudo docker-compose pull
 
 echo "Starting application containers..."
-docker-compose up -d
+sudo docker-compose up -d
 
 echo ""
 echo "================================================"
 echo "  Deployment Complete!"
 echo "  Your application is now running."
 echo "  Frontend should be accessible on port 80."
-echo "  Check logs using: docker-compose logs -f"
+echo "  Check logs using: sudo docker-compose logs -f"
 echo "================================================"
