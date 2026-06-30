@@ -36,9 +36,9 @@ const MicroTensile = () => {
   const [thresholds, setThresholds] = useState(null);
   const [errors, setErrors] = useState({});
 
-  const activeLocations = !formData.id && thresholds?.mechLocations
-    ? thresholds.mechLocations.split(',').filter(Boolean)
-    : [];
+  const activeLocations = formData.mechLocation
+    ? formData.mechLocation.split(',').filter(Boolean)
+    : (thresholds?.mechLocations ? thresholds.mechLocations.split(',').filter(Boolean) : []);
 
   const fetchRecords = async () => {
     try {
@@ -98,7 +98,7 @@ const MicroTensile = () => {
       const res = await axios.get(`/api/part-names/name/${encodeURIComponent(partName)}`);
       setThresholds(res.data);
       if (res.data) {
-        const locs = res.data.mechLocations ? res.data.mechLocations.split(',').filter(Boolean) : [];
+        const locs = currentData.id && currentData.mechLocation ? currentData.mechLocation.split(',').filter(Boolean) : (res.data.mechLocations ? res.data.mechLocations.split(',').filter(Boolean) : []);
         validateAll(currentData, res.data, locs);
       }
     } catch (err) {

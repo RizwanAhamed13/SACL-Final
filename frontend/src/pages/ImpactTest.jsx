@@ -40,10 +40,14 @@ const ImpactTest = () => {
   const [thresholds, setThresholds] = useState(null);
   const [errors, setErrors] = useState({});
 
-  const activeLocations = !formData.id && thresholds?.mechLocations
-    ? thresholds.mechLocations.split(',').filter(Boolean)
-    : [];
-  const activeNotches = !formData.id ? selectedNotches.map(k => NOTCH_LABEL[k]) : [];
+  const activeLocations = formData.mechLocation
+    ? formData.mechLocation.split(',').filter(Boolean)
+    : (thresholds?.mechLocations ? thresholds.mechLocations.split(',').filter(Boolean) : []);
+
+  const activeNotches = formData.notchType
+    ? formData.notchType.split(',').filter(Boolean)
+    : (thresholds?.impactNotchTypes ? thresholds.impactNotchTypes.split(',').filter(Boolean) : []);
+
   const useCombos = activeLocations.length > 0 && activeNotches.length > 0;
 
   const fetchRecords = async () => {
@@ -126,8 +130,8 @@ const ImpactTest = () => {
       const res = await axios.get(`/api/part-names/name/${encodeURIComponent(partName)}`);
       setThresholds(res.data);
       if (res.data) {
-        const locs = res.data.mechLocations ? res.data.mechLocations.split(',').filter(Boolean) : [];
-        const notches = res.data.impactNotchTypes ? res.data.impactNotchTypes.split(',').filter(Boolean) : [];
+        const locs = currentData.id && currentData.mechLocation ? currentData.mechLocation.split(',').filter(Boolean) : (res.data.mechLocations ? res.data.mechLocations.split(',').filter(Boolean) : []);
+        const notches = currentData.id && currentData.notchType ? currentData.notchType.split(',').filter(Boolean) : (res.data.impactNotchTypes ? res.data.impactNotchTypes.split(',').filter(Boolean) : []);
         setSelectedNotches(notches);
         validateAll(currentData, res.data, locs, notches);
       }

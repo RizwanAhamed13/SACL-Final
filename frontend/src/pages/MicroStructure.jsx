@@ -54,9 +54,9 @@ const MicroStructure = () => {
   const [thresholds, setThresholds] = useState(null);
   const [errors, setErrors] = useState({});
 
-  const activeLocations = !formData.id && thresholds?.microLocations
-    ? thresholds.microLocations.split(',').filter(Boolean)
-    : [];
+  const activeLocations = formData.microLocation
+    ? formData.microLocation.split(',').filter(Boolean)
+    : (thresholds?.microLocations ? thresholds.microLocations.split(',').filter(Boolean) : []);
 
   const fetchRecords = async () => {
     try {
@@ -130,7 +130,7 @@ const MicroStructure = () => {
       const res = await axios.get(`/api/part-names/name/${encodeURIComponent(partName)}`);
       setThresholds(res.data);
       if (res.data) {
-        const locs = res.data.microLocations ? res.data.microLocations.split(',').filter(Boolean) : [];
+        const locs = currentData.id && currentData.microLocation ? currentData.microLocation.split(',').filter(Boolean) : (res.data.microLocations ? res.data.microLocations.split(',').filter(Boolean) : []);
         validateAll(currentData, res.data, locs);
       }
     } catch (err) {
