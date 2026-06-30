@@ -674,13 +674,6 @@ const ImpactTest = () => {
                                         Approve HOD
                                       </button>
                                     )}
-
-                                    {user?.role?.toUpperCase()?.includes('ADMIN') && (
-                                      <button className="btn btn-sm" onClick={() => setDeleteRecordId(r.id)} style={{ padding: '0.2rem 0.6rem', fontSize: '12px', background: '#dc2626', color: 'white', border: 'none' }}>
-                                        Delete
-                                      </button>
-                                    )}
-
                                     </div>
                                   </td>
                                 )}
