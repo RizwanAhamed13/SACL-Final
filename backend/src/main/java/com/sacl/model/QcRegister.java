@@ -34,15 +34,34 @@ public class QcRegister {
     private Integer qtyMoulds;
 
     // Metal Composition (%)
+    @Column(name = "composition_c")
     private Double compositionC;
+
+    @Column(name = "composition_si")
     private Double compositionSi;
+
+    @Column(name = "composition_mn")
     private Double compositionMn;
+
+    @Column(name = "composition_p")
     private Double compositionP;
+
+    @Column(name = "composition_s")
     private Double compositionS;
+
+    @Column(name = "composition_mg_first")
     private Double compositionMgFirst;
+
+    @Column(name = "composition_mg_last")
     private Double compositionMgLast;
+
+    @Column(name = "composition_cu")
     private Double compositionCu;
+
+    @Column(name = "composition_cr")
     private Double compositionCr;
+
+    @Column(name = "composition_sn")
     private Double compositionSn;
 
     private String timeOfPouringStart;
@@ -55,12 +74,25 @@ public class QcRegister {
     private String tappingTime;
 
     // Corrective Addition (Kgs)
+    @Column(name = "corrective_c")
     private Double correctiveC;
+
+    @Column(name = "corrective_si")
     private Double correctiveSi;
+
+    @Column(name = "corrective_mn")
     private Double correctiveMn;
+
+    @Column(name = "corrective_s")
     private Double correctiveS;
+
+    @Column(name = "corrective_cr")
     private Double correctiveCr;
+
+    @Column(name = "corrective_cu")
     private Double correctiveCu;
+
+    @Column(name = "corrective_sn")
     private Double correctiveSn;
 
     private Double tappingWtKgs;

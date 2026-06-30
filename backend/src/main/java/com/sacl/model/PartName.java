@@ -21,23 +21,58 @@ public class PartName {
     private String description;
 
     // QC Thresholds (Chemical)
+    @Column(name = "qc_min_c")
     private Double qcMinC;
+
+    @Column(name = "qc_max_c")
     private Double qcMaxC;
+
+    @Column(name = "qc_min_si")
     private Double qcMinSi;
+
+    @Column(name = "qc_max_si")
     private Double qcMaxSi;
+
+    @Column(name = "qc_min_mn")
     private Double qcMinMn;
+
+    @Column(name = "qc_max_mn")
     private Double qcMaxMn;
+
+    @Column(name = "qc_min_p")
     private Double qcMinP;
+
+    @Column(name = "qc_max_p")
     private Double qcMaxP;
+
+    @Column(name = "qc_min_s")
     private Double qcMinS;
+
+    @Column(name = "qc_max_s")
     private Double qcMaxS;
+
+    @Column(name = "qc_min_mg")
     private Double qcMinMg;
+
+    @Column(name = "qc_max_mg")
     private Double qcMaxMg;
+
+    @Column(name = "qc_min_cu")
     private Double qcMinCu;
+
+    @Column(name = "qc_max_cu")
     private Double qcMaxCu;
+
+    @Column(name = "qc_min_cr")
     private Double qcMinCr;
+
+    @Column(name = "qc_max_cr")
     private Double qcMaxCr;
+
+    @Column(name = "qc_min_sn")
     private Double qcMinSn;
+
+    @Column(name = "qc_max_sn")
     private Double qcMaxSn;
 
     // Micro Thresholds
@@ -90,8 +125,12 @@ public class PartName {
     private Double ppMaxMgKgs;
     private Double ppMinStreamInnoculant;
     private Double ppMaxStreamInnoculant;
+    @Column(name = "pp_min_p_time_sec")
     private Double ppMinPTimeSec;
+
+    @Column(name = "pp_max_p_time_sec")
     private Double ppMaxPTimeSec;
+
     private Double ppMinResMgConvertor;
     private Double ppMaxResMgConvertor;
     private Double barDiaMin;
@@ -100,14 +139,23 @@ public class PartName {
     private Double microSizeMax;
 
     // Corrective Addition Thresholds (Kgs)
+    @Column(name = "corr_min_c")
     private Double corrMinC;
+
+    @Column(name = "corr_max_c")
     private Double corrMaxC;
+
     private Double corrMinSi;
     private Double corrMaxSi;
     private Double corrMinMn;
     private Double corrMaxMn;
+
+    @Column(name = "corr_min_s")
     private Double corrMinS;
+
+    @Column(name = "corr_max_s")
     private Double corrMaxS;
+
     private Double corrMinCr;
     private Double corrMaxCr;
     private Double corrMinCu;
