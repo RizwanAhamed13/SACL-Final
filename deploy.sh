@@ -13,6 +13,9 @@ fi
 echo "Pulling latest images from Docker Hub..."
 sudo docker-compose pull
 
+echo "Stopping existing containers..."
+sudo docker-compose down
+
 echo "Starting application containers..."
 sudo docker-compose up -d
 
