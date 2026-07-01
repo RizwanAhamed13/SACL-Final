@@ -22,6 +22,7 @@ const MicroTensile = () => {
 
   const [records, setRecords] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [showSaveConfirm, setShowSaveConfirm] = useState(false);
   const [formData, setFormData] = useState({
     id: null,
     dateOfInspection: new Date().toISOString().split('T')[0], item: '', dateCode: '',
@@ -162,8 +163,17 @@ const MicroTensile = () => {
     fetchThresholds(val, nextData);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
+    if (Object.keys(errors).length > 0) {
+      toast.error('Please fix validation errors before saving.');
+      return;
+    }
+    setShowSaveConfirm(true);
+  };
+
+  const handleConfirmSave = async () => {
+    setShowSaveConfirm(false);
     if (Object.keys(errors).length > 0) {
       return toast.error("Please correct values out of engineering range!");
     }
@@ -367,6 +377,16 @@ const MicroTensile = () => {
                   </div>
                 )}
 
+                <div className="form-section">
+                  <div className="form-section-title">Additional Info</div>
+                  <div className="form-row form-row-1">
+                    <div className="form-group">
+                      <label className="form-label">Remarks</label>
+                      <textarea name="remarks" value={formData.remarks} onChange={handleChange} className="form-control" rows="2" placeholder="Enter any remarks..." />
+                    </div>
+                  </div>
+                </div>
+
                 <div className="card-footer" style={{ margin: '0 -1.5rem -1.5rem', borderRadius: '0 0 var(--radius-xl) var(--radius-xl)' }}>
                   <div style={{ display: 'flex', gap: '1rem' }}>
                     <button type="button" className="btn btn-secondary" onClick={() => setFormData(prev => ({ ...Object.keys(prev).reduce((acc, key) => ({ ...acc, [key]: '' }), {}), approvedBy: user?.employeeId || user?.fullName || '' }))}>Clear</button>
@@ -561,6 +581,12 @@ const MicroTensile = () => {
         </div>
       </div>
        
+      <ConfirmModal 
+        isOpen={showSaveConfirm} 
+        onConfirm={handleConfirmSave} 
+        onCancel={() => setShowSaveConfirm(false)} 
+        message="Are you sure you want to save this record?" 
+      />
     </>
   );
 };

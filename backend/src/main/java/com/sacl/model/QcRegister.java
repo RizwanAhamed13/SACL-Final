@@ -118,6 +118,8 @@ public class QcRegister {
     @Column(length = 4000)
     private String remarks;
 
+
+
     private String hodQc;
 
     private String hofApprovedBy;

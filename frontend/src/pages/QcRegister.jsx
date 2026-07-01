@@ -6,6 +6,7 @@ import { PartNameSelect } from '../components/PartNameSelect';
 import { useAuth } from '../context/AuthContext';
 import ConfirmModal from '../components/ConfirmModal';
 import Skeleton from '../components/Skeleton';
+import TimePicker from '../components/TimePicker';
 
 const QcRegister = () => {
   const { user } = useAuth();
@@ -13,6 +14,7 @@ const QcRegister = () => {
 
   const [records, setRecords] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [showSaveConfirm, setShowSaveConfirm] = useState(false);
   const [formData, setFormData] = useState({
     id: null, // for editing
     heatCode: '', date: new Date().toISOString().split('T')[0], dateCode: '', disa: '', partName: '', qtyMoulds: '',
@@ -156,8 +158,17 @@ const QcRegister = () => {
     fetchThresholds(val, nextData);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
+    if (Object.keys(errors).length > 0) {
+      toast.error('Please fix validation errors before saving.');
+      return;
+    }
+    setShowSaveConfirm(true);
+  };
+
+  const handleConfirmSave = async () => {
+    setShowSaveConfirm(false);
     if (Object.keys(errors).length > 0) {
       return toast.error("Please correct values out of engineering range!");
     }
@@ -336,9 +347,9 @@ const QcRegister = () => {
                     <div className="form-group">
                       <label className="form-label">Time of Pouring</label>
                       <div style={{display:'flex', gap:'0.5rem', alignItems:'center'}}>
-                        <input type="time" name="timeOfPouringStart" value={formData.timeOfPouringStart} onChange={handleChange} className="form-control" placeholder="Start" />
+                        <TimePicker name="timeOfPouringStart" value={formData.timeOfPouringStart} onChange={handleChange} />
                         <span style={{color:'#94a3b8', fontWeight:600}}>—</span>
-                        <input type="time" name="timeOfPouringEnd" value={formData.timeOfPouringEnd} onChange={handleChange} className="form-control" placeholder="End" />
+                        <TimePicker name="timeOfPouringEnd" value={formData.timeOfPouringEnd} onChange={handleChange} />
                       </div>
                     </div>
                       <div className="form-group">
@@ -366,8 +377,11 @@ const QcRegister = () => {
                   <div className="form-row form-row-4">
                     <div className="form-group"><label className="form-label">F/C No / Heat No</label><input type="text" name="fcNoHeatNo" value={formData.fcNoHeatNo} onChange={handleChange} className="form-control" placeholder="e.g. F1/H2" /></div>
                     <div className="form-group"><label className="form-label">Con No</label><input type="text" name="conNo" value={formData.conNo} onChange={handleChange} className="form-control" /></div>
-                    <div className="form-group"><label className="form-label">Tapping Time</label><input type="time" name="tappingTime" value={formData.tappingTime} onChange={handleChange} className="form-control" /></div>
+                    <div className="form-group"><label className="form-label">Tapping Time</label><TimePicker name="tappingTime" value={formData.tappingTime} onChange={handleChange} /></div>
                     <div className="form-group"><label className="form-label">Tapping Wt (Kgs)</label><input type="number" name="tappingWtKgs" value={formData.tappingWtKgs} onChange={handleChange} className="form-control" /></div>
+                  </div>
+                  <div className="form-row form-row-4">
+
                   </div>
                   <div className="form-row form-row-4">
                     <div className="form-group">
@@ -453,7 +467,15 @@ const QcRegister = () => {
                   </div>
                 </div>
 
-
+                <div className="form-section">
+                  <div className="form-section-title">Additional Info</div>
+                  <div className="form-row form-row-1">
+                    <div className="form-group">
+                      <label className="form-label">Remarks</label>
+                      <textarea name="remarks" value={formData.remarks} onChange={handleChange} className="form-control" rows="2" placeholder="Enter any remarks..." />
+                    </div>
+                  </div>
+                </div>
 
                 <div className="card-footer" style={{ margin: '0 -1.5rem -1.5rem', borderRadius: '0 0 var(--radius-xl) var(--radius-xl)' }}>
                   <div style={{ display: 'flex', gap: '1rem' }}>
@@ -512,6 +534,7 @@ const QcRegister = () => {
                   <th rowSpan="2">Res.Mg Convertor %</th>
                   <th rowSpan="2">Rec. Of Mg %</th>
                   <th colSpan="2" className="text-center">Stream Inoculant</th>
+
                   <th rowSpan="2" style={{ minWidth: '150px' }}>Remarks</th>
                   <th rowSpan="2">Status</th>
                   <th rowSpan="2" style={{ minWidth: '150px' }}>Approval Info</th>
@@ -590,6 +613,8 @@ const QcRegister = () => {
                     <td>{dash(r.streamInnoculant)}</td>
                     <td>{r.pTimeSecStart || r.pTimeSecEnd ? `${dash(r.pTimeSecStart)} - ${dash(r.pTimeSecEnd)}` : dash(r.pTimeSec)}</td>
 
+
+
                     <td style={{ fontSize: '11px', maxWidth: '200px', whiteSpace: 'normal' }}>
                     {user?.role?.toUpperCase()?.includes('HOF') && (r.status || 'QC_ENTRY') === 'QC_ENTRY' ? (
                         <textarea 
@@ -610,6 +635,7 @@ const QcRegister = () => {
                       </span>
                     </td>
                     <td style={{ fontSize: '11px', lineHeight: '1.4' }}>
+
                       <div style={{ marginBottom: '6px' }}>
                         <span style={{ color: 'var(--color-text-secondary)', display: 'block', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.02em' }}>Entered By</span>
                         <span style={{ fontWeight: '600', color: 'var(--color-text-primary)' }}>{r.createdBy || '—'}</span>
@@ -670,6 +696,12 @@ const QcRegister = () => {
         </div>
       </div>
        
+      <ConfirmModal 
+        isOpen={showSaveConfirm} 
+        onConfirm={handleConfirmSave} 
+        onCancel={() => setShowSaveConfirm(false)} 
+        message="Are you sure you want to save this record?" 
+      />
     </>
   );
 };
