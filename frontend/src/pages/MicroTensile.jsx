@@ -436,6 +436,7 @@ const MicroTensile = () => {
                    <th colSpan="2" style={{ textAlign: 'center' }}>Strength (N/mm²)</th>
                    <th rowSpan="2">Elongation (%)</th>
                    <th rowSpan="2">Remarks</th>
+                   <th rowSpan="2">HOF Remarks</th>
                    <th rowSpan="2">Status</th>
                    <th rowSpan="2">Approval Info</th>
                    {isStaff && <th rowSpan="2">Actions</th>}
@@ -509,6 +510,9 @@ const MicroTensile = () => {
                                 ) : (
                                   dash(r.remarks)
                                 )}
+                              </td>
+                              <td rowSpan={rowCount} style={{ fontSize: '11px', maxWidth: '200px', whiteSpace: 'normal', color: '#059669', background: r.hofRemarks ? '#ecfdf5' : 'transparent' }}>
+                                {dash(r.hofRemarks)}
                               </td>
                               <td rowSpan={rowCount}>
                                 <span className={`status-badge status-${(r.status || 'QC_ENTRY').toLowerCase()}`}>

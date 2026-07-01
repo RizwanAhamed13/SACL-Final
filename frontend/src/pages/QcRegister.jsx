@@ -536,6 +536,7 @@ const QcRegister = () => {
                   <th colSpan="2" className="text-center">Stream Inoculant</th>
 
                   <th rowSpan="2" style={{ minWidth: '150px' }}>Remarks</th>
+                  <th rowSpan="2" style={{ minWidth: '150px' }}>HOF Remarks</th>
                   <th rowSpan="2">Status</th>
                   <th rowSpan="2" style={{ minWidth: '150px' }}>Approval Info</th>
                   {isStaff && <th rowSpan="2">Actions</th>}
@@ -628,7 +629,10 @@ const QcRegister = () => {
                     ) : (
                       dash(r.remarks)
                     )}
-</td>
+                    </td>
+                    <td style={{ fontSize: '11px', maxWidth: '200px', whiteSpace: 'normal', color: '#059669', background: r.hofRemarks ? '#ecfdf5' : 'transparent' }}>
+                      {dash(r.hofRemarks)}
+                    </td>
                     <td>
                       <span className={`status-badge status-${(r.status || 'QC_ENTRY').toLowerCase()}`}>
                         {(r.status || 'QC_ENTRY').replace('_', ' ')}
