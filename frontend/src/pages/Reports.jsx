@@ -562,8 +562,6 @@ const Reports = () => {
                       <td>{dash(r.mgKgs)}</td><td>{dash(r.resMgConvertorPercent)}</td><td>{dash(r.recMgPercent)}</td>
                       <td>{dash(r.streamInnoculant)}</td><td>{r.pTimeSecStart || r.pTimeSecEnd ? `${dash(r.pTimeSecStart)} - ${dash(r.pTimeSecEnd)}` : dash(r.pTimeSec ?? r.ptimeSec)}</td>
                       <td style={{ maxWidth: '200px', whiteSpace: 'normal' }}>{dash(r.remarks)}</td>
-                      <td>{r.createdBy}</td>
-                      <td><span className="status-badge status-blue">{r.status}</span></td>
                     </tr>
                   ))
                 }
@@ -601,8 +599,6 @@ const Reports = () => {
                       <td>{dash(r.carbidePercentMin)}</td><td>{dash(r.carbidePercentMax)}</td>
                       <td>{dash(r.sizeMin)}</td><td>{dash(r.sizeMax)}</td>
                       <td style={{ maxWidth: '200px', whiteSpace: 'normal' }}>{dash(r.remarks)}</td>
-                      <td>{r.createdBy}</td>
-                      <td><span className="status-badge status-green">{r.status}</span></td>
                     </tr>
                   ))
                 }
@@ -638,8 +634,6 @@ const Reports = () => {
                       <td>{dash(r.tensileStrength)}</td><td>{dash(r.yieldStrength02)}</td>
                       <td>{dash(r.yieldStrength05)}</td><td>{dash(r.elongationPercent)}</td>
                       <td style={{ maxWidth: '200px', whiteSpace: 'normal' }}>{dash(r.remarks)}</td>
-                      <td>{r.createdBy}</td>
-                      <td><span className="status-badge status-amber">{r.status}</span></td>
                     </tr>
                   ))
                 }
@@ -673,8 +667,6 @@ const Reports = () => {
                       <td>{r.location || '—'}</td><td>{r.notchType || '—'}</td>
                       <td>{dash(r.observedValue1)}</td><td>{dash(r.observedValue2)}</td><td>{dash(r.observedValue3)}</td>
                       <td style={{ maxWidth: '200px', whiteSpace: 'normal' }}>{dash(r.remarks)}</td>
-                      <td>{r.createdBy}</td>
-                      <td><span className="status-badge status-purple">{r.status}</span></td>
                     </tr>
                   ))
                 }
