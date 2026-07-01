@@ -92,7 +92,7 @@ const QC_HEADERS = [
   'Tapping Time', 'Tapping Wt (kg)',
   'Corr C', 'Corr Si', 'Corr Mn', 'Corr S', 'Corr Cr', 'Corr Cu', 'Corr Sn',
   'Mg (kg)', 'Res Mg %', 'Rec Mg %', 'Stream Inoculant', 'P Time (sec)',
-  'Remarks',
+  'Remarks', 'Created By', 'Status'
 ];
 const QC_KEYS = [
   'id', 'partName', 'date', 'heatCode', 'dateCode', 'disa', 'qtyMoulds',
@@ -103,44 +103,44 @@ const QC_KEYS = [
   'correctiveC', 'correctiveSi', 'correctiveMn', 'correctiveS',
   'correctiveCr', 'correctiveCu', 'correctiveSn',
   'mgKgs', 'resMgConvertorPercent', 'recMgPercent', 'streamInnoculant', (r) => (r.pTimeSecStart || r.pTimeSecEnd) ? `${r.pTimeSecStart || '-'} - ${r.pTimeSecEnd || '-'}` : (r.pTimeSec ?? r.ptimeSec),
-  'remarks',
+  'remarks', 'createdBy', 'status'
 ];
 
 const MICRO_HEADERS = [
   'ID', 'Part Name', 'Inspection Date', 'Heat Code', 'Date Code', 'Location',
   'Nodularity %', 'Graphite Type', 'Count (nos/mm²)',
   'Ferrite Min %', 'Ferrite Max %', 'Pearlite Min %', 'Pearlite Max %', 'Carbide Min %', 'Carbide Max %',
-  'Size Min', 'Size Max', 'Remarks',
+  'Size Min', 'Size Max', 'Remarks', 'Created By', 'Status'
 ];
 const MICRO_KEYS = [
   'id', 'partName', 'inspectionDate', 'heatCode', 'dateCode', (r) => r.location || r.microLocation,
   'nodularityPercent', 'graphiteType', 'countNosPerMm2',
   'ferritePercentMin', 'ferritePercentMax', 'pearlitePercentMin', 'pearlitePercentMax', 'carbidePercentMin', 'carbidePercentMax',
-  'sizeMin', 'sizeMax', 'remarks',
+  'sizeMin', 'sizeMax', 'remarks', 'createdBy', 'status'
 ];
 
 const TENSILE_HEADERS = [
   'ID', 'Item', 'Inspection Date', 'Heat Code', 'Date Code', 'Location',
   'Bar Dia (mm)', 'Gauge Length (mm)', 'Max Load (kN)', 'Yield Load (kN)',
   'Tensile Strength', 'Yield Strength 0.2 %', 'Yield Strength 0.5 %', 'Elongation %',
-  'Remarks',
+  'Remarks', 'Created By', 'Status'
 ];
 const TENSILE_KEYS = [
   'id', 'item', 'dateOfInspection', 'heatCode', 'dateCode', (r) => r.location || r.mechLocation,
   'barDiaMm', 'gaugeLengthMm', 'maxLoadKn', 'yieldLoadKn',
   'tensileStrength', 'yieldStrength02', 'yieldStrength05', 'elongationPercent',
-  'remarks',
+  'remarks', 'createdBy', 'status'
 ];
 
 const IMPACT_HEADERS = [
   'ID', 'Part Name', 'Inspection Date', 'Date Code', 'Location', 'Notch Type',
   'Observed Value 1 (J)', 'Observed Value 2 (J)', 'Observed Value 3 (J)',
-  'Remarks',
+  'Remarks', 'Created By', 'Status'
 ];
 const IMPACT_KEYS = [
   'id', 'partName', 'dateOfInspection', 'dateCode', (r) => r.location || r.mechLocation, 'notchType',
   'observedValue1', 'observedValue2', 'observedValue3',
-  'remarks',
+  'remarks', 'createdBy', 'status'
 ];
 
 const THEMES = {
@@ -561,6 +561,7 @@ const Reports = () => {
                       <td>{dash(r.correctiveSn)}</td>
                       <td>{dash(r.mgKgs)}</td><td>{dash(r.resMgConvertorPercent)}</td><td>{dash(r.recMgPercent)}</td>
                       <td>{dash(r.streamInnoculant)}</td><td>{r.pTimeSecStart || r.pTimeSecEnd ? `${dash(r.pTimeSecStart)} - ${dash(r.pTimeSecEnd)}` : dash(r.pTimeSec ?? r.ptimeSec)}</td>
+                      <td style={{ maxWidth: '200px', whiteSpace: 'normal' }}>{dash(r.remarks)}</td>
                       <td>{r.createdBy}</td>
                       <td><span className="status-badge status-blue">{r.status}</span></td>
                     </tr>
@@ -599,6 +600,7 @@ const Reports = () => {
                       <td>{dash(r.pearlitePercentMin)}</td><td>{dash(r.pearlitePercentMax)}</td>
                       <td>{dash(r.carbidePercentMin)}</td><td>{dash(r.carbidePercentMax)}</td>
                       <td>{dash(r.sizeMin)}</td><td>{dash(r.sizeMax)}</td>
+                      <td style={{ maxWidth: '200px', whiteSpace: 'normal' }}>{dash(r.remarks)}</td>
                       <td>{r.createdBy}</td>
                       <td><span className="status-badge status-green">{r.status}</span></td>
                     </tr>
@@ -635,6 +637,7 @@ const Reports = () => {
                       <td>{dash(r.maxLoadKn)}</td><td>{dash(r.yieldLoadKn)}</td>
                       <td>{dash(r.tensileStrength)}</td><td>{dash(r.yieldStrength02)}</td>
                       <td>{dash(r.yieldStrength05)}</td><td>{dash(r.elongationPercent)}</td>
+                      <td style={{ maxWidth: '200px', whiteSpace: 'normal' }}>{dash(r.remarks)}</td>
                       <td>{r.createdBy}</td>
                       <td><span className="status-badge status-amber">{r.status}</span></td>
                     </tr>
@@ -669,6 +672,7 @@ const Reports = () => {
                       <td>{r.dateOfInspection}</td><td style={{ fontWeight: 700 }}>{r.dateCode}</td>
                       <td>{r.location || '—'}</td><td>{r.notchType || '—'}</td>
                       <td>{dash(r.observedValue1)}</td><td>{dash(r.observedValue2)}</td><td>{dash(r.observedValue3)}</td>
+                      <td style={{ maxWidth: '200px', whiteSpace: 'normal' }}>{dash(r.remarks)}</td>
                       <td>{r.createdBy}</td>
                       <td><span className="status-badge status-purple">{r.status}</span></td>
                     </tr>
