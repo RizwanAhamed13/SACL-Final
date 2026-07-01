@@ -19,6 +19,9 @@ public class ImpactTest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Version
+    private Long version;
+
     private LocalDate dateOfInspection;
     private String partName;
     private String dateCode;

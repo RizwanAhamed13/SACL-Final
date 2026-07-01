@@ -12,4 +12,11 @@ import java.util.List;
 public interface ImpactTestRepository extends JpaRepository<ImpactTest, Long> {
 
     List<ImpactTest> findAll();
+
+    @Query("SELECT r.createdBy, COUNT(r), " +
+           "SUM(CASE WHEN r.status = com.sacl.model.RecordStatus.HOF_APPROVED OR r.status = com.sacl.model.RecordStatus.HOD_APPROVED THEN 1 ELSE 0 END), " +
+           "SUM(CASE WHEN r.status = com.sacl.model.RecordStatus.HOD_APPROVED THEN 1 ELSE 0 END), " +
+           "MAX(r.dateOfInspection) " +
+           "FROM ImpactTest r WHERE r.createdBy IS NOT NULL AND r.createdBy != '' GROUP BY r.createdBy")
+    List<Object[]> getEfficiencyStats();
 }

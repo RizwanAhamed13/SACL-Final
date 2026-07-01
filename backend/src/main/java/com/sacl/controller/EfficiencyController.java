@@ -29,12 +29,6 @@ public class EfficiencyController {
     @GetMapping("/employees")
     public ResponseEntity<List<Map<String, Object>>> getEmployeeEfficiency() {
 
-        // Gather all records across all forms
-        List<QcRegister>          qcAll      = qcRepo.findAll();
-        List<MicroStructureAnalysis> microAll = microRepo.findAll();
-        List<MicroTensileTest>    tensileAll  = tensileRepo.findAll();
-        List<ImpactTest>          impactAll   = impactRepo.findAll();
-
         // Build a map: employeeId → metrics
         Map<String, Map<String, Object>> metricsMap = new LinkedHashMap<>();
 
@@ -56,18 +50,30 @@ public class EfficiencyController {
             return m;
         };
 
-        java.util.function.BiConsumer<String, String> increment = (empId, key) -> {
-            metricsMap.computeIfAbsent(empId, initEntry);
-            Map<String, Object> m = metricsMap.get(empId);
-            m.put(key, ((Number) m.get(key)).intValue() + 1);
-        };
-
-        java.util.function.BiConsumer<String, LocalDate> trackDate = (empId, date) -> {
-            if (empId == null || date == null) return;
-            metricsMap.computeIfAbsent(empId, initEntry);
-            Map<String, Object> m = metricsMap.get(empId);
-            LocalDate current = m.get("lastActivity") != null ? (LocalDate) m.get("lastActivity") : null;
-            if (current == null || date.isAfter(current)) m.put("lastActivity", date);
+        java.util.function.BiConsumer<List<Object[]>, String> processStats = (list, countKey) -> {
+            for (Object[] row : list) {
+                String emp = (String) row[0];
+                if (emp == null || emp.isBlank()) continue;
+                metricsMap.computeIfAbsent(emp, initEntry);
+                Map<String, Object> m = metricsMap.get(emp);
+                
+                long total = row[1] != null ? ((Number) row[1]).longValue() : 0L;
+                long hofApp = row[2] != null ? ((Number) row[2]).longValue() : 0L;
+                long hodApp = row[3] != null ? ((Number) row[3]).longValue() : 0L;
+                LocalDate date = (LocalDate) row[4];
+                
+                m.put(countKey, ((Number) m.get(countKey)).intValue() + (int) total);
+                m.put("totalSubmissions", ((Number) m.get("totalSubmissions")).intValue() + (int) total);
+                m.put("hofApproved", ((Number) m.get("hofApproved")).intValue() + (int) (hofApp + hodApp)); // Since logic was hof or hod, and query handles both
+                m.put("hodApproved", ((Number) m.get("hodApproved")).intValue() + (int) hodApp);
+                
+                if (date != null) {
+                    LocalDate current = (LocalDate) m.get("lastActivity");
+                    if (current == null || date.isAfter(current)) {
+                        m.put("lastActivity", date);
+                    }
+                }
+            }
         };
 
         java.util.function.BiConsumer<String, Map<String, String>> addRemark = (empId, remarkData) -> {
@@ -79,53 +85,11 @@ public class EfficiencyController {
             m.put("issuesCount", ((Number) m.get("issuesCount")).intValue() + 1);
         };
 
-        // --- QC Register ---
-        for (QcRegister r : qcAll) {
-            String emp = r.getCreatedBy(); if (emp == null || emp.isBlank()) continue;
-            metricsMap.computeIfAbsent(emp, initEntry);
-            increment.accept(emp, "totalSubmissions");
-            increment.accept(emp, "qcCount");
-            if (r.getStatus() == RecordStatus.HOF_APPROVED || r.getStatus() == RecordStatus.HOD_APPROVED)
-                increment.accept(emp, "hofApproved");
-            if (r.getStatus() == RecordStatus.HOD_APPROVED) increment.accept(emp, "hodApproved");
-            trackDate.accept(emp, r.getDate());
-        }
-
-        // --- Micro Structure ---
-        for (MicroStructureAnalysis r : microAll) {
-            String emp = r.getCreatedBy(); if (emp == null || emp.isBlank()) continue;
-            metricsMap.computeIfAbsent(emp, initEntry);
-            increment.accept(emp, "totalSubmissions");
-            increment.accept(emp, "microCount");
-            if (r.getStatus() == RecordStatus.HOF_APPROVED || r.getStatus() == RecordStatus.HOD_APPROVED)
-                increment.accept(emp, "hofApproved");
-            if (r.getStatus() == RecordStatus.HOD_APPROVED) increment.accept(emp, "hodApproved");
-            trackDate.accept(emp, r.getInspectionDate());
-        }
-
-        // --- Tensile Test ---
-        for (MicroTensileTest r : tensileAll) {
-            String emp = r.getCreatedBy(); if (emp == null || emp.isBlank()) continue;
-            metricsMap.computeIfAbsent(emp, initEntry);
-            increment.accept(emp, "totalSubmissions");
-            increment.accept(emp, "tensileCount");
-            if (r.getStatus() == RecordStatus.HOF_APPROVED || r.getStatus() == RecordStatus.HOD_APPROVED)
-                increment.accept(emp, "hofApproved");
-            if (r.getStatus() == RecordStatus.HOD_APPROVED) increment.accept(emp, "hodApproved");
-            trackDate.accept(emp, r.getDateOfInspection());
-        }
-
-        // --- Impact Test ---
-        for (ImpactTest r : impactAll) {
-            String emp = r.getCreatedBy(); if (emp == null || emp.isBlank()) continue;
-            metricsMap.computeIfAbsent(emp, initEntry);
-            increment.accept(emp, "totalSubmissions");
-            increment.accept(emp, "impactCount");
-            if (r.getStatus() == RecordStatus.HOF_APPROVED || r.getStatus() == RecordStatus.HOD_APPROVED)
-                increment.accept(emp, "hofApproved");
-            if (r.getStatus() == RecordStatus.HOD_APPROVED) increment.accept(emp, "hodApproved");
-            trackDate.accept(emp, r.getDateOfInspection());
-        }
+        // Process stats directly from database without loading models into memory
+        processStats.accept(qcRepo.getEfficiencyStats(), "qcCount");
+        processStats.accept(microRepo.getEfficiencyStats(), "microCount");
+        processStats.accept(tensileRepo.getEfficiencyStats(), "tensileCount");
+        processStats.accept(impactRepo.getEfficiencyStats(), "impactCount");
 
         // --- Performance Feedback (Remarks) ---
         List<PerformanceFeedback> feedbacks = feedbackRepo.findAll();

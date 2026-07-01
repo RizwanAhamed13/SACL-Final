@@ -146,7 +146,11 @@ const MicroTensile = () => {
       fetchRecords();
       toast.success('Record approved');
     } catch (err) {
-      toast.error('Approval failed');
+      if (err.response && err.response.status === 409) {
+        toast.error(err.response.data.message || 'Record modified by another user. Please refresh.', { duration: 5000 });
+      } else {
+        toast.error('Approval failed');
+      }
     }
   };
 
@@ -221,7 +225,11 @@ const MicroTensile = () => {
       setErrors({});
       fetchRecords();
     } catch (err) {
-      toast.error('Submission failed');
+      if (err.response && err.response.status === 409) {
+        toast.error(err.response.data.message || 'Record modified by another user. Please refresh.', { duration: 5000 });
+      } else {
+        toast.error('Submission failed');
+      }
     }
   };
 

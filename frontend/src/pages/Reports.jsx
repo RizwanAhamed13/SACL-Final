@@ -338,6 +338,14 @@ const Reports = () => {
   /** Download All — Combined sheet + 4 individual sheets */
   const exportAllToExcel = () => {
     if (!results) return;
+    
+    // Check if at least one search parameter is populated
+    const hasFilters = Object.values(searchParams).some(val => val && val.trim() !== '');
+    if (!hasFilters) {
+      toast.error('Please enter at least one search criteria (Part Name, Date Code, or Heat Code) before exporting to prevent server overload.', { duration: 5000 });
+      return;
+    }
+    
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, buildCombinedSheet(results), 'Combined Report');
     XLSX.utils.book_append_sheet(wb, buildStyledSheet(results.qcRegister, '1. QC REGISTER DATA', QC_HEADERS, QC_KEYS, THEMES.qc), 'QC Register');

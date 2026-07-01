@@ -8,6 +8,8 @@ const instance = axios.create({
   baseURL: API_BASE_URL,
 });
 
+import { toast } from 'react-hot-toast';
+
 // Request interceptor for adding the JWT token
 instance.interceptors.request.use(
   (config) => {
@@ -27,7 +29,9 @@ instance.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem('user');
       localStorage.removeItem('token');
-      window.location.href = '/login';
+      if (window.location.pathname !== '/login') {
+         toast.error("Your session has expired! Please copy any unsaved work to your clipboard before logging in again.", { duration: 15000 });
+      }
     }
     return Promise.reject(error);
   }
