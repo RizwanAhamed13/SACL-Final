@@ -61,6 +61,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/micro-tensile/**").authenticated()
                         .requestMatchers("/api/impact-test/**").authenticated()
                         .requestMatchers("/api/dashboard/**").authenticated()
+                        .requestMatchers("/api/performance-feedback/**").hasAnyRole("ADMIN", "HOD", "HOF")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

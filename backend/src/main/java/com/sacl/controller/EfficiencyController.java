@@ -23,6 +23,7 @@ public class EfficiencyController {
     private final MicroStructureRepository microRepo;
     private final MicroTensileRepository tensileRepo;
     private final ImpactTestRepository impactRepo;
+    private final PerformanceFeedbackRepository feedbackRepo;
 
     @PreAuthorize("hasAnyRole('HOD','ADMIN')")
     @GetMapping("/employees")
@@ -72,7 +73,9 @@ public class EfficiencyController {
         java.util.function.BiConsumer<String, Map<String, String>> addRemark = (empId, remarkData) -> {
             metricsMap.computeIfAbsent(empId, initEntry);
             Map<String, Object> m = metricsMap.get(empId);
-            ((List<Map<String, String>>) m.get("remarksList")).add(remarkData);
+            @SuppressWarnings("unchecked")
+            List<Map<String, String>> rl = (List<Map<String, String>>) m.get("remarksList");
+            rl.add(remarkData);
             m.put("issuesCount", ((Number) m.get("issuesCount")).intValue() + 1);
         };
 
@@ -86,15 +89,6 @@ public class EfficiencyController {
                 increment.accept(emp, "hofApproved");
             if (r.getStatus() == RecordStatus.HOD_APPROVED) increment.accept(emp, "hodApproved");
             trackDate.accept(emp, r.getDate());
-
-            if (r.getRemarks() != null && !r.getRemarks().trim().isEmpty()) {
-                Map<String, String> remarkData = new HashMap<>();
-                remarkData.put("form", "QC Register");
-                remarkData.put("date", r.getDate() != null ? r.getDate().toString() : "N/A");
-                remarkData.put("text", r.getRemarks());
-                remarkData.put("reviewer", r.getHofApprovedBy() != null && !r.getHofApprovedBy().isEmpty() ? r.getHofApprovedBy() : (r.getHodApprovedBy() != null ? r.getHodApprovedBy() : "Reviewer"));
-                addRemark.accept(emp, remarkData);
-            }
         }
 
         // --- Micro Structure ---
@@ -107,15 +101,6 @@ public class EfficiencyController {
                 increment.accept(emp, "hofApproved");
             if (r.getStatus() == RecordStatus.HOD_APPROVED) increment.accept(emp, "hodApproved");
             trackDate.accept(emp, r.getInspectionDate());
-
-            if (r.getRemarks() != null && !r.getRemarks().trim().isEmpty()) {
-                Map<String, String> remarkData = new HashMap<>();
-                remarkData.put("form", "Micro Structure");
-                remarkData.put("date", r.getInspectionDate() != null ? r.getInspectionDate().toString() : "N/A");
-                remarkData.put("text", r.getRemarks());
-                remarkData.put("reviewer", r.getHofApprovedBy() != null && !r.getHofApprovedBy().isEmpty() ? r.getHofApprovedBy() : (r.getHodApprovedBy() != null ? r.getHodApprovedBy() : "Reviewer"));
-                addRemark.accept(emp, remarkData);
-            }
         }
 
         // --- Tensile Test ---
@@ -128,15 +113,6 @@ public class EfficiencyController {
                 increment.accept(emp, "hofApproved");
             if (r.getStatus() == RecordStatus.HOD_APPROVED) increment.accept(emp, "hodApproved");
             trackDate.accept(emp, r.getDateOfInspection());
-
-            if (r.getRemarks() != null && !r.getRemarks().trim().isEmpty()) {
-                Map<String, String> remarkData = new HashMap<>();
-                remarkData.put("form", "Tensile Test");
-                remarkData.put("date", r.getDateOfInspection() != null ? r.getDateOfInspection().toString() : "N/A");
-                remarkData.put("text", r.getRemarks());
-                remarkData.put("reviewer", r.getHofApprovedBy() != null && !r.getHofApprovedBy().isEmpty() ? r.getHofApprovedBy() : (r.getHodApprovedBy() != null ? r.getHodApprovedBy() : "Reviewer"));
-                addRemark.accept(emp, remarkData);
-            }
         }
 
         // --- Impact Test ---
@@ -149,15 +125,20 @@ public class EfficiencyController {
                 increment.accept(emp, "hofApproved");
             if (r.getStatus() == RecordStatus.HOD_APPROVED) increment.accept(emp, "hodApproved");
             trackDate.accept(emp, r.getDateOfInspection());
+        }
 
-            if (r.getRemarks() != null && !r.getRemarks().trim().isEmpty()) {
-                Map<String, String> remarkData = new HashMap<>();
-                remarkData.put("form", "Impact Test");
-                remarkData.put("date", r.getDateOfInspection() != null ? r.getDateOfInspection().toString() : "N/A");
-                remarkData.put("text", r.getRemarks());
-                remarkData.put("reviewer", r.getHofApprovedBy() != null && !r.getHofApprovedBy().isEmpty() ? r.getHofApprovedBy() : (r.getHodApprovedBy() != null ? r.getHodApprovedBy() : "Reviewer"));
-                addRemark.accept(emp, remarkData);
-            }
+        // --- Performance Feedback (Remarks) ---
+        List<PerformanceFeedback> feedbacks = feedbackRepo.findAll();
+        for (PerformanceFeedback f : feedbacks) {
+            String emp = f.getTargetEmployeeId();
+            if (emp == null || emp.isBlank()) continue;
+            
+            Map<String, String> remarkData = new HashMap<>();
+            remarkData.put("form", "Performance");
+            remarkData.put("date", f.getCreatedAt() != null ? f.getCreatedAt().toLocalDate().toString() : "N/A");
+            remarkData.put("text", f.getFeedbackText());
+            remarkData.put("reviewer", f.getReviewerName());
+            addRemark.accept(emp, remarkData);
         }
 
         // --- Enrich with full names from user table ---
