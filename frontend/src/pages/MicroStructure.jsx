@@ -711,7 +711,7 @@ const MicroStructure = () => {
       <ConfirmModal 
         isOpen={showSaveConfirm} 
         onConfirm={handleConfirmSave} 
-        onCancel={() => setShowSaveConfirm(false)} 
+        onClose={() => setShowSaveConfirm(false)} 
         message="Are you sure you want to save this record?" 
       />
     </>
