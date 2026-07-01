@@ -60,8 +60,9 @@ const HofRemarks = () => {
       else if (selectedRecord.formType === 'Impact Test') endpoint = `/api/impact-test/${selectedRecord.id}`;
 
       // We preserve everything and just update remarks
-      const updatedRecord = { ...selectedRecord, remarks: remarkText, hofApprovedBy: user.employeeId || user.fullName };
-      await axios.put(endpoint, updatedRecord);
+      const { formType, ...payload } = selectedRecord;
+      const updatedPayload = { ...payload, remarks: remarkText, hofApprovedBy: user.employeeId || user.fullName };
+      await axios.put(endpoint, updatedPayload);
       
       toast.success('Remark saved successfully');
       
@@ -72,9 +73,9 @@ const HofRemarks = () => {
                       
       setRecords(prev => ({
         ...prev,
-        [formKey]: prev[formKey].map(r => r.id === selectedRecord.id ? updatedRecord : r)
+        [formKey]: prev[formKey].map(r => r.id === selectedRecord.id ? { ...updatedPayload, formType: selectedRecord.formType } : r)
       }));
-      setSelectedRecord(updatedRecord);
+      setSelectedRecord({ ...updatedPayload, formType: selectedRecord.formType });
     } catch (err) {
       toast.error('Failed to save remark');
     }

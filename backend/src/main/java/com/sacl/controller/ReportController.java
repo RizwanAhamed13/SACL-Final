@@ -4,6 +4,7 @@ import com.sacl.model.ImpactTest;
 import com.sacl.model.MicroStructureAnalysis;
 import com.sacl.model.MicroTensileTest;
 import com.sacl.model.QcRegister;
+import com.sacl.model.RecordStatus;
 import com.sacl.repository.ImpactTestRepository;
 import com.sacl.repository.MicroStructureRepository;
 import com.sacl.repository.MicroTensileRepository;
@@ -54,28 +55,32 @@ public class ReportController {
 
         // QC Register
         List<QcRegister> qc = qcRepo.findAll().stream()
-            .filter(r -> (!hasValue(partName) || matchesAny(r.getPartName(), partName)) &&
+            .filter(r -> r.getStatus() == RecordStatus.HOD_APPROVED &&
+                         (!hasValue(partName) || matchesAny(r.getPartName(), partName)) &&
                          (!hasValue(dateCode) || matchesAny(r.getDateCode(), dateCode)) &&
                          (!hasValue(heatCode) || matchesAny(r.getHeatCode(), heatCode)))
             .collect(Collectors.toList());
 
         // Micro Structure
         List<MicroStructureAnalysis> micro = microRepo.findAll().stream()
-            .filter(r -> (!hasValue(partName) || matchesAny(r.getPartName(), partName)) &&
+            .filter(r -> r.getStatus() == RecordStatus.HOD_APPROVED &&
+                         (!hasValue(partName) || matchesAny(r.getPartName(), partName)) &&
                          (!hasValue(dateCode) || matchesAny(r.getDateCode(), dateCode)) &&
                          (!hasValue(heatCode) || matchesAny(r.getHeatCode(), heatCode)))
             .collect(Collectors.toList());
 
         // Tensile Test
         List<MicroTensileTest> tensile = tensileRepo.findAll().stream()
-            .filter(r -> (!hasValue(partName) || matchesAny(r.getItem(), partName)) &&
+            .filter(r -> r.getStatus() == RecordStatus.HOD_APPROVED &&
+                         (!hasValue(partName) || matchesAny(r.getItem(), partName)) &&
                          (!hasValue(dateCode) || matchesAny(r.getDateCode(), dateCode)) &&
                          (!hasValue(heatCode) || matchesAny(r.getHeatCode(), heatCode)))
             .collect(Collectors.toList());
 
         // Impact Test (no heatCode field)
         List<ImpactTest> impact = impactRepo.findAll().stream()
-            .filter(r -> (!hasValue(partName) || matchesAny(r.getPartName(), partName)) &&
+            .filter(r -> r.getStatus() == RecordStatus.HOD_APPROVED &&
+                         (!hasValue(partName) || matchesAny(r.getPartName(), partName)) &&
                          (!hasValue(dateCode) || matchesAny(r.getDateCode(), dateCode)))
             .collect(Collectors.toList());
 
