@@ -158,7 +158,7 @@ export const MainLayout = () => {
             </div>
           )}
           
-          {(user?.role?.toUpperCase()?.includes('HOF') || user?.role?.toUpperCase()?.includes('ADMIN')) && (
+          {(user?.role?.toUpperCase()?.includes('HOF') || user?.role?.toUpperCase()?.includes('HOD') || user?.role?.toUpperCase()?.includes('ADMIN')) && (
             <div className="nav-section">
               <div className="nav-section-title">Feedback</div>
               <NavLink to="/inspector-feedback" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={closeMobileSidebar}>

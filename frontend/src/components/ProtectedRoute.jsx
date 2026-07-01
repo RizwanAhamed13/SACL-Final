@@ -14,7 +14,9 @@ export const ProtectedRoute = ({ children, requiredRole, requiredPermission }) =
   const hasGlobalFormAccess = isSuperAdmin || userRole.includes('HOD');
 
   if (requiredRole) {
-    if (!isSuperAdmin && userRole !== requiredRole.toUpperCase() && userRole !== `ROLE_${requiredRole.toUpperCase()}`) {
+    const roles = requiredRole.toUpperCase().split(',');
+    const hasRole = roles.some(role => userRole === role.trim() || userRole === `ROLE_${role.trim()}`);
+    if (!isSuperAdmin && !hasRole) {
       return <Navigate to="/" replace />;
     }
   }

@@ -52,7 +52,7 @@ const App = () => {
               <Route path="users" element={<ProtectedRoute requiredRole="ADMIN"><UserManagement /></ProtectedRoute>} />
               <Route path="reports" element={<ProtectedRoute requiredRole="ADMIN"><Reports /></ProtectedRoute>} />
               <Route path="efficiency" element={<ProtectedRoute requiredRole="ADMIN"><EmployeeEfficiency /></ProtectedRoute>} />
-              <Route path="inspector-feedback" element={<ProtectedRoute requiredRole="HOF"><HofRemarks /></ProtectedRoute>} />
+              <Route path="inspector-feedback" element={<ProtectedRoute requiredRole="HOF,HOD"><HofRemarks /></ProtectedRoute>} />
             </Route>
 
             <Route path="*" element={<Navigate to="/" replace />} />
