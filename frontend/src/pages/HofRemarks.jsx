@@ -77,12 +77,16 @@ const HofRemarks = () => {
       ]);
 
       const matchUser = (r) => (r.createdBy && r.createdBy.toLowerCase() === userId.toLowerCase());
-      
+      const qcData = qcRes.data.content || qcRes.data;
+      const microData = microRes.data.content || microRes.data;
+      const tensileData = tensileRes.data.content || tensileRes.data;
+      const impactData = impactRes.data.content || impactRes.data;
+
       setRecords({
-        qc: qcRes.data.filter(matchUser).map(r => ({ ...r, formType: 'QC Register' })),
-        micro: microRes.data.filter(matchUser).map(r => ({ ...r, formType: 'Micro Structure' })),
-        tensile: tensileRes.data.filter(matchUser).map(r => ({ ...r, formType: 'Tensile Test' })),
-        impact: impactRes.data.filter(matchUser).map(r => ({ ...r, formType: 'Impact Test' }))
+        qc: qcData.filter(matchUser).map(r => ({ ...r, formType: 'QC Register' })),
+        micro: microData.filter(matchUser).map(r => ({ ...r, formType: 'Micro Structure' })),
+        tensile: tensileData.filter(matchUser).map(r => ({ ...r, formType: 'Tensile Test' })),
+        impact: impactData.filter(matchUser).map(r => ({ ...r, formType: 'Impact Test' }))
       });
     } catch (err) {
       toast.error('Failed to fetch records');
