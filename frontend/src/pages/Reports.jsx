@@ -92,7 +92,7 @@ const QC_HEADERS = [
   'Tapping Time', 'Tapping Wt (kg)',
   'Corr C', 'Corr Si', 'Corr Mn', 'Corr S', 'Corr Cr', 'Corr Cu', 'Corr Sn',
   'Mg (kg)', 'Res Mg %', 'Rec Mg %', 'Stream Inoculant', 'P Time (sec)',
-  'Remarks', 'Created By', 'Status'
+  'Remarks'
 ];
 const QC_KEYS = [
   'id', 'partName', 'date', 'heatCode', 'dateCode', 'disa', 'qtyMoulds',
@@ -103,44 +103,44 @@ const QC_KEYS = [
   'correctiveC', 'correctiveSi', 'correctiveMn', 'correctiveS',
   'correctiveCr', 'correctiveCu', 'correctiveSn',
   'mgKgs', 'resMgConvertorPercent', 'recMgPercent', 'streamInnoculant', (r) => (r.pTimeSecStart || r.pTimeSecEnd) ? `${r.pTimeSecStart || '-'} - ${r.pTimeSecEnd || '-'}` : (r.pTimeSec ?? r.ptimeSec),
-  'remarks', 'createdBy', 'status'
+  'remarks'
 ];
 
 const MICRO_HEADERS = [
   'ID', 'Part Name', 'Inspection Date', 'Heat Code', 'Date Code', 'Location',
   'Nodularity %', 'Graphite Type', 'Count (nos/mm²)',
   'Ferrite Min %', 'Ferrite Max %', 'Pearlite Min %', 'Pearlite Max %', 'Carbide Min %', 'Carbide Max %',
-  'Size Min', 'Size Max', 'Remarks', 'Created By', 'Status'
+  'Size Min', 'Size Max', 'Remarks'
 ];
 const MICRO_KEYS = [
   'id', 'partName', 'inspectionDate', 'heatCode', 'dateCode', (r) => r.location || r.microLocation,
   'nodularityPercent', 'graphiteType', 'countNosPerMm2',
   'ferritePercentMin', 'ferritePercentMax', 'pearlitePercentMin', 'pearlitePercentMax', 'carbidePercentMin', 'carbidePercentMax',
-  'sizeMin', 'sizeMax', 'remarks', 'createdBy', 'status'
+  'sizeMin', 'sizeMax', 'remarks'
 ];
 
 const TENSILE_HEADERS = [
   'ID', 'Item', 'Inspection Date', 'Heat Code', 'Date Code', 'Location',
   'Bar Dia (mm)', 'Gauge Length (mm)', 'Max Load (kN)', 'Yield Load (kN)',
   'Tensile Strength', 'Yield Strength 0.2 %', 'Yield Strength 0.5 %', 'Elongation %',
-  'Remarks', 'Created By', 'Status'
+  'Remarks'
 ];
 const TENSILE_KEYS = [
   'id', 'item', 'dateOfInspection', 'heatCode', 'dateCode', (r) => r.location || r.mechLocation,
   'barDiaMm', 'gaugeLengthMm', 'maxLoadKn', 'yieldLoadKn',
   'tensileStrength', 'yieldStrength02', 'yieldStrength05', 'elongationPercent',
-  'remarks', 'createdBy', 'status'
+  'remarks'
 ];
 
 const IMPACT_HEADERS = [
   'ID', 'Part Name', 'Inspection Date', 'Date Code', 'Location', 'Notch Type',
   'Observed Value 1 (J)', 'Observed Value 2 (J)', 'Observed Value 3 (J)',
-  'Remarks', 'Created By', 'Status'
+  'Remarks'
 ];
 const IMPACT_KEYS = [
   'id', 'partName', 'dateOfInspection', 'dateCode', (r) => r.location || r.mechLocation, 'notchType',
   'observedValue1', 'observedValue2', 'observedValue3',
-  'remarks', 'createdBy', 'status'
+  'remarks'
 ];
 
 const THEMES = {

@@ -624,18 +624,7 @@ const MicroStructure = () => {
                           {idx === 0 && (
                             <>
                               <td rowSpan={rowCount} style={{ fontSize: '11px', maxWidth: '200px', whiteSpace: 'normal' }}>
-                                {user?.role?.toUpperCase()?.includes('HOF') && (r.status || 'QC_ENTRY') === 'QC_ENTRY' ? (
-                                    <textarea 
-                                      className="form-control" 
-                                      style={{ fontSize: '11px', padding: '4px', width: '100%', minWidth: '120px' }}
-                                      rows="2"
-                                      value={tableRemarks[r.id] !== undefined ? tableRemarks[r.id] : (r.remarks || '')}
-                                      onChange={e => setTableRemarks({...tableRemarks, [r.id]: e.target.value})}
-                                      placeholder="Add remarks..."
-                                    />
-                                ) : (
-                                  dash(r.remarks)
-                                )}
+                                {dash(r.remarks)}
                               </td>
                               <td rowSpan={rowCount}>
                                 <span className={`status-badge status-${(r.status || 'QC_ENTRY').toLowerCase()}`}>
