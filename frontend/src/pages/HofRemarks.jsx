@@ -47,7 +47,7 @@ const HofRemarks = () => {
 
   const handleSelectRecord = (record) => {
     setSelectedRecord(record);
-    setRemarkText(record.remarks || '');
+    setRemarkText(record.hofRemarks || '');
   };
 
   const handleSaveRemark = async () => {
@@ -59,9 +59,9 @@ const HofRemarks = () => {
       else if (selectedRecord.formType === 'Tensile Test') endpoint = `/api/micro-tensile/${selectedRecord.id}`;
       else if (selectedRecord.formType === 'Impact Test') endpoint = `/api/impact-test/${selectedRecord.id}`;
 
-      // We preserve everything and just update remarks
+      // We preserve everything and just update hofRemarks
       const { formType, ...payload } = selectedRecord;
-      const updatedPayload = { ...payload, remarks: remarkText, hofApprovedBy: user.employeeId || user.fullName };
+      const updatedPayload = { ...payload, hofRemarks: remarkText, hofApprovedBy: user.employeeId || user.fullName };
       await axios.put(endpoint, updatedPayload);
       
       toast.success('Remark saved successfully');
@@ -140,9 +140,9 @@ const HofRemarks = () => {
                 </div>
                 <div style={{ fontSize: '13px', color: '#4b5563' }}>Part: {r.partName || r.item || 'N/A'}</div>
                 <div style={{ fontSize: '13px', color: '#4b5563' }}>Status: {r.status || 'QC_ENTRY'}</div>
-                {r.remarks && (
+                {r.hofRemarks && (
                   <div style={{ marginTop: '0.5rem', fontSize: '12px', color: '#059669', background: '#ecfdf5', padding: '0.25rem 0.5rem', borderRadius: '4px' }}>
-                    Has Remarks
+                    Has HOF Remarks
                   </div>
                 )}
               </div>
@@ -163,13 +163,13 @@ const HofRemarks = () => {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Feedback / Remarks</label>
+                <label className="form-label">HOF / Admin Remarks</label>
                 <textarea
                   className="form-control"
                   rows="5"
                   value={remarkText}
                   onChange={e => setRemarkText(e.target.value)}
-                  placeholder="Enter remarks for this submission..."
+                  placeholder="Enter HOF remarks for this submission (Internal only)..."
                 />
               </div>
 

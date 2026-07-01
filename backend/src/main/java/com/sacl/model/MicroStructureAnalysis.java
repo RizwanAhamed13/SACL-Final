@@ -49,6 +49,9 @@ public class MicroStructureAnalysis {
     @Column(length = 4000)
     private String remarks;
 
+    @Column(length = 4000)
+    private String hofRemarks;
+
     private String approvedBy;
 
     private String hofApprovedBy;
