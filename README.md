@@ -27,7 +27,7 @@ Full-stack quality control application for Sakthi Autos / SACL. The system manag
 ## Project Structure
 
 ```text
-Sakthi_Autos-Production/
+SACL-Final/
 ├── backend/                 # Spring Boot REST API
 │   ├── src/main/java/com/sacl/
 │   │   ├── config/          # Security, CORS, password config
