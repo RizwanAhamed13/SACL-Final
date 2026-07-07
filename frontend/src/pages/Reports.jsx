@@ -85,15 +85,37 @@ const styleTitleRow = (ws, rowIdx, colCount, bgHex) => {
 // Section definitions — full column names, keys, theme colours
 // ─────────────────────────────────────────────────────────────
 
-const QC_HEADERS = [
-  'ID', 'Part Name', 'Date', 'Heat Code', 'Date Code', 'Disa', 'Moulds',
-  'C %', 'Si %', 'Mn %', 'P %', 'S %', 'Mg First %', 'Mg Last %', 'Cu %', 'Cr %', 'Sn %',
-  'Pour Start', 'Pour End', 'Temp (°C)', 'PP Code', 'Treatment No', 'FC No / Heat No', 'Con No',
-  'Tapping Time', 'Tapping Wt (kg)',
-  'Corr C', 'Corr Si', 'Corr Mn', 'Corr S', 'Corr Cr', 'Corr Cu', 'Corr Sn',
-  'Mg (kg)', 'Res Mg %', 'Rec Mg %', 'Stream Inoculant', 'P Time (sec)',
-  'Remarks'
-];
+const QC_HEADERS = {
+  rows: [
+    [
+      'ID', 'Part Name', 'Date', 'Heat Code', 'Date Code', 'Disa', 'Moulds',
+      'Metal Composition (%)', '', '', '', '', '', '', '', '', '',
+      'Process Parameters', '', '', '', '', '', '',
+      'Tapping Time', 'Tapping Wt (kg)',
+      'Corrective Additions', '', '', '', '', '', '',
+      'Alloy Additions', '', '', '', '',
+      'Remarks'
+    ],
+    [
+      '', '', '', '', '', '', '',
+      'C %', 'Si %', 'Mn %', 'P %', 'S %', 'Mg First %', 'Mg Last %', 'Cu %', 'Cr %', 'Sn %',
+      'Pour Start', 'Pour End', 'Temp (°C)', 'PP Code', 'Treatment No', 'FC No / Heat No', 'Con No',
+      '', '',
+      'Corr C', 'Corr Si', 'Corr Mn', 'Corr S', 'Corr Cr', 'Corr Cu', 'Corr Sn',
+      'Mg (kg)', 'Res Mg %', 'Rec Mg %', 'Stream Inoculant', 'P Time (sec)',
+      ''
+    ]
+  ],
+  merges: [
+    {s:{r:0,c:0}, e:{r:1,c:0}}, {s:{r:0,c:1}, e:{r:1,c:1}}, {s:{r:0,c:2}, e:{r:1,c:2}}, {s:{r:0,c:3}, e:{r:1,c:3}}, {s:{r:0,c:4}, e:{r:1,c:4}}, {s:{r:0,c:5}, e:{r:1,c:5}}, {s:{r:0,c:6}, e:{r:1,c:6}},
+    {s:{r:0,c:7}, e:{r:0,c:16}},
+    {s:{r:0,c:17}, e:{r:0,c:23}},
+    {s:{r:0,c:24}, e:{r:1,c:24}}, {s:{r:0,c:25}, e:{r:1,c:25}},
+    {s:{r:0,c:26}, e:{r:0,c:32}},
+    {s:{r:0,c:33}, e:{r:0,c:37}},
+    {s:{r:0,c:38}, e:{r:1,c:38}}
+  ]
+};
 const QC_KEYS = [
   'id', 'partName', 'date', 'heatCode', 'dateCode', 'disa', 'qtyMoulds',
   'compositionC', 'compositionSi', 'compositionMn', 'compositionP', 'compositionS',
@@ -106,39 +128,77 @@ const QC_KEYS = [
   'remarks'
 ];
 
-const MICRO_HEADERS = [
-  'ID', 'Part Name', 'Inspection Date', 'Heat Code', 'Date Code', 'Location',
-  'Nodularity %', 'Graphite Type', 'Count (nos/mm²)',
-  'Ferrite Min %', 'Ferrite Max %', 'Pearlite Min %', 'Pearlite Max %', 'Carbide Min %', 'Carbide Max %',
-  'Size Min', 'Size Max', 'Remarks'
-];
+const MICRO_HEADERS = {
+  rows: [
+    [
+      'ID', 'Part Name', 'Inspection Date', 'Heat Code', 'Date Code', 'Disa', 'Location',
+      'Micro Structure Properties', '', '', '', '', '', '', '', '', '', '', 'Remarks'
+    ],
+    [
+      '', '', '', '', '', '', '',
+      'Nodularity %', 'Graphite Type', 'Count (nos/mm²)',
+      'Ferrite Min %', 'Ferrite Max %', 'Pearlite Min %', 'Pearlite Max %', 'Carbide Min %', 'Carbide Max %',
+      'Size Min', 'Size Max', ''
+    ]
+  ],
+  merges: [
+    {s:{r:0,c:0}, e:{r:1,c:0}}, {s:{r:0,c:1}, e:{r:1,c:1}}, {s:{r:0,c:2}, e:{r:1,c:2}}, {s:{r:0,c:3}, e:{r:1,c:3}}, {s:{r:0,c:4}, e:{r:1,c:4}}, {s:{r:0,c:5}, e:{r:1,c:5}}, {s:{r:0,c:6}, e:{r:1,c:6}},
+    {s:{r:0,c:7}, e:{r:0,c:17}},
+    {s:{r:0,c:18}, e:{r:1,c:18}}
+  ]
+};
 const MICRO_KEYS = [
-  'id', 'partName', 'inspectionDate', 'heatCode', 'dateCode', (r) => r.location || r.microLocation,
+  'id', 'partName', 'inspectionDate', 'heatCode', 'dateCode', 'disa', (r) => r.location || r.microLocation,
   'nodularityPercent', 'graphiteType', 'countNosPerMm2',
   'ferritePercentMin', 'ferritePercentMax', 'pearlitePercentMin', 'pearlitePercentMax', 'carbidePercentMin', 'carbidePercentMax',
   'sizeMin', 'sizeMax', 'remarks'
 ];
 
-const TENSILE_HEADERS = [
-  'ID', 'Item', 'Inspection Date', 'Heat Code', 'Date Code', 'Location',
-  'Bar Dia (mm)', 'Gauge Length (mm)', 'Max Load (kN)', 'Yield Load (kN)',
-  'Tensile Strength', 'Yield Strength 0.2 %', 'Yield Strength 0.5 %', 'Elongation %',
-  'Remarks'
-];
+const TENSILE_HEADERS = {
+  rows: [
+    [
+      'ID', 'Item', 'Inspection Date', 'Heat Code', 'Date Code', 'Disa', 'Location',
+      'Specimen Dimensions', '', 'Mechanical Properties', '', '', '', '', '', 'Remarks'
+    ],
+    [
+      '', '', '', '', '', '', '',
+      'Bar Dia (mm)', 'Gauge Length (mm)', 'Max Load (kN)', 'Yield Load (kN)',
+      'Tensile Strength', 'Yield Strength 0.2 %', 'Yield Strength 0.5 %', 'Elongation %', ''
+    ]
+  ],
+  merges: [
+    {s:{r:0,c:0}, e:{r:1,c:0}}, {s:{r:0,c:1}, e:{r:1,c:1}}, {s:{r:0,c:2}, e:{r:1,c:2}}, {s:{r:0,c:3}, e:{r:1,c:3}}, {s:{r:0,c:4}, e:{r:1,c:4}}, {s:{r:0,c:5}, e:{r:1,c:5}}, {s:{r:0,c:6}, e:{r:1,c:6}},
+    {s:{r:0,c:7}, e:{r:0,c:8}},
+    {s:{r:0,c:9}, e:{r:0,c:14}},
+    {s:{r:0,c:15}, e:{r:1,c:15}}
+  ]
+};
 const TENSILE_KEYS = [
-  'id', 'item', 'dateOfInspection', 'heatCode', 'dateCode', (r) => r.location || r.mechLocation,
+  'id', 'item', 'dateOfInspection', 'heatCode', 'dateCode', 'disa', (r) => r.location || r.mechLocation,
   'barDiaMm', 'gaugeLengthMm', 'maxLoadKn', 'yieldLoadKn',
   'tensileStrength', 'yieldStrength02', 'yieldStrength05', 'elongationPercent',
   'remarks'
 ];
 
-const IMPACT_HEADERS = [
-  'ID', 'Part Name', 'Inspection Date', 'Date Code', 'Location', 'Notch Type',
-  'Observed Value 1 (J)', 'Observed Value 2 (J)', 'Observed Value 3 (J)',
-  'Remarks'
-];
+const IMPACT_HEADERS = {
+  rows: [
+    [
+      'ID', 'Part Name', 'Inspection Date', 'Date Code', 'Disa', 'Location', 'Notch Type',
+      'Impact Energy (Joules)', '', '', 'Remarks'
+    ],
+    [
+      '', '', '', '', '', '', '',
+      'Value 1', 'Value 2', 'Value 3', ''
+    ]
+  ],
+  merges: [
+    {s:{r:0,c:0}, e:{r:1,c:0}}, {s:{r:0,c:1}, e:{r:1,c:1}}, {s:{r:0,c:2}, e:{r:1,c:2}}, {s:{r:0,c:3}, e:{r:1,c:3}}, {s:{r:0,c:4}, e:{r:1,c:4}}, {s:{r:0,c:5}, e:{r:1,c:5}}, {s:{r:0,c:6}, e:{r:1,c:6}},
+    {s:{r:0,c:7}, e:{r:0,c:9}},
+    {s:{r:0,c:10}, e:{r:1,c:10}}
+  ]
+};
 const IMPACT_KEYS = [
-  'id', 'partName', 'dateOfInspection', 'dateCode', (r) => r.location || r.mechLocation, 'notchType',
+  'id', 'partName', 'dateOfInspection', 'dateCode', 'disa', (r) => r.location || r.mechLocation, 'notchType',
   'observedValue1', 'observedValue2', 'observedValue3',
   'remarks'
 ];
@@ -230,24 +290,43 @@ const expandLocationValues = (records, type) => {
 
 const buildStyledSheet = (data, title, headers, keys, theme) => {
   const safe = data || [];
-  const cols = headers.length;
+  const cols = headers.rows[0].length;
 
   const titleRow = [title, ...Array(cols - 1).fill('')];
   const blankRow = Array(cols).fill('');
-  const headerRow = [...headers];
+  
   const dataRows = safe.length > 0
     ? safe.map((r) => keys.map((k) => getRecordValue(r, k)))
     : [['No records found.', ...Array(cols - 1).fill('')]];
 
-  const allRows = [titleRow, blankRow, headerRow, ...dataRows];
+  const allRows = [titleRow, blankRow, ...headers.rows, ...dataRows];
 
   const ws = XLSX.utils.aoa_to_sheet(allRows);
+  
+  const headerOffset = 2; // title, blank
+  if (headers.merges) {
+    ws['!merges'] = headers.merges.map(m => ({
+      s: { r: m.s.r + headerOffset, c: m.s.c },
+      e: { r: m.e.r + headerOffset, c: m.e.c }
+    }));
+  }
+
   ws['!cols'] = autoFitColumns(allRows);
-  ws['!rows'] = [{ hpt: 28 }, { hpt: 6 }, { hpt: 22 }, ...dataRows.map(() => ({ hpt: 18 }))];
+  ws['!rows'] = [
+    { hpt: 28 }, { hpt: 6 }, 
+    ...headers.rows.map(() => ({ hpt: 22 })), 
+    ...dataRows.map(() => ({ hpt: 18 }))
+  ];
 
   styleTitleRow(ws, 0, cols, theme.bg);
-  styleHeaderRow(ws, 2, cols, theme.bg, theme.fg);
-  if (dataRows.length) styleDataRows(ws, 3, 3 + dataRows.length - 1, cols, theme.rowTint);
+  headers.rows.forEach((_, idx) => {
+    styleHeaderRow(ws, headerOffset + idx, cols, theme.bg, theme.fg);
+  });
+  
+  if (dataRows.length) {
+    const startDataRow = headerOffset + headers.rows.length;
+    styleDataRows(ws, startDataRow, startDataRow + dataRows.length - 1, cols, theme.rowTint);
+  }
 
   return ws;
 };
@@ -263,22 +342,35 @@ const buildCombinedSheet = (results) => {
     { label: '3. TENSILE TEST DATA', data: results.microTensile, headers: TENSILE_HEADERS, keys: TENSILE_KEYS, theme: THEMES.tensile },
     { label: '4. IMPACT TEST DATA', data: results.impactTest, headers: IMPACT_HEADERS, keys: IMPACT_KEYS, theme: THEMES.impact },
   ];
-  const maxCols = Math.max(...sections.map((s) => s.headers.length));
+  const maxCols = Math.max(...sections.map((s) => s.headers.rows[0].length));
 
   const allRows = [];
   const styleMap = [];
+  const globalMerges = [];
 
   sections.forEach(({ label, data, headers, keys, theme }) => {
     const safe = data || [];
-    const cols = headers.length;
+    const cols = headers.rows[0].length;
 
     styleMap.push({ rowIdx: allRows.length, type: 'title', theme, colCount: maxCols });
     allRows.push([label, ...Array(maxCols - 1).fill('')]);
 
     allRows.push(Array(maxCols).fill(''));   // blank spacer
 
-    styleMap.push({ rowIdx: allRows.length, type: 'header', theme, colCount: cols });
-    allRows.push([...headers, ...Array(maxCols - cols).fill('')]);
+    const headerStartIdx = allRows.length;
+    headers.rows.forEach(row => {
+      styleMap.push({ rowIdx: allRows.length, type: 'header', theme, colCount: cols });
+      allRows.push([...row, ...Array(maxCols - cols).fill('')]);
+    });
+    
+    if (headers.merges) {
+      headers.merges.forEach(m => {
+        globalMerges.push({
+          s: { r: m.s.r + headerStartIdx, c: m.s.c },
+          e: { r: m.e.r + headerStartIdx, c: m.e.c }
+        });
+      });
+    }
 
     const dataRows = safe.length > 0
       ? safe.map((r) => {
@@ -295,6 +387,9 @@ const buildCombinedSheet = (results) => {
   });
 
   const ws = XLSX.utils.aoa_to_sheet(allRows);
+  if (globalMerges.length > 0) {
+    ws['!merges'] = globalMerges;
+  }
   ws['!cols'] = autoFitColumns(allRows);
   ws['!rows'] = allRows.map(() => ({ hpt: 18 }));
 

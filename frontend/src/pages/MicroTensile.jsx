@@ -25,7 +25,7 @@ const MicroTensile = () => {
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
   const [formData, setFormData] = useState({
     id: null,
-    dateOfInspection: new Date().toISOString().split('T')[0], item: '', dateCode: '',
+    dateOfInspection: new Date().toISOString().split('T')[0], item: '', dateCode: '', disa: '',
     barDiaMm: '', gaugeLengthMm: '', mechLocation: '',
     maxLoadKn: '', yieldLoadKn: '', tensileStrength: '', yieldStrength02: '', yieldStrength05: '', elongationPercent: '',
     remarks: '',
@@ -201,6 +201,7 @@ const MicroTensile = () => {
           dateOfInspection: formData.dateOfInspection,
           item: formData.item,
           dateCode: formData.dateCode,
+          disa: formData.disa,
           barDiaMm: formData.barDiaMm,
           gaugeLengthMm: formData.gaugeLengthMm,
           remarks: formData.remarks,
@@ -216,7 +217,7 @@ const MicroTensile = () => {
       setShowForm(false);
       setFormData({
         id: null,
-        dateOfInspection: new Date().toISOString().split('T')[0], item: '', dateCode: '',
+        dateOfInspection: new Date().toISOString().split('T')[0], item: '', dateCode: '', disa: '',
         barDiaMm: '', gaugeLengthMm: '', mechLocation: '',
         maxLoadKn: '', yieldLoadKn: '', tensileStrength: '', yieldStrength02: '', yieldStrength05: '', elongationPercent: '',
         remarks: '',
@@ -291,6 +292,10 @@ const MicroTensile = () => {
                     <div className="form-group">
                       <label className="form-label">Date Code</label>
                       <input type="text" name="dateCode" value={formData.dateCode} onChange={handleChange} className="form-control" placeholder="e.g. 6D08-41" />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">DISA</label>
+                      <input type="text" name="disa" value={formData.disa || ''} onChange={handleChange} className="form-control" placeholder="e.g. D1234" />
                     </div>
                     {formData.id && (
                       <div className="form-group">
@@ -439,6 +444,7 @@ const MicroTensile = () => {
                    <th rowSpan="2" style={{ whiteSpace: 'nowrap' }}>Inspection Date</th>
                    <th rowSpan="2">Item / Part</th>
                    <th rowSpan="2">Date/Heat Code</th>
+                   <th rowSpan="2">DISA</th>
                    <th rowSpan="2">Bar Dia (mm)</th>
                    <th rowSpan="2">Gauge Len (mm)</th>
                    <th rowSpan="2">Loc</th>
@@ -496,6 +502,7 @@ const MicroTensile = () => {
                               <td rowSpan={rowCount}>{r.dateOfInspection?.split('T')[0] || '—'}</td>
                               <td rowSpan={rowCount}><strong>{dash(r.item)}</strong></td>
                               <td rowSpan={rowCount}>{dash(r.dateCode)}</td>
+                              <td rowSpan={rowCount} style={{ fontSize: '12px' }}>{dash(r.disa)}</td>
                               <td rowSpan={rowCount} style={{ fontSize: '12px' }}>{dash(r.barDiaMm)}</td>
                               <td rowSpan={rowCount} style={{ fontSize: '12px' }}>{dash(r.gaugeLengthMm)}</td>
                             </>

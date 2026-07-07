@@ -29,8 +29,8 @@ const ImpactTest = () => {
   const [selectedNotches, setSelectedNotches] = useState([]);
   const [formData, setFormData] = useState({
     id: null,
-    dateOfInspection: new Date().toISOString().split('T')[0], partName: '', dateCode: '',
-    specification: '', testType: '', mechLocation: '',
+    dateOfInspection: new Date().toISOString().split('T')[0], partName: '', dateCode: '', disa: '',
+    specification: '', testType: '', 
     observedValue1: '', observedValue2: '', observedValue3: '',
     remarks: '',
     status: 'QC_ENTRY', hofApprovedBy: '', hodApprovedBy: '', createdBy: ''
@@ -245,6 +245,7 @@ const ImpactTest = () => {
           dateOfInspection: formData.dateOfInspection,
           partName: formData.partName,
           dateCode: formData.dateCode,
+          disa: formData.disa,
           specification: formData.specification,
           remarks: formData.remarks,
           createdBy: user.employeeId || user.fullName,
@@ -267,6 +268,7 @@ const ImpactTest = () => {
           dateOfInspection: formData.dateOfInspection,
           partName: formData.partName,
           dateCode: formData.dateCode,
+          disa: formData.disa,
           specification: formData.specification,
           testType: formData.testType,
           remarks: formData.remarks,
@@ -283,8 +285,8 @@ const ImpactTest = () => {
       setSelectedNotches([]);
       setFormData({
         id: null,
-        dateOfInspection: new Date().toISOString().split('T')[0], partName: '', dateCode: '',
-        specification: '', testType: '', mechLocation: '',
+        dateOfInspection: new Date().toISOString().split('T')[0], partName: '', dateCode: '', disa: '',
+        specification: '', testType: '', 
         observedValue1: '', observedValue2: '', observedValue3: '',
         remarks: '',
         status: 'QC_ENTRY', hofApprovedBy: '', hodApprovedBy: '', createdBy: ''
@@ -358,6 +360,10 @@ const ImpactTest = () => {
                     <div className="form-group">
                       <label className="form-label">Date Code</label>
                       <input type="text" name="dateCode" value={formData.dateCode} onChange={handleChange} className="form-control" placeholder="e.g. 5D03-45" />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">DISA</label>
+                      <input type="text" name="disa" value={formData.disa || ''} onChange={handleChange} className="form-control" placeholder="e.g. D1234" />
                     </div>
                     {formData.id && (
                       <>
@@ -533,6 +539,7 @@ const ImpactTest = () => {
                    <th rowSpan="2" style={{ whiteSpace: 'nowrap' }}>Inspection Date</th>
                    <th rowSpan="2">Part Name</th>
                    <th rowSpan="2">Date Code</th>
+                   <th rowSpan="2">DISA</th>
                    <th rowSpan="2">Loc</th>
                    <th rowSpan="2">Notch Type</th>
                    <th colSpan="4" style={{ textAlign: 'center' }}>Impact Energy (Joules)</th>
@@ -552,12 +559,12 @@ const ImpactTest = () => {
                 {loading ? (
                   Array(5).fill(0).map((_, i) => (
                     <tr key={i}>
-                      <td colSpan="13"><Skeleton width="100%" height="40px" /></td>
+                      <td colSpan="14"><Skeleton width="100%" height="40px" /></td>
                     </tr>
                   ))
                 ) : records.length === 0 ? (
                   <tr>
-                    <td colSpan="13" style={{ textAlign: 'center', padding: '2rem', color: 'var(--color-text-secondary)' }}>No records found</td>
+                    <td colSpan="14" style={{ textAlign: 'center', padding: '2rem', color: 'var(--color-text-secondary)' }}>No records found</td>
                   </tr>
                 ) : records.map((r) => {
                   let combos = [];
@@ -604,6 +611,7 @@ const ImpactTest = () => {
                                 <td rowSpan={rowCount}>{r.dateOfInspection?.split('T')[0] || '—'}</td>
                                 <td rowSpan={rowCount}><strong>{dash(r.partName)}</strong></td>
                                 <td rowSpan={rowCount}>{dash(r.dateCode)}</td>
+                                <td rowSpan={rowCount} style={{ fontSize: '12px' }}>{dash(r.disa)}</td>
                               </>
                             )}
                             <td style={{ fontWeight: 600, color: '#4b5563', fontSize: '12px' }}>{c.loc}</td>

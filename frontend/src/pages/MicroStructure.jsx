@@ -40,7 +40,7 @@ const MicroStructure = () => {
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
   const [formData, setFormData] = useState({
     id: null,
-    inspectionDate: new Date().toISOString().split('T')[0], partName: '', dateCode: '',
+    inspectionDate: new Date().toISOString().split('T')[0], partName: '', dateCode: '', disa: '',
     microLocation: '',
     nodularityPercent: '', graphiteType: '', countNosPerMm2: '', size: '',
     ferritePercent: '', pearlitePercent: '', carbidePercent: '',
@@ -241,6 +241,7 @@ const MicroStructure = () => {
           inspectionDate: formData.inspectionDate,
           partName: formData.partName,
           dateCode: formData.dateCode,
+          disa: formData.disa,
           remarks: formData.remarks,
           createdBy: user.employeeId || user.fullName,
           microLocation: activeLocations.join(','),
@@ -332,6 +333,10 @@ const MicroStructure = () => {
                     <div className="form-group">
                       <label className="form-label">Date Code</label>
                       <input type="text" name="dateCode" value={formData.dateCode} onChange={handleChange} className="form-control" placeholder="e.g. 5D03-45" />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">DISA</label>
+                      <input type="text" name="disa" value={formData.disa || ''} onChange={handleChange} className="form-control" placeholder="e.g. D1234" />
                     </div>
                     {formData.id && (
                       <div className="form-group">
@@ -545,6 +550,7 @@ const MicroStructure = () => {
                    <th rowSpan="2" style={{ whiteSpace: 'nowrap' }}>Inspection Date</th>
                    <th rowSpan="2">Part Name</th>
                    <th rowSpan="2">Date/Heat Code</th>
+                   <th rowSpan="2">DISA</th>
                    <th rowSpan="2">Loc</th>
                    <th rowSpan="2">Nodularity (%)</th>
                    <th rowSpan="2">Graphite Type</th>
@@ -610,6 +616,7 @@ const MicroStructure = () => {
                               <td rowSpan={rowCount}>{r.inspectionDate?.split('T')[0] || '—'}</td>
                               <td rowSpan={rowCount}><strong>{dash(r.partName)}</strong></td>
                               <td rowSpan={rowCount}>{dash(r.dateCode)}</td>
+                              <td rowSpan={rowCount} style={{ fontSize: '12px' }}>{dash(r.disa)}</td>
                             </>
                           )}
                           <td style={{ fontWeight: 600, color: '#4b5563', fontSize: '12px' }}>{loc}</td>

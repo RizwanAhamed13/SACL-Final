@@ -25,6 +25,7 @@ public class ImpactTest {
     private LocalDate dateOfInspection;
     private String partName;
     private String dateCode;
+    private String disa;
     private String specification;
     private String mechLocation;
 

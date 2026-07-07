@@ -19,7 +19,7 @@ const QcRegister = () => {
     id: null, // for editing
     heatCode: '', date: new Date().toISOString().split('T')[0], dateCode: '', disa: '', partName: '', qtyMoulds: '',
     compositionC: '', compositionSi: '', compositionMn: '', compositionP: '', compositionS: '',
-    compositionMgFirst: '', compositionMgLast: '', compositionCu: '', compositionCr: '',
+    compositionMgFirst: '', compositionMgLast: '', compositionCu: '', compositionCr: '', compositionSn: '',
     fcNoHeatNo: '', conNo: '', tappingTime: '', tappingWtKgs: '', pouringTemp: '', pouringTempStart: '', pouringTempEnd: '', timeOfPouringStart: '', timeOfPouringEnd: '', streamInnoculant: '', ppCode: '',
     treatmentNo: '', mgKgs: '', resMgConvertorPercent: '', recMgPercent: '', pTimeSec: '', pTimeSecStart: '', pTimeSecEnd: '',
     correctiveC: '', correctiveSi: '', correctiveMn: '', correctiveS: '', correctiveCr: '', correctiveCu: '', correctiveSn: '',

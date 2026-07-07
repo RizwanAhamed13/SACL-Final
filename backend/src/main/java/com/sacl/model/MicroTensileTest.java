@@ -25,6 +25,7 @@ public class MicroTensileTest {
     private LocalDate dateOfInspection;
     private String item;
     private String dateCode;
+    private String disa;
     private String heatCode;
     private String mechLocation;
 

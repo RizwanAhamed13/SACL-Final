@@ -25,6 +25,7 @@ public class MicroStructureAnalysis {
     private LocalDate inspectionDate;
     private String partName;
     private String dateCode;
+    private String disa;
     private String heatCode;
     private String microLocation;
 
