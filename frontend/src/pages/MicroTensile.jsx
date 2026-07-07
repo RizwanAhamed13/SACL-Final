@@ -439,9 +439,11 @@ const MicroTensile = () => {
                    <th rowSpan="2" style={{ whiteSpace: 'nowrap' }}>Inspection Date</th>
                    <th rowSpan="2">Item / Part</th>
                    <th rowSpan="2">Date/Heat Code</th>
+                   <th rowSpan="2">Bar Dia (mm)</th>
+                   <th rowSpan="2">Gauge Len (mm)</th>
                    <th rowSpan="2">Loc</th>
                    <th colSpan="2" style={{ textAlign: 'center' }}>Load (kN)</th>
-                   <th colSpan="2" style={{ textAlign: 'center' }}>Strength (N/mm²)</th>
+                   <th colSpan="3" style={{ textAlign: 'center' }}>Strength (N/mm²)</th>
                    <th rowSpan="2">Elongation (%)</th>
                    <th rowSpan="2">Remarks</th>
                    <th rowSpan="2">Status</th>
@@ -453,6 +455,7 @@ const MicroTensile = () => {
                    <th style={{ fontSize: '10px' }}>Yield</th>
                    <th style={{ fontSize: '10px' }}>UTS</th>
                    <th style={{ fontSize: '10px' }}>Yield 0.2%</th>
+                   <th style={{ fontSize: '10px' }}>Yield 0.5%</th>
                  </tr>
               </thead>
               <tbody>
@@ -493,6 +496,8 @@ const MicroTensile = () => {
                               <td rowSpan={rowCount}>{r.dateOfInspection?.split('T')[0] || '—'}</td>
                               <td rowSpan={rowCount}><strong>{dash(r.item)}</strong></td>
                               <td rowSpan={rowCount}>{dash(r.dateCode)}</td>
+                              <td rowSpan={rowCount} style={{ fontSize: '12px' }}>{dash(r.barDiaMm)}</td>
+                              <td rowSpan={rowCount} style={{ fontSize: '12px' }}>{dash(r.gaugeLengthMm)}</td>
                             </>
                           )}
                           <td style={{ fontWeight: 600, color: '#4b5563', fontSize: '12px' }}>{loc}</td>
@@ -500,6 +505,7 @@ const MicroTensile = () => {
                           <td style={{ fontSize: '12px' }}>{dash(vals.yieldLoadKn)}</td>
                           <td style={{ fontSize: '12px' }}>{dash(vals.tensileStrength)}</td>
                           <td style={{ fontSize: '12px' }}>{dash(vals.yieldStrength02)}</td>
+                          <td style={{ fontSize: '12px' }}>{dash(vals.yieldStrength05)}</td>
                           <td style={{ fontSize: '12px' }}>{dash(vals.elongationPercent)}</td>
                           
                           {idx === 0 && (

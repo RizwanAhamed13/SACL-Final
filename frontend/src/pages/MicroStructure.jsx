@@ -40,7 +40,7 @@ const MicroStructure = () => {
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
   const [formData, setFormData] = useState({
     id: null,
-    inspectionDate: new Date().toISOString().split('T')[0], partName: '', disa: '', dateCode: '',
+    inspectionDate: new Date().toISOString().split('T')[0], partName: '', dateCode: '',
     microLocation: '',
     nodularityPercent: '', graphiteType: '', countNosPerMm2: '', size: '',
     ferritePercent: '', pearlitePercent: '', carbidePercent: '',

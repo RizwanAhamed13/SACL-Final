@@ -527,6 +527,8 @@ const QcRegister = () => {
               <thead>
                 <tr>
                   <th rowSpan="2" style={{ minWidth: '150px' }}>PART NAME / DATE / HEAT CODE</th>
+                  <th rowSpan="2">Date Code</th>
+                  <th rowSpan="2">DISA</th>
                   <th rowSpan="2">Qty of Moulds</th>
                   <th colSpan="10" className="text-center">Metal Composition (%)</th>
                   <th colSpan="2" className="text-center">Time of Pouring</th>
@@ -580,6 +582,8 @@ const QcRegister = () => {
                       <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)' }}>{r.date?.split('T')[0]}</div>
                       <div style={{ fontSize: '11px', color: 'var(--color-primary)', fontWeight: '500' }}>{dash(r.heatCode)}</div>
                     </td>
+                    <td style={{ fontSize: '12px' }}>{dash(r.dateCode)}</td>
+                    <td style={{ fontSize: '12px' }}>{dash(r.disa)}</td>
                     <td className="text-center">{dash(r.qtyMoulds)}</td>
                     
                     {/* Metal Composition */}
