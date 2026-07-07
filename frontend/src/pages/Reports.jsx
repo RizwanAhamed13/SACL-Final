@@ -217,6 +217,13 @@ const getRecordValue = (record, key) => {
   return (value != null && value !== '') ? value : '—';
 };
 
+const getFlatHeaders = (headersObj) => {
+  const row0 = headersObj.rows[0];
+  const row1 = headersObj.rows[1];
+  if (!row1) return row0;
+  return row0.map((h0, i) => row1[i] || h0);
+};
+
 // Expand records with locationValues JSON into multiple rows (one per location)
 const expandLocationValues = (records, type) => {
   if (!records) return [];
@@ -642,10 +649,10 @@ const Reports = () => {
           </div>
           <div className="rpt-table-wrap">
             <table className="rpt-table">
-              <thead><tr>{QC_HEADERS.map(h => <th key={h} className="th-qc">{h}</th>)}</tr></thead>
+              <thead><tr>{getFlatHeaders(QC_HEADERS).map((h, i) => <th key={i} className="th-qc">{h}</th>)}</tr></thead>
               <tbody>
                 {results.qcRegister.length === 0
-                  ? <tr><td colSpan={QC_HEADERS.length} className="rpt-empty">No records found.</td></tr>
+                  ? <tr><td colSpan={getFlatHeaders(QC_HEADERS).length} className="rpt-empty">No records found.</td></tr>
                   : results.qcRegister.map(r => (
                     <tr key={r.id}>
                       <td>{r.id}</td><td className="part-name">{r.partName}</td><td>{r.date}</td>
@@ -687,10 +694,10 @@ const Reports = () => {
           </div>
           <div className="rpt-table-wrap">
             <table className="rpt-table">
-              <thead><tr>{MICRO_HEADERS.map(h => <th key={h} className="th-micro">{h}</th>)}</tr></thead>
+              <thead><tr>{getFlatHeaders(MICRO_HEADERS).map((h, i) => <th key={i} className="th-micro">{h}</th>)}</tr></thead>
               <tbody>
                 {results.microStructure.length === 0
-                  ? <tr><td colSpan={MICRO_HEADERS.length} className="rpt-empty">No records found.</td></tr>
+                  ? <tr><td colSpan={getFlatHeaders(MICRO_HEADERS).length} className="rpt-empty">No records found.</td></tr>
                   : results.microStructure.map((r, idx) => (
                     <tr key={`${r.id}-${r.location}-${idx}`}>
                       <td>{r.id}</td><td className="part-name">{r.partName}</td>
@@ -724,10 +731,10 @@ const Reports = () => {
           </div>
           <div className="rpt-table-wrap">
             <table className="rpt-table">
-              <thead><tr>{TENSILE_HEADERS.map(h => <th key={h} className="th-tensile">{h}</th>)}</tr></thead>
+              <thead><tr>{getFlatHeaders(TENSILE_HEADERS).map((h, i) => <th key={i} className="th-tensile">{h}</th>)}</tr></thead>
               <tbody>
                 {results.microTensile.length === 0
-                  ? <tr><td colSpan={TENSILE_HEADERS.length} className="rpt-empty">No records found.</td></tr>
+                  ? <tr><td colSpan={getFlatHeaders(TENSILE_HEADERS).length} className="rpt-empty">No records found.</td></tr>
                   : results.microTensile.map((r, idx) => (
                     <tr key={`${r.id}-${r.location}-${idx}`}>
                       <td>{r.id}</td><td className="part-name">{r.item}</td>
@@ -759,10 +766,10 @@ const Reports = () => {
           </div>
           <div className="rpt-table-wrap">
             <table className="rpt-table">
-              <thead><tr>{IMPACT_HEADERS.map(h => <th key={h} className="th-impact">{h}</th>)}</tr></thead>
+              <thead><tr>{getFlatHeaders(IMPACT_HEADERS).map((h, i) => <th key={i} className="th-impact">{h}</th>)}</tr></thead>
               <tbody>
                 {results.impactTest.length === 0
-                  ? <tr><td colSpan={IMPACT_HEADERS.length} className="rpt-empty">No records found.</td></tr>
+                  ? <tr><td colSpan={getFlatHeaders(IMPACT_HEADERS).length} className="rpt-empty">No records found.</td></tr>
                   : results.impactTest.map((r, idx) => (
                     <tr key={`${r.id}-${r.location}-${r.notchType}-${idx}`}>
                       <td>{r.id}</td><td className="part-name">{r.partName}</td>
