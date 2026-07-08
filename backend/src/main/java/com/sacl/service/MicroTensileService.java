@@ -15,6 +15,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -44,6 +46,22 @@ public class MicroTensileService {
     public Page<MicroTensileTest> search(String keyword, String createdBy, Pageable pageable) {
         String searchParam = (keyword == null) ? "" : keyword;
         return repository.searchByKeyword(searchParam, createdBy, pageable);
+    }
+
+    @Transactional
+    public int approveAll(String approvedBy) {
+        String role = getCurrentUserRole();
+        if (!role.contains("HOD") && !role.contains("ADMIN")) {
+            throw new UnauthorizedException("Only HOD or ADMIN role can bulk approve records");
+        }
+        List<MicroTensileTest> pending = repository.findByStatus(RecordStatus.HOF_APPROVED);
+        pending.forEach(r -> {
+            r.setStatus(RecordStatus.HOD_APPROVED);
+            r.setHodApprovedBy(approvedBy);
+        });
+        repository.saveAll(pending);
+        log.info("Micro Tensile bulk approved {} records by {}", pending.size(), approvedBy);
+        return pending.size();
     }
 
     public MicroTensileTest findById(Long id) {

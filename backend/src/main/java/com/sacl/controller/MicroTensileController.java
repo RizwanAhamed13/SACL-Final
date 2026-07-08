@@ -12,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -49,6 +51,14 @@ public class MicroTensileController {
     @GetMapping("/{id}")
     public ResponseEntity<MicroTensileTest> getById(@PathVariable Long id) {
         return ResponseEntity.ok(service.findById(id));
+    }
+
+    @PreAuthorize("hasAnyRole('HOD','ADMIN')")
+    @PostMapping("/approve-all")
+    public ResponseEntity<java.util.Map<String, Object>> approveAll(@AuthenticationPrincipal UserDetails principal) {
+        String approvedBy = principal != null ? principal.getUsername() : "HOD";
+        int count = service.approveAll(approvedBy);
+        return ResponseEntity.ok(java.util.Map.of("approved", count, "message", count + " records approved"));
     }
 
     @PreAuthorize("hasAnyRole('USER','HOF','HOD','ADMIN')")

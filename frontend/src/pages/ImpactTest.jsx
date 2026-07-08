@@ -41,6 +41,9 @@ const ImpactTest = () => {
   const [tableRemarks, setTableRemarks] = useState({});
   const [thresholds, setThresholds] = useState(null);
   const [errors, setErrors] = useState({});
+  const [approveAllModal, setApproveAllModal] = useState(false);
+  const [approveAllLoading, setApproveAllLoading] = useState(false);
+  const [hofPendingCount, setHofPendingCount] = useState(0);
 
   const activeLocations = formData.mechLocation
     ? formData.mechLocation.split(',').filter(Boolean)
@@ -56,7 +59,9 @@ const ImpactTest = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
       const res = await axios.get('/api/impact-test');
-      setRecords(res.data.content ?? res.data);
+      const data = res.data.content ?? res.data;
+      setRecords(data);
+      setHofPendingCount(data.filter(r => r.status === 'HOF_APPROVED').length);
     } catch (err) {
       console.warn("Could not fetch records", err);
     } finally {
@@ -358,6 +363,18 @@ const ImpactTest = () => {
                 <line x1="5" y1="12" x2="19" y2="12" />
               </svg>
               Add Test
+            </button>
+          )}
+          {(user?.role?.toUpperCase()?.includes('HOD') || user?.role?.toUpperCase()?.includes('ADMIN')) && hofPendingCount > 0 && (
+            <button
+              className="btn btn-secondary"
+              style={{ background: 'linear-gradient(135deg,#059669,#047857)', color: '#fff', border: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}
+              onClick={() => setApproveAllModal(true)}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              Approve All ({hofPendingCount})
             </button>
           )}
         </div>
@@ -688,7 +705,7 @@ const ImpactTest = () => {
                                 </td>
                                 <td rowSpan={rowCount} style={{ whiteSpace: 'nowrap' }}>
                                     <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
-                                    {((user?.role?.toUpperCase()?.includes('HOF') && (r.status || 'QC_ENTRY') === 'QC_ENTRY') || user?.role?.toUpperCase()?.includes('ADMIN') || user?.role?.toUpperCase()?.includes('HOD') || r.createdBy === user?.username) && (
+                                    {((user?.role?.toUpperCase()?.includes('HOF') && (r.status || 'QC_ENTRY') === 'QC_ENTRY') || user?.role?.toUpperCase()?.includes('ADMIN') || user?.role?.toUpperCase()?.includes('HOD') || r.createdBy === user?.username || r.createdBy === user?.employeeId || r.createdBy === user?.fullName) && (
                                       <button className="btn btn-primary btn-sm" onClick={() => openEdit(r)} style={{ padding: '0.2rem 0.6rem', fontSize: '12px', background: 'var(--color-primary)', border: 'none' }}>
                                         Edit
                                       </button>
@@ -722,6 +739,26 @@ const ImpactTest = () => {
         onConfirm={handleConfirmSave} 
         onClose={() => setShowSaveConfirm(false)} 
         message="Are you sure you want to save this record?" 
+      />
+      <ConfirmModal
+        isOpen={approveAllModal}
+        onClose={() => setApproveAllModal(false)}
+        onConfirm={async () => {
+          setApproveAllModal(false);
+          setApproveAllLoading(true);
+          try {
+            const res = await axios.post('/api/impact-test/approve-all');
+            toast.success(`${res.data.approved} Impact Test records approved!`);
+            fetchRecords();
+          } catch (err) {
+            toast.error(err.response?.data?.message || 'Failed to approve records');
+          } finally {
+            setApproveAllLoading(false);
+          }
+        }}
+        title="HOD Bulk Approval"
+        message={`Approve all ${hofPendingCount} HOF-approved Impact Test records in one shot?`}
+        confirmText={approveAllLoading ? 'Approving...' : 'Approve All'}
       />
     </>
   );

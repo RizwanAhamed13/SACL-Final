@@ -1,6 +1,7 @@
 package com.sacl.repository;
 
 import com.sacl.model.QcRegister;
+import com.sacl.model.RecordStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,6 +15,8 @@ import java.util.List;
 public interface QcRegisterRepository extends JpaRepository<QcRegister, Long> {
 
     List<QcRegister> findAll();
+
+    List<QcRegister> findByStatus(RecordStatus status);
 
     @Query("SELECT r.createdBy, COUNT(r), " +
            "SUM(CASE WHEN r.status = com.sacl.model.RecordStatus.HOF_APPROVED OR r.status = com.sacl.model.RecordStatus.HOD_APPROVED THEN 1 ELSE 0 END), " +

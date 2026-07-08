@@ -4,6 +4,7 @@ import axios from '../api/axios';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import ConfirmModal from '../components/ConfirmModal';
+import { PartNameSelect } from '../components/PartNameSelect';
 
 const UserManagement = () => {
   const { user: currentUser } = useAuth();
@@ -15,6 +16,14 @@ const UserManagement = () => {
     fullName: '', username: '', employeeId: '', password: '', email: '', role: '', active: 'true',
     permissions: []
   });
+
+  // Record Search State
+  const [recSearch, setRecSearch] = useState({ partName: '', dateCode: '', heatCode: '' });
+  const [recResults, setRecResults] = useState(null);
+  const [recLoading, setRecLoading] = useState(false);
+  const [editRecord, setEditRecord] = useState(null); // { type, data }
+  const [editRecordForm, setEditRecordForm] = useState({});
+  const [editRecordLoading, setEditRecordLoading] = useState(false);
 
   const fetchRecords = async () => {
     try {
@@ -136,6 +145,48 @@ const UserManagement = () => {
 
   const dash = (val) => val || '—';
 
+  const handleRecordSearch = async (e) => {
+    e.preventDefault();
+    setRecLoading(true);
+    try {
+      const res = await axios.get('/api/reports/search', { params: recSearch });
+      setRecResults(res.data);
+    } catch {
+      toast.error('Failed to search records');
+    } finally {
+      setRecLoading(false);
+    }
+  };
+
+  const openRecordEdit = (type, data) => {
+    setEditRecord({ type, data });
+    setEditRecordForm({ ...data });
+  };
+
+  const handleRecordEditSave = async () => {
+    if (!editRecord) return;
+    setEditRecordLoading(true);
+    const { type, data } = editRecord;
+    const endpointMap = {
+      qcRegister: `/api/qc-register/${data.id}`,
+      microStructure: `/api/micro-structure/${data.id}`,
+      microTensile: `/api/micro-tensile/${data.id}`,
+      impactTest: `/api/impact-test/${data.id}`,
+    };
+    try {
+      await axios.put(endpointMap[type], editRecordForm);
+      toast.success('Record updated successfully!');
+      setEditRecord(null);
+      // refresh search results
+      const res = await axios.get('/api/reports/search', { params: recSearch });
+      setRecResults(res.data);
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to update record');
+    } finally {
+      setEditRecordLoading(false);
+    }
+  };
+
   return (
     <>
       <style>{`
@@ -150,6 +201,20 @@ const UserManagement = () => {
         .action-btn { background: none; border: none; cursor: pointer; padding: .3rem .5rem; border-radius: var(--radius-md); font-size: 13px; font-weight: 500; transition: background .15s; }
         .action-btn-edit   { color: #2563eb; } .action-btn-edit:hover { background: #eff6ff; }
         .action-btn-delete { color: #dc2626; } .action-btn-delete:hover { background: #fef2f2; }
+        .rec-search-card { background:#fff; border-radius:14px; border:1px solid #e2e8f0; box-shadow:0 2px 8px rgba(0,0,0,0.06); padding:22px 28px; margin-bottom:28px; }
+        .rec-search-row { display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end; }
+        .rec-search-field { display:flex; flex-direction:column; min-width:160px; flex:1; }
+        .rec-field-label { font-weight:700; color:#475569; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.07em; margin-bottom:6px; }
+        .rec-input { height:40px; border-radius:8px; border:1.5px solid #cbd5e1; font-size:0.85rem; padding:0 12px; width:100%; outline:none; transition:border-color 0.2s; }
+        .rec-input:focus { border-color:#f97316; box-shadow:0 0 0 3px rgba(249,115,22,0.12); }
+        .rec-type-badge { font-size:10px; font-weight:700; padding:2px 8px; border-radius:12px; }
+        .rec-qc { background:#dbeafe; color:#1e3a5f; }
+        .rec-micro { background:#ccfbf1; color:#134e4a; }
+        .rec-tensile { background:#fef3c7; color:#78350f; }
+        .rec-impact { background:#ede9fe; color:#4c1d95; }
+        .rec-edit-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:9999; padding:1rem; }
+        .rec-edit-modal { background:#fff; border-radius:16px; padding:28px; max-width:600px; width:100%; max-height:90vh; overflow:auto; box-shadow:0 20px 60px rgba(0,0,0,0.2); }
+        .rec-edit-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:1rem; }
       `}</style>
 
       <div className="breadcrumb">
@@ -171,6 +236,74 @@ const UserManagement = () => {
             Add User
           </button>
         </div>
+      </div>
+
+      {/* Record Search Panel */}
+      <div className="rec-search-card">
+        <h3 style={{ marginTop: 0, marginBottom: '1rem', color: '#1e293b', fontSize: '1.1rem' }}>Global Record Search & Edit</h3>
+        <form onSubmit={handleRecordSearch} className="rec-search-row">
+          <div className="rec-search-field">
+            <label className="rec-field-label">Part Name</label>
+            <PartNameSelect value={recSearch.partName} onChange={(e) => setRecSearch({...recSearch, partName: e.target.value})} />
+          </div>
+          <div className="rec-search-field">
+            <label className="rec-field-label">Date Code</label>
+            <input type="text" className="rec-input" placeholder="e.g. 5D03-45" value={recSearch.dateCode} onChange={e => setRecSearch({...recSearch, dateCode: e.target.value})} />
+          </div>
+          <div className="rec-search-field">
+            <label className="rec-field-label">Heat Code</label>
+            <input type="text" className="rec-input" placeholder="e.g. H123" value={recSearch.heatCode} onChange={e => setRecSearch({...recSearch, heatCode: e.target.value})} />
+          </div>
+          <button type="submit" className="btn btn-primary" style={{ height: '40px', padding: '0 24px' }} disabled={recLoading}>
+            {recLoading ? 'Searching...' : 'Search'}
+          </button>
+        </form>
+
+        {recResults && (
+          <div style={{ marginTop: '2rem' }}>
+            <h4 style={{ margin: '0 0 1rem 0', color: '#475569', fontSize: '0.9rem' }}>Search Results ({recResults.length} records found)</h4>
+            {recResults.length === 0 ? (
+              <p style={{ color: '#64748b' }}>No records match the given criteria.</p>
+            ) : (
+              <div className="table-responsive">
+                <table className="table">
+                  <thead>
+                    <tr>
+                      <th>Module</th>
+                      <th>Date</th>
+                      <th>Part / Code</th>
+                      <th>Created By</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {recResults.map((r, i) => (
+                      <tr key={i}>
+                        <td>
+                          {r.type === 'qcRegister' && <span className="rec-type-badge rec-qc">QC REGISTER</span>}
+                          {r.type === 'microStructure' && <span className="rec-type-badge rec-micro">MICRO STRUCT</span>}
+                          {r.type === 'microTensile' && <span className="rec-type-badge rec-tensile">TENSILE TEST</span>}
+                          {r.type === 'impactTest' && <span className="rec-type-badge rec-impact">IMPACT TEST</span>}
+                        </td>
+                        <td>{r.date}</td>
+                        <td>
+                          <div style={{ fontWeight: 600 }}>{r.partName}</div>
+                          <div style={{ fontSize: '0.8rem', color: '#64748b' }}>{r.dateCode || '-'} / {r.heatCode || '-'}</div>
+                        </td>
+                        <td>{r.createdBy}</td>
+                        <td><span className={`status-badge status-${r.status.toLowerCase()}`}>{r.status}</span></td>
+                        <td>
+                          <button type="button" className="action-btn action-btn-edit" onClick={() => openRecordEdit(r.type, r.data)}>Edit</button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {showForm && (
@@ -321,6 +454,54 @@ const UserManagement = () => {
           </div>
         </div>
       </div>
+      
+      {editRecord && (
+        <div className="rec-edit-overlay" onClick={() => setEditRecord(null)}>
+          <div className="rec-edit-modal" onClick={e => e.stopPropagation()}>
+            <h2 style={{ margin: '0 0 1rem 0', fontSize: '1.25rem' }}>Edit {editRecord.type} Record</h2>
+            <div style={{ marginBottom: '1.5rem', padding: '1rem', background: '#f8fafc', borderRadius: '8px', fontSize: '0.85rem' }}>
+              <strong>Important:</strong> You are modifying a record globally. Please ensure all values are correct.
+            </div>
+            
+            <div className="rec-edit-grid">
+              <div className="form-group">
+                <label className="form-label">Part Name</label>
+                <PartNameSelect value={editRecordForm.partName || ''} onChange={(e) => setEditRecordForm({...editRecordForm, partName: e.target.value})} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Date Code</label>
+                <input type="text" className="form-control" value={editRecordForm.dateCode || ''} onChange={e => setEditRecordForm({...editRecordForm, dateCode: e.target.value})} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Heat Code / No</label>
+                <input type="text" className="form-control" value={editRecordForm.heatCode || editRecordForm.fcNoHeatNo || ''} onChange={e => {
+                  if (editRecord.type === 'qcRegister') {
+                    setEditRecordForm({...editRecordForm, fcNoHeatNo: e.target.value});
+                  } else {
+                    setEditRecordForm({...editRecordForm, heatCode: e.target.value});
+                  }
+                }} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Status</label>
+                <select className="form-control" value={editRecordForm.status || ''} onChange={e => setEditRecordForm({...editRecordForm, status: e.target.value})}>
+                  <option value="QC_ENTRY">QC_ENTRY</option>
+                  <option value="HOF_APPROVED">HOF_APPROVED</option>
+                  <option value="HOD_APPROVED">HOD_APPROVED</option>
+                </select>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '2rem' }}>
+              <button className="btn btn-secondary" onClick={() => setEditRecord(null)}>Cancel</button>
+              <button className="btn btn-primary" onClick={handleRecordEditSave} disabled={editRecordLoading}>
+                {editRecordLoading ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
        <ConfirmModal 
          isOpen={deleteModal.isOpen}
          onClose={() => setDeleteModal({ isOpen: false, user: null })}
