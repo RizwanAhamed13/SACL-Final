@@ -131,7 +131,7 @@ const QC_KEYS = [
 const MICRO_HEADERS = {
   rows: [
     [
-      'ID', 'Part Name', 'Inspection Date', 'Heat Code', 'Date Code', 'Disa', 'Location',
+      'ID', 'Part Name', 'Inspection Date', 'Heat Code', 'Date Code', 'Location', 'Disa',
       'Micro Structure Properties', '', '', '', '', '', '', '', '', '', '', 'Remarks'
     ],
     [
@@ -148,7 +148,7 @@ const MICRO_HEADERS = {
   ]
 };
 const MICRO_KEYS = [
-  'id', 'partName', 'inspectionDate', 'heatCode', 'dateCode', 'disa', (r) => r.location || r.microLocation,
+  'id', 'partName', 'inspectionDate', 'heatCode', 'dateCode', (r) => r.location || r.microLocation, 'disa',
   'nodularityPercent', 'graphiteType', 'countNosPerMm2',
   'ferritePercentMin', 'ferritePercentMax', 'pearlitePercentMin', 'pearlitePercentMax', 'carbidePercentMin', 'carbidePercentMax',
   'sizeMin', 'sizeMax', 'remarks'
@@ -157,7 +157,7 @@ const MICRO_KEYS = [
 const TENSILE_HEADERS = {
   rows: [
     [
-      'ID', 'Item', 'Inspection Date', 'Heat Code', 'Date Code', 'Disa', 'Location',
+      'ID', 'Item', 'Inspection Date', 'Heat Code', 'Date Code', 'Location', 'Disa',
       'Specimen Dimensions', '', 'Mechanical Properties', '', '', '', '', '', 'Remarks'
     ],
     [
@@ -174,7 +174,7 @@ const TENSILE_HEADERS = {
   ]
 };
 const TENSILE_KEYS = [
-  'id', 'item', 'dateOfInspection', 'heatCode', 'dateCode', 'disa', (r) => r.location || r.mechLocation,
+  'id', 'item', 'dateOfInspection', 'heatCode', 'dateCode', (r) => r.location || r.mechLocation, 'disa',
   'barDiaMm', 'gaugeLengthMm', 'maxLoadKn', 'yieldLoadKn',
   'tensileStrength', 'yieldStrength02', 'yieldStrength05', 'elongationPercent',
   'remarks'
@@ -183,7 +183,7 @@ const TENSILE_KEYS = [
 const IMPACT_HEADERS = {
   rows: [
     [
-      'ID', 'Part Name', 'Inspection Date', 'Date Code', 'Disa', 'Location', 'Notch Type',
+      'ID', 'Part Name', 'Inspection Date', 'Date Code', 'Location', 'Disa', 'Notch Type',
       'Impact Energy (Joules)', '', '', 'Remarks'
     ],
     [
@@ -198,7 +198,7 @@ const IMPACT_HEADERS = {
   ]
 };
 const IMPACT_KEYS = [
-  'id', 'partName', 'dateOfInspection', 'dateCode', 'disa', (r) => r.location || r.mechLocation, 'notchType',
+  'id', 'partName', 'dateOfInspection', 'dateCode', (r) => r.location || r.mechLocation, 'disa', 'notchType',
   'observedValue1', 'observedValue2', 'observedValue3',
   'remarks'
 ];
@@ -703,7 +703,7 @@ const Reports = () => {
                   : results.microStructure.map((r, idx) => (
                     <tr key={`${r.id}-${r.location}-${idx}`}>
                       <td>{r.id}</td><td className="part-name">{r.partName}</td>
-                      <td>{r.inspectionDate}</td><td style={{ fontWeight: 700 }}>{r.heatCode}</td><td>{r.dateCode}</td><td>{r.disa || '—'}</td><td>{r.location || '—'}</td>
+                      <td>{r.inspectionDate}</td><td style={{ fontWeight: 700 }}>{r.heatCode}</td><td>{r.dateCode}</td><td>{r.location || '—'}</td><td>{r.disa || '—'}</td>
                       <td>{dash(r.nodularityPercent)}</td><td>{dash(r.graphiteType)}</td>
                       <td>{dash(r.countNosPerMm2)}</td>
                       <td>{dash(r.ferritePercentMin)}</td><td>{dash(r.ferritePercentMax)}</td>
@@ -740,7 +740,7 @@ const Reports = () => {
                   : results.microTensile.map((r, idx) => (
                     <tr key={`${r.id}-${r.location}-${idx}`}>
                       <td>{r.id}</td><td className="part-name">{r.item}</td>
-                      <td>{r.dateOfInspection}</td><td style={{ fontWeight: 700 }}>{r.heatCode}</td><td>{r.dateCode}</td><td>{r.disa || '—'}</td><td>{r.location || '—'}</td>
+                      <td>{r.dateOfInspection}</td><td style={{ fontWeight: 700 }}>{r.heatCode}</td><td>{r.dateCode}</td><td>{r.location || '—'}</td><td>{r.disa || '—'}</td>
                       <td>{dash(r.barDiaMm)}</td><td>{dash(r.gaugeLengthMm)}</td>
                       <td>{dash(r.maxLoadKn)}</td><td>{dash(r.yieldLoadKn)}</td>
                       <td>{dash(r.tensileStrength)}</td><td>{dash(r.yieldStrength02)}</td>
@@ -776,7 +776,7 @@ const Reports = () => {
                     <tr key={`${r.id}-${r.location}-${r.notchType}-${idx}`}>
                       <td>{r.id}</td><td className="part-name">{r.partName}</td>
                       <td>{r.dateOfInspection}</td><td style={{ fontWeight: 700 }}>{r.dateCode}</td>
-                      <td>{r.disa || '—'}</td><td>{r.location || '—'}</td><td>{r.notchType || '—'}</td>
+                      <td>{r.location || '—'}</td><td>{r.disa || '—'}</td><td>{r.notchType || '—'}</td>
                       <td>{dash(r.observedValue1)}</td><td>{dash(r.observedValue2)}</td><td>{dash(r.observedValue3)}</td>
                       <td style={{ maxWidth: '200px', whiteSpace: 'normal' }}>{dash(r.remarks)}</td>
                     </tr>
