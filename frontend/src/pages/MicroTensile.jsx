@@ -110,19 +110,28 @@ const MicroTensile = () => {
 
   const openEdit = (record) => {
     let flatLocData = {};
+    let discoveredLocs = [];
     if (record.locationValues) {
       try {
         const parsed = JSON.parse(record.locationValues);
         Object.keys(parsed).forEach(loc => {
+          if (!discoveredLocs.includes(loc)) discoveredLocs.push(loc);
           Object.keys(parsed[loc]).forEach(k => {
             flatLocData[`${loc}_${k}`] = parsed[loc][k];
           });
         });
       } catch (e) { console.error("Error parsing locationValues", e); }
     }
+    
+    // Ensure mechLocation is populated for UI rendering
+    let currentLocs = record.mechLocation ? record.mechLocation.split(',').filter(Boolean) : [];
+    if (currentLocs.length === 0 && discoveredLocs.length > 0) currentLocs = discoveredLocs;
+    if (currentLocs.length === 0) currentLocs = ['TRA'];
+
     setFormData({
       ...record,
       ...flatLocData,
+      mechLocation: currentLocs.join(','),
       dateOfInspection: record.dateOfInspection ? record.dateOfInspection.split('T')[0] : ''
     });
     fetchThresholds(record.item, {

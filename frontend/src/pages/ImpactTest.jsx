@@ -144,17 +144,22 @@ const ImpactTest = () => {
 
   const openEdit = (record) => {
     let flatLocData = {};
+    let discoveredNotches = [];
+    let discoveredLocs = [];
     if (record.locationValues) {
       try {
         const parsed = JSON.parse(record.locationValues);
         Object.keys(parsed).forEach(loc => {
+          if (!discoveredLocs.includes(loc)) discoveredLocs.push(loc);
           const data = parsed[loc];
           const firstKey = Object.keys(data)[0];
           if (firstKey && typeof data[firstKey] === 'object' && data[firstKey] !== null) {
             Object.entries(data).forEach(([notch, vals]) => {
-              if (vals.v1 !== undefined) flatLocData[`${loc}_${notch}_observedValue1`] = vals.v1;
-              if (vals.v2 !== undefined) flatLocData[`${loc}_${notch}_observedValue2`] = vals.v2;
-              if (vals.v3 !== undefined) flatLocData[`${loc}_${notch}_observedValue3`] = vals.v3;
+              const normalNotch = notch.toLowerCase();
+              if (!discoveredNotches.includes(normalNotch)) discoveredNotches.push(normalNotch);
+              if (vals.v1 !== undefined) flatLocData[`${loc}_${normalNotch}_observedValue1`] = vals.v1;
+              if (vals.v2 !== undefined) flatLocData[`${loc}_${normalNotch}_observedValue2`] = vals.v2;
+              if (vals.v3 !== undefined) flatLocData[`${loc}_${normalNotch}_observedValue3`] = vals.v3;
             });
           } else {
             Object.keys(data).forEach(k => {
@@ -164,9 +169,31 @@ const ImpactTest = () => {
         });
       } catch (e) { console.error("Error parsing locationValues", e); }
     }
+    
+    if (discoveredNotches.length > 0) {
+      setSelectedNotches(discoveredNotches);
+    } else if (record.notchType) {
+      // Fallback for old records with no locationValues but a comma separated notchType
+      const fallbacks = record.notchType.split(',').filter(Boolean).map(n => {
+        if (n.toLowerCase().includes('un')) return 'unnotch';
+        if (n.toLowerCase().includes('v')) return 'vnotch';
+        if (n.toLowerCase().includes('u')) return 'unotch';
+        return n;
+      });
+      setSelectedNotches(fallbacks);
+    } else {
+      setSelectedNotches([]);
+    }
+
+    // Ensure mechLocation is populated for UI rendering
+    let currentLocs = record.mechLocation ? record.mechLocation.split(',').filter(Boolean) : [];
+    if (currentLocs.length === 0 && discoveredLocs.length > 0) currentLocs = discoveredLocs;
+    if (currentLocs.length === 0) currentLocs = ['TRA'];
+
     setFormData({
       ...record,
       ...flatLocData,
+      mechLocation: currentLocs.join(','),
       dateOfInspection: record.dateOfInspection ? record.dateOfInspection.split('T')[0] : ''
     });
     fetchThresholds(record.partName, {

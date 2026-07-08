@@ -141,10 +141,12 @@ const MicroStructure = () => {
 
   const openEdit = (record) => {
     let flatLocData = {};
+    let discoveredLocs = [];
     if (record.locationValues) {
       try {
         const parsed = JSON.parse(record.locationValues);
         Object.keys(parsed).forEach(loc => {
+          if (!discoveredLocs.includes(loc)) discoveredLocs.push(loc);
           const lk = locKey(loc);
           Object.keys(parsed[loc]).forEach(k => {
             flatLocData[`${lk}_${k}`] = parsed[loc][k];
@@ -152,9 +154,16 @@ const MicroStructure = () => {
         });
       } catch (e) { console.error("Error parsing locationValues", e); }
     }
+    
+    // Ensure microLocation is populated for UI rendering
+    let currentLocs = record.microLocation ? record.microLocation.split(',').filter(Boolean) : [];
+    if (currentLocs.length === 0 && discoveredLocs.length > 0) currentLocs = discoveredLocs;
+    if (currentLocs.length === 0) currentLocs = ['TRA'];
+
     setFormData({
       ...record,
       ...flatLocData,
+      microLocation: currentLocs.join(','),
       inspectionDate: record.inspectionDate ? record.inspectionDate.split('T')[0] : ''
     });
     fetchThresholds(record.partName, {
