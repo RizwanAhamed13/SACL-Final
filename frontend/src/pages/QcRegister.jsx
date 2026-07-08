@@ -14,6 +14,7 @@ const QcRegister = () => {
 
   const [records, setRecords] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
   const [formData, setFormData] = useState({
     id: null, // for editing
@@ -32,10 +33,10 @@ const QcRegister = () => {
   const [thresholds, setThresholds] = useState(null);
   const [errors, setErrors] = useState({});
 
-  const fetchRecords = async () => {
+  const fetchRecords = async (query = searchTerm) => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      const res = await axios.get('/api/qc-register');
+      const res = await axios.get('/api/qc-register/search', { params: { q: query } });
       setRecords(res.data.content ?? res.data);
     } catch (err) {
       console.warn("Could not fetch records", err);
@@ -178,7 +179,11 @@ const QcRegister = () => {
     }
     try {
       if (formData.id) {
-        await axios.put(`/api/qc-register/${formData.id}`, formData);
+        let payload = formData;
+        if (user?.role?.toUpperCase()?.includes('HOD') && formData.status === 'HOF_APPROVED') {
+          payload = { ...formData, status: 'HOD_APPROVED', hodApprovedBy: user.employeeId || user.fullName };
+        }
+        await axios.put(`/api/qc-register/${formData.id}`, payload);
         toast.success('Updated successfully');
       } else {
         await axios.post('/api/qc-register', { ...formData, createdBy: user.employeeId || user.fullName });
@@ -214,7 +219,7 @@ const QcRegister = () => {
     return '(—)';
   };
 
-  const dash = (val) => val || '—';
+  const dash = (val) => (val !== null && val !== undefined && val !== '') ? val : '—';
 
   return (
     <>
@@ -228,8 +233,20 @@ const QcRegister = () => {
           <h1 className="page-title">Quality Control Register</h1>
           <p className="page-subtitle">Daily chemical composition &amp; metal treatment log — DISA I/II/III/IV</p>
         </div>
-        <div className="page-actions">
-          {(user?.role?.toUpperCase()?.includes('QC') || user?.role?.toUpperCase()?.includes('ADMIN')) && (
+        <div className="page-actions" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <input 
+              type="text" 
+              className="form-input" 
+              placeholder="Search part, heat code..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && fetchRecords()}
+              style={{ padding: '0.5rem', width: '250px' }}
+            />
+            <button className="btn btn-secondary" onClick={() => fetchRecords()}>Search</button>
+          </div>
+          {(user?.role?.toUpperCase()?.includes('QC') || user?.role?.toUpperCase()?.includes('ADMIN') || user?.role?.toUpperCase()?.includes('USER')) && (
             <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19" />
@@ -548,7 +565,7 @@ const QcRegister = () => {
                   <th rowSpan="2" style={{ minWidth: '150px' }}>Remarks</th>
                   <th rowSpan="2">Status</th>
                   <th rowSpan="2" style={{ minWidth: '150px' }}>Approval Info</th>
-                  {isStaff && <th rowSpan="2">Actions</th>}
+                  <th rowSpan="2">Actions</th>
                 </tr>
                 <tr>
                   {/* Metal Comp */}
@@ -664,11 +681,11 @@ const QcRegister = () => {
                         )}
                       </div>
                     </td>
-                    {isStaff && (
-                        <td style={{ whiteSpace: 'nowrap' }}>
+                    <td style={{ whiteSpace: 'nowrap' }}>
                          <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
                          {((user?.role?.toUpperCase()?.includes('HOF') && (r.status || 'QC_ENTRY') === 'QC_ENTRY') ||
-                           user?.role?.toUpperCase()?.includes('ADMIN') || user?.role?.toUpperCase()?.includes('HOD')) && (
+                           user?.role?.toUpperCase()?.includes('ADMIN') || user?.role?.toUpperCase()?.includes('HOD') ||
+                           r.createdBy === user?.username) && (
                            <button className="btn btn-primary btn-sm" onClick={() => openEdit(r)} style={{ padding: '0.2rem 0.6rem', fontSize: '12px', background: 'var(--color-primary)', border: 'none' }}>
                              Edit
                            </button>
@@ -680,15 +697,10 @@ const QcRegister = () => {
                            </button>
                          )}
 
-                         {(user?.role?.toUpperCase()?.includes('HOD') || user?.role?.toUpperCase()?.includes('ADMIN')) && (r.status || 'QC_ENTRY') === 'HOF_APPROVED' && (
-                           <button className="btn btn-primary btn-sm" onClick={() => handleApprove(r, 'HOD_APPROVED', tableRemarks[r.id])} style={{ padding: '0.2rem 0.6rem', fontSize: '12px', background: '#2563eb', border: 'none' }}>
-                             Approve HOD
-                           </button>
-                         )}
+                         
 
                           </div>
                         </td>
-                     )}
                   </tr>
                 ))}
               </tbody>

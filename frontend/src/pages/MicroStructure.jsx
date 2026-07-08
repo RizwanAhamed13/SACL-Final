@@ -227,6 +227,9 @@ const MicroStructure = () => {
             graphiteType: formData[`${lk}_graphiteType`] || null,
             countNosPerMm2: formData[`${lk}_countNosPerMm2`] || null,
             size: formData[`${lk}_size`] || null,
+            ferritePercent: formData[`${lk}_ferritePercent`] || null,
+            pearlitePercent: formData[`${lk}_pearlitePercent`] || null,
+            carbidePercent: formData[`${lk}_carbidePercent`] || null,
             ferritePercentMin: formData[`${lk}_ferritePercentMin`] || null,
             ferritePercentMax: formData[`${lk}_ferritePercentMax`] || null,
             pearlitePercentMin: formData[`${lk}_pearlitePercentMin`] || null,
@@ -249,7 +252,11 @@ const MicroStructure = () => {
         });
         toast.success('1 record saved');
       } else {
-        await axios.post('/api/micro-structure', { ...formData, createdBy: user.employeeId || user.fullName });
+        const payload = { ...formData, createdBy: user.employeeId || user.fullName };
+        ['nodularityPercent', 'countNosPerMm2', 'ferritePercent', 'pearlitePercent', 'carbidePercent', 'ferritePercentMin', 'ferritePercentMax', 'pearlitePercentMin', 'pearlitePercentMax', 'carbidePercentMin', 'carbidePercentMax', 'sizeMin', 'sizeMax'].forEach(k => {
+          if (payload[k] === '') payload[k] = null;
+        });
+        await axios.post('/api/micro-structure', payload);
         toast.success('Added successfully');
       }
       setShowForm(false);
@@ -282,7 +289,7 @@ const MicroStructure = () => {
     return '';
   };
 
-  const dash = (val) => val || '—';
+  const dash = (val) => (val !== null && val !== undefined && val !== '') ? val : '—';
 
   return (
     <>

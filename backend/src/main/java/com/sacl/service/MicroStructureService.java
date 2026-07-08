@@ -41,6 +41,11 @@ public class MicroStructureService {
         return repository.findAll(pageable);
     }
 
+    public Page<MicroStructureAnalysis> search(String keyword, String createdBy, Pageable pageable) {
+        String searchParam = (keyword == null) ? "" : keyword;
+        return repository.searchByKeyword(searchParam, createdBy, pageable);
+    }
+
     public MicroStructureAnalysis findById(Long id) {
         return repository.findById(id).orElseThrow(() -> {
             log.warn("Micro Structure entry not found: {}", id);

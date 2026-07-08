@@ -41,6 +41,11 @@ public class ImpactTestService {
         return repository.findAll(pageable);
     }
 
+    public Page<ImpactTest> search(String keyword, String createdBy, Pageable pageable) {
+        String searchParam = (keyword == null) ? "" : keyword;
+        return repository.searchByKeyword(searchParam, createdBy, pageable);
+    }
+
     public ImpactTest findById(Long id) {
         return repository.findById(id).orElseThrow(() -> {
             log.warn("Impact Test entry not found: {}", id);

@@ -25,6 +25,7 @@ const ImpactTest = () => {
 
   const [records, setRecords] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
   const [selectedNotches, setSelectedNotches] = useState([]);
   const [formData, setFormData] = useState({
@@ -227,7 +228,11 @@ const ImpactTest = () => {
     }
     try {
       if (formData.id) {
-        await axios.put(`/api/impact-test/${formData.id}`, formData);
+        let payload = formData;
+        if (user?.role?.toUpperCase()?.includes('HOD') && formData.status === 'HOF_APPROVED') {
+          payload = { ...formData, status: 'HOD_APPROVED', hodApprovedBy: user.employeeId || user.fullName };
+        }
+        await axios.put(`/api/impact-test/${formData.id}`, payload);
         toast.success('Updated successfully');
       } else if (useCombos) {
         const locationValues = {};
@@ -309,7 +314,7 @@ const ImpactTest = () => {
     return '';
   };
 
-  const dash = (val) => val || '—';
+  const dash = (val) => (val !== null && val !== undefined && val !== '') ? val : '—';
 
   return (
     <>
@@ -323,8 +328,20 @@ const ImpactTest = () => {
           <h1 className="page-title">Charpy Impact Test Report</h1>
           <p className="page-subtitle">Impact energy absorption (Joules) for V-notch specimens</p>
         </div>
-        <div className="page-actions">
-          {(user?.role?.toUpperCase()?.includes('QC') || user?.role?.toUpperCase()?.includes('ADMIN')) && (
+        <div className="page-actions" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <input 
+              type="text" 
+              className="form-input" 
+              placeholder="Search..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && fetchRecords()}
+              style={{ padding: '0.5rem', width: '250px' }}
+            />
+            <button className="btn btn-secondary" onClick={() => fetchRecords()}>Search</button>
+          </div>
+          {(user?.role?.toUpperCase()?.includes('\1') || user?.role?.toUpperCase()?.includes('ADMIN') || user?.role?.toUpperCase()?.includes('USER')) && (
             <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19" />
@@ -546,7 +563,7 @@ const ImpactTest = () => {
                    <th rowSpan="2">Remarks</th>
                    <th rowSpan="2">Status</th>
                    <th rowSpan="2">Approval Info</th>
-                   {isStaff && <th rowSpan="2">Actions</th>}
+                   <th rowSpan="2">Actions</th>
                  </tr>
                  <tr>
                    <th style={{ fontSize: '10px' }}>1</th>
@@ -659,11 +676,9 @@ const ImpactTest = () => {
                                     )}
                                   </div>
                                 </td>
-                                {isStaff && (
-                                  <td rowSpan={rowCount} style={{ whiteSpace: 'nowrap' }}>
+                                <td rowSpan={rowCount} style={{ whiteSpace: 'nowrap' }}>
                                     <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
-                                    {((user?.role?.toUpperCase()?.includes('HOF') && (r.status || 'QC_ENTRY') === 'QC_ENTRY') ||
-                                      user?.role?.toUpperCase()?.includes('ADMIN') || user?.role?.toUpperCase()?.includes('HOD')) && (
+                                    {((user?.role?.toUpperCase()?.includes('HOF') && (r.status || 'QC_ENTRY') === 'QC_ENTRY') || user?.role?.toUpperCase()?.includes('ADMIN') || user?.role?.toUpperCase()?.includes('HOD') || r.createdBy === user?.username) && (
                                       <button className="btn btn-primary btn-sm" onClick={() => openEdit(r)} style={{ padding: '0.2rem 0.6rem', fontSize: '12px', background: 'var(--color-primary)', border: 'none' }}>
                                         Edit
                                       </button>
@@ -675,14 +690,9 @@ const ImpactTest = () => {
                                       </button>
                                     )}
 
-                                    {(user?.role?.toUpperCase()?.includes('HOD') || user?.role?.toUpperCase()?.includes('ADMIN')) && (r.status || 'QC_ENTRY') === 'HOF_APPROVED' && (
-                                      <button className="btn btn-primary btn-sm" onClick={() => handleApprove(r, 'HOD_APPROVED', tableRemarks[r.id])} style={{ padding: '0.2rem 0.6rem', fontSize: '12px', background: '#2563eb', border: 'none' }}>
-                                        Approve HOD
-                                      </button>
-                                    )}
+                                    
                                     </div>
                                   </td>
-                                )}
                               </>
                             )}
                           </tr>

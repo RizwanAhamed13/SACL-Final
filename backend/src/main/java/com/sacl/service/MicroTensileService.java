@@ -41,6 +41,11 @@ public class MicroTensileService {
         return repository.findAll(pageable);
     }
 
+    public Page<MicroTensileTest> search(String keyword, String createdBy, Pageable pageable) {
+        String searchParam = (keyword == null) ? "" : keyword;
+        return repository.searchByKeyword(searchParam, createdBy, pageable);
+    }
+
     public MicroTensileTest findById(Long id) {
         return repository.findById(id).orElseThrow(() -> {
             log.warn("Micro Tensile entry not found: {}", id);

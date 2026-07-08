@@ -22,6 +22,7 @@ const MicroTensile = () => {
 
   const [records, setRecords] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
   const [formData, setFormData] = useState({
     id: null,
@@ -41,10 +42,10 @@ const MicroTensile = () => {
     ? formData.mechLocation.split(',').filter(Boolean)
     : (thresholds?.mechLocations ? thresholds.mechLocations.split(',').filter(Boolean) : []);
 
-  const fetchRecords = async () => {
+  const fetchRecords = async (query = searchTerm) => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      const res = await axios.get('/api/micro-tensile');
+      const res = await axios.get('/api/micro-tensile/search', { params: { q: query } });
       setRecords(res.data.content ?? res.data);
     } catch (err) {
       console.warn("Could not fetch records", err);
@@ -183,18 +184,22 @@ const MicroTensile = () => {
     }
     try {
       if (formData.id) {
-        await axios.put(`/api/micro-tensile/${formData.id}`, formData);
+        let payload = formData;
+        if (user?.role?.toUpperCase()?.includes('HOD') && formData.status === 'HOF_APPROVED') {
+          payload = { ...formData, status: 'HOD_APPROVED', hodApprovedBy: user.employeeId || user.fullName };
+        }
+        await axios.put(`/api/micro-tensile/${formData.id}`, payload);
         toast.success('Updated successfully');
       } else if (activeLocations.length > 0) {
         const locationValues = {};
         activeLocations.forEach(loc => {
           locationValues[loc] = {
-            maxLoadKn: formData[`${loc}_maxLoadKn`] || null,
-            yieldLoadKn: formData[`${loc}_yieldLoadKn`] || null,
-            tensileStrength: formData[`${loc}_tensileStrength`] || null,
-            yieldStrength02: formData[`${loc}_yieldStrength02`] || null,
-            yieldStrength05: formData[`${loc}_yieldStrength05`] || null,
-            elongationPercent: formData[`${loc}_elongationPercent`] || null,
+            maxLoadKn: formData.maxLoadKn || null,
+            yieldLoadKn: formData.yieldLoadKn || null,
+            tensileStrength: formData.tensileStrength || null,
+            yieldStrength02: formData.yieldStrength02 || null,
+            yieldStrength05: formData.yieldStrength05 || null,
+            elongationPercent: formData.elongationPercent || null,
           };
         });
         await axios.post('/api/micro-tensile', {
@@ -211,7 +216,11 @@ const MicroTensile = () => {
         });
         toast.success('1 record saved');
       } else {
-        await axios.post('/api/micro-tensile', { ...formData, createdBy: user.employeeId || user.fullName });
+        const payload = { ...formData, createdBy: user.employeeId || user.fullName };
+        ['maxLoadKn', 'yieldLoadKn', 'tensileStrength', 'yieldStrength02', 'yieldStrength05', 'elongationPercent', 'barDiaMm', 'gaugeLengthMm'].forEach(k => {
+          if (payload[k] === '') payload[k] = null;
+        });
+        await axios.post('/api/micro-tensile', payload);
         toast.success('Added successfully');
       }
       setShowForm(false);
@@ -241,7 +250,7 @@ const MicroTensile = () => {
     return '';
   };
 
-  const dash = (val) => val || '—';
+  const dash = (val) => (val !== null && val !== undefined && val !== '') ? val : '—';
 
   return (
     <>
@@ -255,8 +264,20 @@ const MicroTensile = () => {
           <h1 className="page-title">Micro Tensile Test Report</h1>
           <p className="page-subtitle">Bar dia, gauge length, max/yield load, tensile strength, elongation — DISA I/II/III/IV</p>
         </div>
-        <div className="page-actions">
-          {(user?.role?.toUpperCase()?.includes('QC') || user?.role?.toUpperCase()?.includes('ADMIN')) && (
+        <div className="page-actions" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <input 
+              type="text" 
+              className="form-input" 
+              placeholder="Search..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && fetchRecords()}
+              style={{ padding: '0.5rem', width: '250px' }}
+            />
+            <button className="btn btn-secondary" onClick={() => fetchRecords()}>Search</button>
+          </div>
+          {(user?.role?.toUpperCase()?.includes('\1') || user?.role?.toUpperCase()?.includes('ADMIN') || user?.role?.toUpperCase()?.includes('USER')) && (
             <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19" />
@@ -454,7 +475,7 @@ const MicroTensile = () => {
                    <th rowSpan="2">Remarks</th>
                    <th rowSpan="2">Status</th>
                    <th rowSpan="2">Approval Info</th>
-                   {isStaff && <th rowSpan="2">Actions</th>}
+                   <th rowSpan="2">Actions</th>
                  </tr>
                  <tr>
                    <th style={{ fontSize: '10px' }}>Max</th>
@@ -488,6 +509,7 @@ const MicroTensile = () => {
                       yieldLoadKn: r.yieldLoadKn,
                       tensileStrength: r.tensileStrength,
                       yieldStrength02: r.yieldStrength02,
+                      yieldStrength05: r.yieldStrength05,
                       elongationPercent: r.elongationPercent,
                     }]];
                   }
@@ -553,11 +575,9 @@ const MicroTensile = () => {
                                   )}
                                 </div>
                               </td>
-                              {isStaff && (
-                                <td rowSpan={rowCount} style={{ whiteSpace: 'nowrap' }}>
+                              <td rowSpan={rowCount} style={{ whiteSpace: 'nowrap' }}>
                                   <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
-                                  {((user?.role?.toUpperCase()?.includes('HOF') && (r.status || 'QC_ENTRY') === 'QC_ENTRY') ||
-                                    user?.role?.toUpperCase()?.includes('ADMIN') || user?.role?.toUpperCase()?.includes('HOD')) && (
+                                  {((user?.role?.toUpperCase()?.includes('HOF') && (r.status || 'QC_ENTRY') === 'QC_ENTRY') || user?.role?.toUpperCase()?.includes('ADMIN') || user?.role?.toUpperCase()?.includes('HOD') || r.createdBy === user?.username) && (
                                     <button className="btn btn-primary btn-sm" onClick={() => openEdit(r)} style={{ padding: '0.2rem 0.6rem', fontSize: '12px', background: 'var(--color-primary)', border: 'none' }}>
                                       Edit
                                     </button>
@@ -569,15 +589,10 @@ const MicroTensile = () => {
                                     </button>
                                   )}
 
-                                  {(user?.role?.toUpperCase()?.includes('HOD') || user?.role?.toUpperCase()?.includes('ADMIN')) && (r.status || 'QC_ENTRY') === 'HOF_APPROVED' && (
-                                    <button className="btn btn-primary btn-sm" onClick={() => handleApprove(r, 'HOD_APPROVED', tableRemarks[r.id])} style={{ padding: '0.2rem 0.6rem', fontSize: '12px', background: '#2563eb', border: 'none' }}>
-                                      Approve HOD
-                                    </button>
-                                  )}
+                                  
 
                                   </div>
                                 </td>
-                              )}
                             </>
                           )}
                         </tr>

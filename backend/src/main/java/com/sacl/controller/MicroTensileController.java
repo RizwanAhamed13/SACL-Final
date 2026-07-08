@@ -35,12 +35,23 @@ public class MicroTensileController {
         return ResponseEntity.ok(PageResponse.of(result));
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<PageResponse<MicroTensileTest>> search(
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String createdBy,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size) {
+        Page<MicroTensileTest> result = service.search(
+                q, createdBy, PageRequest.of(page, size, Sort.by("createdAt").descending()));
+        return ResponseEntity.ok(PageResponse.of(result));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<MicroTensileTest> getById(@PathVariable Long id) {
         return ResponseEntity.ok(service.findById(id));
     }
 
-    @PreAuthorize("hasAnyRole('HOF','HOD','ADMIN')")
+    @PreAuthorize("hasAnyRole('USER','HOF','HOD','ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<MicroTensileTest> update(@PathVariable Long id, @Valid @RequestBody MicroTensileTest entry) {
         entry.setId(id);

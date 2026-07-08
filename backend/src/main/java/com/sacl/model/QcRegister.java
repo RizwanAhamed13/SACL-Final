@@ -127,6 +127,10 @@ public class QcRegister {
 
     private String hofApprovedBy;
     private String hodApprovedBy;
+
+    @Column(length = 1000)
+    private String hodApprovedFields;
+
     private String createdBy;
 
     @Enumerated(EnumType.STRING)

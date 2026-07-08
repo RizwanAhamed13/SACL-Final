@@ -41,6 +41,11 @@ public class QcRegisterService {
         return repository.findAll(pageable);
     }
 
+    public Page<QcRegister> search(String keyword, String createdBy, Pageable pageable) {
+        String searchParam = (keyword == null) ? "" : keyword;
+        return repository.searchByKeyword(searchParam, createdBy, pageable);
+    }
+
     public QcRegister findById(Long id) {
         return repository.findById(id).orElseThrow(() -> {
             log.warn("QC Register entry not found: {}", id);

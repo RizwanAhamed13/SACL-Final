@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -19,4 +21,10 @@ public interface ImpactTestRepository extends JpaRepository<ImpactTest, Long> {
            "MAX(r.dateOfInspection) " +
            "FROM ImpactTest r WHERE r.createdBy IS NOT NULL AND r.createdBy != '' GROUP BY r.createdBy")
     List<Object[]> getEfficiencyStats();
+
+    @Query("SELECT r FROM ImpactTest r WHERE " +
+           "(:search = '' OR LOWER(r.partName) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           " LOWER(r.dateCode) LIKE LOWER(CONCAT('%', :search, '%'))) AND " +
+           "(:createdBy IS NULL OR r.createdBy = :createdBy)")
+    Page<ImpactTest> searchByKeyword(@Param("search") String search, @Param("createdBy") String createdBy, Pageable pageable);
 }

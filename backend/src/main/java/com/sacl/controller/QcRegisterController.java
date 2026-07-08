@@ -35,12 +35,23 @@ public class QcRegisterController {
         return ResponseEntity.ok(PageResponse.of(result));
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<PageResponse<QcRegister>> search(
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String createdBy,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size) {
+        Page<QcRegister> result = service.search(
+                q, createdBy, PageRequest.of(page, size, Sort.by("createdAt").descending()));
+        return ResponseEntity.ok(PageResponse.of(result));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<QcRegister> getById(@PathVariable Long id) {
         return ResponseEntity.ok(service.findById(id));
     }
 
-    @PreAuthorize("hasAnyRole('HOF','HOD','ADMIN')")
+    @PreAuthorize("hasAnyRole('USER','HOF','HOD','ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<QcRegister> update(@PathVariable Long id, @Valid @RequestBody QcRegister entry) {
         entry.setId(id);
