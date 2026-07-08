@@ -9,18 +9,6 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    const token = localStorage.getItem('token');
-
-    if (storedUser && token) {
-      const userObj = JSON.parse(storedUser);
-      setUser(userObj);
-      scheduleExpiryWarning(token);
-    }
-    setLoading(false);
-  }, []);
-
   const decodeJwtPayload = (token) => {
     try {
       const payload = token.split('.')[1];
@@ -44,6 +32,19 @@ export const AuthProvider = ({ children }) => {
       }, delay);
     }
   };
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    const token = localStorage.getItem('token');
+
+    if (storedUser && token) {
+      const userObj = JSON.parse(storedUser);
+      setUser(userObj);
+      scheduleExpiryWarning(token);
+    }
+    setLoading(false);
+  }, []);
+
 
   const login = (userData, token) => {
     localStorage.setItem('user', JSON.stringify(userData));

@@ -67,7 +67,7 @@ const EmployeeEfficiency = () => {
   const totalApproved    = data.reduce((s, e) => s + (e.hodApproved || 0), 0);
   const totalIssues      = data.reduce((s, e) => s + (e.issuesCount || 0), 0);
 
-  const SortIcon = ({ col }) => {
+  const renderSortIcon = (col) => {
     if (sortBy !== col) return <span style={{ opacity:.3, fontSize:'10px' }}>↕</span>;
     return <span style={{ fontSize:'10px', color:'#ff7b21' }}>{sortDir === 'asc' ? '↑' : '↓'}</span>;
   };
@@ -152,14 +152,14 @@ const EmployeeEfficiency = () => {
             <table className="eff-table" style={{ width:'100%', borderCollapse:'collapse', fontSize:'13px' }}>
               <thead>
                 <tr>
-                  <th style={thStyle('employeeId')} onClick={() => handleSort('employeeId')}>Employee UID <SortIcon col="employeeId" /></th>
-                  <th style={thStyle('totalSubmissions')} onClick={() => handleSort('totalSubmissions')}>Submissions <SortIcon col="totalSubmissions" /></th>
+                  <th style={thStyle('employeeId')} onClick={() => handleSort('employeeId')}>Employee UID {renderSortIcon("employeeId")}</th>
+                  <th style={thStyle('totalSubmissions')} onClick={() => handleSort('totalSubmissions')}>Submissions {renderSortIcon("totalSubmissions")}</th>
                   <th style={{ ...thStyle(''), cursor:'default' }}>By Form</th>
-                  <th style={thStyle('hofApproved')} onClick={() => handleSort('hofApproved')}>HOF Approved <SortIcon col="hofApproved" /></th>
-                  <th style={thStyle('hodApproved')} onClick={() => handleSort('hodApproved')}>HOD Approved <SortIcon col="hodApproved" /></th>
-                  <th style={thStyle('pending')} onClick={() => handleSort('pending')}>Pending <SortIcon col="pending" /></th>
-                  <th style={thStyle('issuesCount')} onClick={() => handleSort('issuesCount')}>Forms w/ Remarks <SortIcon col="issuesCount" /></th>
-                  <th style={thStyle('lastActivity')} onClick={() => handleSort('lastActivity')}>Last Activity <SortIcon col="lastActivity" /></th>
+                  <th style={thStyle('hofApproved')} onClick={() => handleSort('hofApproved')}>HOF Approved {renderSortIcon("hofApproved")}</th>
+                  <th style={thStyle('hodApproved')} onClick={() => handleSort('hodApproved')}>HOD Approved {renderSortIcon("hodApproved")}</th>
+                  <th style={thStyle('pending')} onClick={() => handleSort('pending')}>Pending {renderSortIcon("pending")}</th>
+                  <th style={thStyle('issuesCount')} onClick={() => handleSort('issuesCount')}>Forms w/ Remarks {renderSortIcon("issuesCount")}</th>
+                  <th style={thStyle('lastActivity')} onClick={() => handleSort('lastActivity')}>Last Activity {renderSortIcon("lastActivity")}</th>
                 </tr>
               </thead>
               <tbody>

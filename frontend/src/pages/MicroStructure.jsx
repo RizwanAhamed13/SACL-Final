@@ -599,7 +599,7 @@ const MicroStructure = () => {
                   if (r.locationValues) {
                     try {
                       locations = Object.entries(JSON.parse(r.locationValues));
-                    } catch (e) {}
+                    } catch (e) { console.error("Error parsing locationValues", e); }
                   }
                   if (locations.length === 0) {
                     locations = [['—', {

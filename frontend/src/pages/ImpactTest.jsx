@@ -351,7 +351,7 @@ const ImpactTest = () => {
             />
             <button className="btn btn-secondary" onClick={() => fetchRecords()}>Search</button>
           </div>
-          {(user?.role?.toUpperCase()?.includes('\1') || user?.role?.toUpperCase()?.includes('ADMIN') || user?.role?.toUpperCase()?.includes('USER')) && (
+          {(user?.role?.toUpperCase()?.includes('HOF') || user?.role?.toUpperCase()?.includes('ADMIN') || user?.role?.toUpperCase()?.includes('USER')) && (
             <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19" />
@@ -608,7 +608,7 @@ const ImpactTest = () => {
                            combos.push({ loc, notch: '—', v1: data.v1, v2: data.v2, v3: data.v3 });
                         }
                       });
-                    } catch(e) {}
+                    } catch(e) { console.error("Error parsing locationValues", e); }
                   }
                   if (combos.length === 0) {
                      const notches = (r.notchType || '').split(',').filter(Boolean);
