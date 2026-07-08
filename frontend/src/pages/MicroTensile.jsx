@@ -37,6 +37,21 @@ const MicroTensile = () => {
   const [tableRemarks, setTableRemarks] = useState({});
   const [thresholds, setThresholds] = useState(null);
   const [errors, setErrors] = useState({});
+  const [selectedIds, setSelectedIds] = useState([]);
+  
+  const toggleSelection = (id) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
+  
+  const toggleSelectAll = () => {
+    const pending = records.filter(r => r.status === 'HOF_APPROVED');
+    if (selectedIds.length === pending.length && pending.length > 0) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(pending.map(r => r.id));
+    }
+  };
+
   const [approveAllModal, setApproveAllModal] = useState(false);
   const [approveAllLoading, setApproveAllLoading] = useState(false);
   const [hofPendingCount, setHofPendingCount] = useState(0);
@@ -302,7 +317,7 @@ const MicroTensile = () => {
               <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="20 6 9 17 4 12" />
               </svg>
-              Approve All ({hofPendingCount})
+              Approve {selectedIds.length > 0 ? `Selected (${selectedIds.length})` : `All (${hofPendingCount})`}
             </button>
           )}
         </div>
@@ -481,6 +496,15 @@ const MicroTensile = () => {
             <table className="table table-bordered">
               <thead>
                 <tr>
+                  <th rowSpan="2" style={{ width: '40px', textAlign: 'center' }}>
+                    {(user?.role?.toUpperCase()?.includes('HOD') || user?.role?.toUpperCase()?.includes('ADMIN')) && (
+                      <input 
+                        type="checkbox" 
+                        onChange={toggleSelectAll} 
+                        checked={records.filter(r => r.status === 'HOF_APPROVED').length > 0 && selectedIds.length === records.filter(r => r.status === 'HOF_APPROVED').length}
+                      />
+                    )}
+                  </th>
                    <th rowSpan="2" style={{ whiteSpace: 'nowrap' }}>Inspection Date</th>
                    <th rowSpan="2">Item / Part</th>
                    <th rowSpan="2">Date/Heat Code</th>
@@ -538,6 +562,15 @@ const MicroTensile = () => {
                     <React.Fragment key={r.id}>
                       {locations.map(([loc, vals], idx) => (
                         <tr key={`${r.id}-${loc}`}>
+                    <td style={{ textAlign: 'center' }}>
+                      {(user?.role?.toUpperCase()?.includes('HOD') || user?.role?.toUpperCase()?.includes('ADMIN')) && r.status === 'HOF_APPROVED' && (
+                        <input 
+                          type="checkbox" 
+                          checked={selectedIds.includes(r.id)} 
+                          onChange={() => toggleSelection(r.id)} 
+                        />
+                      )}
+                    </td>
                           {idx === 0 && (
                             <>
                               <td rowSpan={rowCount}>{r.dateOfInspection?.split('T')[0] || '—'}</td>
@@ -638,17 +671,18 @@ const MicroTensile = () => {
           setApproveAllModal(false);
           setApproveAllLoading(true);
           try {
-            const res = await axios.post('/api/micro-tensile/approve-all');
+            const res = await selectedIds.length > 0 ? axios.post('/api/micro-tensile/approve-bulk', selectedIds) : axios.post('/api/micro-tensile/approve-all');
             toast.success(`${res.data.approved} Tensile Test records approved!`);
             fetchRecords();
+            setSelectedIds([]);
           } catch (err) {
             toast.error(err.response?.data?.message || 'Failed to approve records');
           } finally {
             setApproveAllLoading(false);
           }
         }}
-        title="HOD Bulk Approval"
-        message={`Approve all ${hofPendingCount} HOF-approved Tensile Test records in one shot?`}
+        title={selectedIds.length > 0 ? "Approve Selected Records" : "HOD Bulk Approval"}
+        message={`${selectedIds.length > 0 ? `Approve ${selectedIds.length} selected` : `Approve all ${hofPendingCount}`} pending HOF-approved Tensile Test records in one shot?`}
         confirmText={approveAllLoading ? 'Approving...' : 'Approve All'}
       />
     </>

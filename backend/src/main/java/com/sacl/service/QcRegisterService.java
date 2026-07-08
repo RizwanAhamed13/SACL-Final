@@ -49,6 +49,11 @@ public class QcRegisterService {
     }
 
     @Transactional
+    @Transactional
+    public int approveBulk(java.util.List<Long> ids, String approver) {
+        return repository.updateStatusForIds(RecordStatus.HOD_APPROVED, approver, ids, RecordStatus.HOF_APPROVED);
+    }
+
     public int approveAll(String approvedBy) {
         String role = getCurrentUserRole();
         if (!role.contains("HOD") && !role.contains("ADMIN")) {
