@@ -183,14 +183,9 @@ const MicroTensile = () => {
       return toast.error("Please correct values out of engineering range!");
     }
     try {
-      if (formData.id) {
-        let payload = formData;
-        if (user?.role?.toUpperCase()?.includes('HOD') && formData.status === 'HOF_APPROVED') {
-          payload = { ...formData, status: 'HOD_APPROVED', hodApprovedBy: user.employeeId || user.fullName };
-        }
-        await axios.put(`/api/micro-tensile/${formData.id}`, payload);
-        toast.success('Updated successfully');
-      } else if (activeLocations.length > 0) {
+      let payload = { ...formData };
+      
+      if (activeLocations.length > 0) {
         const locationValues = {};
         activeLocations.forEach(loc => {
           locationValues[loc] = {
@@ -202,24 +197,22 @@ const MicroTensile = () => {
             elongationPercent: formData.elongationPercent || null,
           };
         });
-        await axios.post('/api/micro-tensile', {
-          dateOfInspection: formData.dateOfInspection,
-          item: formData.item,
-          dateCode: formData.dateCode,
-          disa: formData.disa,
-          barDiaMm: formData.barDiaMm,
-          gaugeLengthMm: formData.gaugeLengthMm,
-          remarks: formData.remarks,
-          createdBy: user.employeeId || user.fullName,
-          mechLocation: activeLocations.join(','),
-          locationValues: JSON.stringify(locationValues),
-        });
-        toast.success('1 record saved');
+        payload.mechLocation = activeLocations.join(',');
+        payload.locationValues = JSON.stringify(locationValues);
       } else {
-        const payload = { ...formData, createdBy: user.employeeId || user.fullName };
         ['maxLoadKn', 'yieldLoadKn', 'tensileStrength', 'yieldStrength02', 'yieldStrength05', 'elongationPercent', 'barDiaMm', 'gaugeLengthMm'].forEach(k => {
           if (payload[k] === '') payload[k] = null;
         });
+      }
+
+      if (payload.id) {
+        if (user?.role?.toUpperCase()?.includes('HOD') && payload.status === 'HOF_APPROVED') {
+          payload = { ...payload, status: 'HOD_APPROVED', hodApprovedBy: user.employeeId || user.fullName };
+        }
+        await axios.put(`/api/micro-tensile/${payload.id}`, payload);
+        toast.success('Updated successfully');
+      } else {
+        payload.createdBy = user.employeeId || user.fullName;
         await axios.post('/api/micro-tensile', payload);
         toast.success('Added successfully');
       }

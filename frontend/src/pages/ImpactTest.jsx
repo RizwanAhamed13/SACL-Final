@@ -227,14 +227,9 @@ const ImpactTest = () => {
       return toast.error("Please correct values out of engineering range!");
     }
     try {
-      if (formData.id) {
-        let payload = formData;
-        if (user?.role?.toUpperCase()?.includes('HOD') && formData.status === 'HOF_APPROVED') {
-          payload = { ...formData, status: 'HOD_APPROVED', hodApprovedBy: user.employeeId || user.fullName };
-        }
-        await axios.put(`/api/impact-test/${formData.id}`, payload);
-        toast.success('Updated successfully');
-      } else if (useCombos) {
+      let payload = { ...formData };
+      
+      if (useCombos) {
         const locationValues = {};
         activeLocations.forEach(loc => {
           locationValues[loc] = {};
@@ -246,20 +241,10 @@ const ImpactTest = () => {
             };
           });
         });
-        await axios.post('/api/impact-test', {
-          dateOfInspection: formData.dateOfInspection,
-          partName: formData.partName,
-          dateCode: formData.dateCode,
-          disa: formData.disa,
-          specification: formData.specification,
-          remarks: formData.remarks,
-          createdBy: user.employeeId || user.fullName,
-          mechLocation: activeLocations.join(','),
-          notchType: selectedNotches.join(','),
-          testType: selectedNotches.map(k => NOTCH_LABEL[k]).join(','),
-          locationValues: JSON.stringify(locationValues),
-        });
-        toast.success('1 record saved');
+        payload.mechLocation = activeLocations.join(',');
+        payload.notchType = selectedNotches.join(',');
+        payload.testType = selectedNotches.map(k => NOTCH_LABEL[k]).join(',');
+        payload.locationValues = JSON.stringify(locationValues);
       } else if (activeLocations.length > 0) {
         const locationValues = {};
         activeLocations.forEach(loc => {
@@ -269,21 +254,19 @@ const ImpactTest = () => {
             v3: formData[`${loc}_observedValue3`] || null,
           };
         });
-        await axios.post('/api/impact-test', {
-          dateOfInspection: formData.dateOfInspection,
-          partName: formData.partName,
-          dateCode: formData.dateCode,
-          disa: formData.disa,
-          specification: formData.specification,
-          testType: formData.testType,
-          remarks: formData.remarks,
-          createdBy: user.employeeId || user.fullName,
-          mechLocation: activeLocations.join(','),
-          locationValues: JSON.stringify(locationValues),
-        });
-        toast.success('1 record saved');
+        payload.mechLocation = activeLocations.join(',');
+        payload.locationValues = JSON.stringify(locationValues);
+      }
+
+      if (payload.id) {
+        if (user?.role?.toUpperCase()?.includes('HOD') && payload.status === 'HOF_APPROVED') {
+          payload = { ...payload, status: 'HOD_APPROVED', hodApprovedBy: user.employeeId || user.fullName };
+        }
+        await axios.put(`/api/impact-test/${payload.id}`, payload);
+        toast.success('Updated successfully');
       } else {
-        await axios.post('/api/impact-test', { ...formData, createdBy: user.employeeId || user.fullName });
+        payload.createdBy = user.employeeId || user.fullName;
+        await axios.post('/api/impact-test', payload);
         toast.success('Added successfully');
       }
       setShowForm(false);

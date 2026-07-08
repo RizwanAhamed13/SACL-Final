@@ -215,10 +215,9 @@ const MicroStructure = () => {
       return toast.error("Please correct values out of engineering range!");
     }
     try {
-      if (formData.id) {
-        await axios.put(`/api/micro-structure/${formData.id}`, formData);
-        toast.success('Updated successfully');
-      } else if (activeLocations.length > 0) {
+      let payload = { ...formData };
+      
+      if (activeLocations.length > 0) {
         const locationValues = {};
         activeLocations.forEach(loc => {
           const lk = locKey(loc);
@@ -240,22 +239,22 @@ const MicroStructure = () => {
             sizeMax: formData[`${lk}_sizeMax`] || null,
           };
         });
-        await axios.post('/api/micro-structure', {
-          inspectionDate: formData.inspectionDate,
-          partName: formData.partName,
-          dateCode: formData.dateCode,
-          disa: formData.disa,
-          remarks: formData.remarks,
-          createdBy: user.employeeId || user.fullName,
-          microLocation: activeLocations.join(','),
-          locationValues: JSON.stringify(locationValues),
-        });
-        toast.success('1 record saved');
+        payload.microLocation = activeLocations.join(',');
+        payload.locationValues = JSON.stringify(locationValues);
       } else {
-        const payload = { ...formData, createdBy: user.employeeId || user.fullName };
         ['nodularityPercent', 'countNosPerMm2', 'ferritePercent', 'pearlitePercent', 'carbidePercent', 'ferritePercentMin', 'ferritePercentMax', 'pearlitePercentMin', 'pearlitePercentMax', 'carbidePercentMin', 'carbidePercentMax', 'sizeMin', 'sizeMax'].forEach(k => {
           if (payload[k] === '') payload[k] = null;
         });
+      }
+
+      if (payload.id) {
+        if (user?.role?.toUpperCase()?.includes('HOD') && payload.status === 'HOF_APPROVED') {
+          payload = { ...payload, status: 'HOD_APPROVED', hodApprovedBy: user.employeeId || user.fullName };
+        }
+        await axios.put(`/api/micro-structure/${payload.id}`, payload);
+        toast.success('Updated successfully');
+      } else {
+        payload.createdBy = user.employeeId || user.fullName;
         await axios.post('/api/micro-structure', payload);
         toast.success('Added successfully');
       }
