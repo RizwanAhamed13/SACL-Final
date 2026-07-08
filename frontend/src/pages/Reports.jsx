@@ -703,7 +703,7 @@ const Reports = () => {
                   : results.microStructure.map((r, idx) => (
                     <tr key={`${r.id}-${r.location}-${idx}`}>
                       <td>{r.id}</td><td className="part-name">{r.partName}</td>
-                      <td>{r.inspectionDate}</td><td style={{ fontWeight: 700 }}>{r.heatCode}</td><td>{r.dateCode}</td><td>{r.location || '—'}</td>
+                      <td>{r.inspectionDate}</td><td style={{ fontWeight: 700 }}>{r.heatCode}</td><td>{r.dateCode}</td><td>{r.disa || '—'}</td><td>{r.location || '—'}</td>
                       <td>{dash(r.nodularityPercent)}</td><td>{dash(r.graphiteType)}</td>
                       <td>{dash(r.countNosPerMm2)}</td>
                       <td>{dash(r.ferritePercentMin)}</td><td>{dash(r.ferritePercentMax)}</td>
@@ -740,7 +740,7 @@ const Reports = () => {
                   : results.microTensile.map((r, idx) => (
                     <tr key={`${r.id}-${r.location}-${idx}`}>
                       <td>{r.id}</td><td className="part-name">{r.item}</td>
-                      <td>{r.dateOfInspection}</td><td style={{ fontWeight: 700 }}>{r.heatCode}</td><td>{r.dateCode}</td><td>{r.location || '—'}</td>
+                      <td>{r.dateOfInspection}</td><td style={{ fontWeight: 700 }}>{r.heatCode}</td><td>{r.dateCode}</td><td>{r.disa || '—'}</td><td>{r.location || '—'}</td>
                       <td>{dash(r.barDiaMm)}</td><td>{dash(r.gaugeLengthMm)}</td>
                       <td>{dash(r.maxLoadKn)}</td><td>{dash(r.yieldLoadKn)}</td>
                       <td>{dash(r.tensileStrength)}</td><td>{dash(r.yieldStrength02)}</td>
@@ -776,7 +776,7 @@ const Reports = () => {
                     <tr key={`${r.id}-${r.location}-${r.notchType}-${idx}`}>
                       <td>{r.id}</td><td className="part-name">{r.partName}</td>
                       <td>{r.dateOfInspection}</td><td style={{ fontWeight: 700 }}>{r.dateCode}</td>
-                      <td>{r.location || '—'}</td><td>{r.notchType || '—'}</td>
+                      <td>{r.disa || '—'}</td><td>{r.location || '—'}</td><td>{r.notchType || '—'}</td>
                       <td>{dash(r.observedValue1)}</td><td>{dash(r.observedValue2)}</td><td>{dash(r.observedValue3)}</td>
                       <td style={{ maxWidth: '200px', whiteSpace: 'normal' }}>{dash(r.remarks)}</td>
                     </tr>
