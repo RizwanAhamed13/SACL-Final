@@ -19,8 +19,6 @@ public class MicroStructureAnalysis {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Version
-    private Long version;
 
     private LocalDate inspectionDate;
     private String partName;

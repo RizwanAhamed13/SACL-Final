@@ -23,8 +23,6 @@ public class QcRegister {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Version
-    private Long version;
 
     private String disa;
     private LocalDate date;

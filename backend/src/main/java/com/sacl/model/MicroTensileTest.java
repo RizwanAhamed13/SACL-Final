@@ -19,8 +19,6 @@ public class MicroTensileTest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Version
-    private Long version;
 
     private LocalDate dateOfInspection;
     private String item;
