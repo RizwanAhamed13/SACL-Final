@@ -53,15 +53,9 @@ public class MicroStructureController {
     }
 
     @PreAuthorize("hasAnyRole('HOD','ADMIN')")
-    @PostMapping("/approve-all")
-    @PreAuthorize("hasAnyRole('HOD','ADMIN')")
     @PostMapping("/approve-bulk")
     public ResponseEntity<?> approveBulk(@RequestBody java.util.List<Long> ids, @AuthenticationPrincipal org.springframework.security.core.userdetails.UserDetails userDetails) {
         String approver = userDetails.getUsername();
-        if (userDetails instanceof com.sacl.security.CustomUserDetails) {
-            String empId = ((com.sacl.security.CustomUserDetails) userDetails).getEmployeeId();
-            approver = (empId != null && !empId.isEmpty()) ? empId : approver;
-        }
         int count = service.approveBulk(ids, approver);
         return ResponseEntity.ok(java.util.Collections.singletonMap("approved", count));
     }

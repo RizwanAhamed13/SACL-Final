@@ -49,7 +49,6 @@ public class MicroStructureService {
     }
 
     @Transactional
-    @Transactional
     public int approveBulk(java.util.List<Long> ids, String approver) {
         return repository.updateStatusForIds(RecordStatus.HOD_APPROVED, approver, ids, RecordStatus.HOF_APPROVED);
     }
