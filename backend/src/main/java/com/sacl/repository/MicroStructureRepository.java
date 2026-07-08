@@ -15,7 +15,7 @@ import java.util.List;
 public interface MicroStructureRepository extends JpaRepository<MicroStructureAnalysis, Long> {
 
     @org.springframework.data.jpa.repository.Modifying
-    @Query("UPDATE MicroStructureAnalysis r SET r.status = :newStatus, r.approvedBy = :approver, r.approvedAt = CURRENT_TIMESTAMP WHERE r.id IN :ids AND r.status = :reqStatus")
+    @Query("UPDATE MicroStructureAnalysis r SET r.status = :newStatus, r.hodApprovedBy = :approver WHERE r.id IN :ids AND r.status = :reqStatus")
     int updateStatusForIds(@Param("newStatus") RecordStatus newStatus, @Param("approver") String approver, @Param("ids") List<Long> ids, @Param("reqStatus") RecordStatus reqStatus);
 
     List<MicroStructureAnalysis> findAll();
