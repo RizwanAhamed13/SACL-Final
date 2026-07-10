@@ -44,7 +44,7 @@ jobs:
       - name: Install Dependencies
         run: |
           cd frontend
-          npm install
+          npm install --legacy-peer-deps
 
       - name: Run Vitest
         run: |
@@ -112,7 +112,7 @@ jobs:
       - name: Install Frontend Dependencies & Playwright
         run: |
           cd frontend
-          npm install
+          npm install --legacy-peer-deps
           npx playwright install --with-deps chromium
 
       - name: Start Frontend
