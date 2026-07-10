@@ -16,6 +16,9 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -59,11 +62,21 @@ public class QcRegisterIntegrationTest {
         assertNotNull(saved.getId());
         assertEquals(RecordStatus.QC_ENTRY, saved.getStatus());
 
+        // Switch Context to HOF
+        SecurityContextHolder.getContext().setAuthentication(
+            new UsernamePasswordAuthenticationToken("HOF01", "password", List.of(new SimpleGrantedAuthority("ROLE_HOF")))
+        );
+
         // HOF Approval
         saved.setStatus(RecordStatus.HOF_APPROVED);
         saved.setHofApprovedBy("HOF01");
         QcRegister hofApproved = qcRegisterService.save(saved);
         assertEquals(RecordStatus.HOF_APPROVED, hofApproved.getStatus());
+
+        // Switch Context to HOD
+        SecurityContextHolder.getContext().setAuthentication(
+            new UsernamePasswordAuthenticationToken("HOD01", "password", List.of(new SimpleGrantedAuthority("ROLE_HOD")))
+        );
 
         // HOD Approval
         hofApproved.setStatus(RecordStatus.HOD_APPROVED);

@@ -44,7 +44,7 @@ jobs:
       - name: Install Dependencies
         run: |
           cd frontend
-          npm ci
+          npm install
 
       - name: Run Vitest
         run: |
@@ -112,7 +112,7 @@ jobs:
       - name: Install Frontend Dependencies & Playwright
         run: |
           cd frontend
-          npm ci
+          npm install
           npx playwright install --with-deps chromium
 
       - name: Start Frontend
