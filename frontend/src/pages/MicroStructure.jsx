@@ -36,6 +36,7 @@ const MicroStructure = () => {
   const isStaff = user?.role?.toUpperCase()?.includes('HOF') || user?.role?.toUpperCase()?.includes('HOD') || user?.role?.toUpperCase()?.includes('ADMIN');
 
   const [records, setRecords] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
   const [formData, setFormData] = useState({
@@ -60,8 +61,15 @@ const MicroStructure = () => {
     setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
   };
   
+  const filteredRecords = records.filter(r => 
+    (r.partName && r.partName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (r.dateCode && r.dateCode.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (r.disa && r.disa.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (r.inspectionDate && r.inspectionDate.includes(searchTerm))
+  );
+
   const toggleSelectAll = () => {
-    const pending = records.filter(r => r.status === 'HOF_APPROVED');
+    const pending = filteredRecords.filter(r => r.status === 'HOF_APPROVED');
     if (selectedIds.length === pending.length && pending.length > 0) {
       setSelectedIds([]);
     } else {
@@ -341,6 +349,20 @@ const MicroStructure = () => {
           <p className="page-subtitle">Nodularity, nodule count, matrix composition, and carbide percentage</p>
         </div>
         <div className="page-actions" style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+          <div className="search-container" style={{ position: 'relative' }}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }}>
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input 
+              type="text" 
+              placeholder="Search records..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="form-control"
+              style={{ paddingLeft: '32px', width: '200px' }}
+            />
+          </div>
           {(user?.role?.toUpperCase()?.includes('QC') || user?.role?.toUpperCase()?.includes('ADMIN') || user?.role?.toUpperCase()?.includes('USER')) && (
             <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -606,7 +628,7 @@ const MicroStructure = () => {
       <div className="card">
         <div className="card-header">
           <h2 className="card-title">Analysis Records</h2>
-          <span className="badge badge-secondary">{records.length} records</span>
+          <span className="badge badge-secondary">{filteredRecords.length} records</span>
         </div>
         <div className="card-body" style={{ padding: 0 }}>
           <div className="table-container" style={{ border: 'none' }}>
@@ -618,7 +640,7 @@ const MicroStructure = () => {
                       <input 
                         type="checkbox" 
                         onChange={toggleSelectAll} 
-                        checked={records.filter(r => r.status === 'HOF_APPROVED').length > 0 && selectedIds.length === records.filter(r => r.status === 'HOF_APPROVED').length}
+                        checked={filteredRecords.filter(r => r.status === 'HOF_APPROVED').length > 0 && selectedIds.length === filteredRecords.filter(r => r.status === 'HOF_APPROVED').length}
                       />
                     )}
                   </th>
@@ -650,11 +672,11 @@ const MicroStructure = () => {
                       <td colSpan="14"><Skeleton width="100%" height="40px" /></td>
                     </tr>
                   ))
-                ) : records.length === 0 ? (
+                ) : filteredRecords.length === 0 ? (
                   <tr>
                     <td colSpan="14" style={{ textAlign: 'center', padding: '2rem', color: 'var(--color-text-secondary)' }}>No records found</td>
                   </tr>
-                ) : records.map((r) => {
+                ) : filteredRecords.map((r) => {
                   let locations = [];
                   if (r.locationValues) {
                     try {
