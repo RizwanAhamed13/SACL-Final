@@ -61,15 +61,10 @@ const MicroStructure = () => {
     setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
   };
   
-  const filteredRecords = records.filter(r => 
-    (r.partName && r.partName.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (r.dateCode && r.dateCode.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (r.disa && r.disa.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (r.inspectionDate && r.inspectionDate.includes(searchTerm))
-  );
+
 
   const toggleSelectAll = () => {
-    const pending = filteredRecords.filter(r => r.status === 'HOF_APPROVED');
+    const pending = records.filter(r => r.status === 'HOF_APPROVED');
     if (selectedIds.length === pending.length && pending.length > 0) {
       setSelectedIds([]);
     } else {
@@ -85,10 +80,9 @@ const MicroStructure = () => {
     ? formData.microLocation.split(',').filter(Boolean)
     : (thresholds?.microLocations ? thresholds.microLocations.split(',').filter(Boolean) : []);
 
-  const fetchRecords = async () => {
+  const fetchRecords = async (query = '') => {
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      const res = await axios.get('/api/micro-structure');
+      const res = await axios.get('/api/micro-structure/search', { params: { q: query } });
       const data = res.data.content ?? res.data;
       setRecords(data);
       setHofPendingCount(data.filter(r => r.status === 'HOF_APPROVED').length);
@@ -100,8 +94,11 @@ const MicroStructure = () => {
   };
 
   useEffect(() => {
-    fetchRecords();
-  }, []);
+    const delayDebounceFn = setTimeout(() => {
+      fetchRecords(searchTerm);
+    }, 500);
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchTerm]);
 
   const isOutOfRange = (val, min, max) => {
     if (val === undefined || val === null || val === '') return false;
@@ -628,7 +625,7 @@ const MicroStructure = () => {
       <div className="card">
         <div className="card-header">
           <h2 className="card-title">Analysis Records</h2>
-          <span className="badge badge-secondary">{filteredRecords.length} records</span>
+          <span className="badge badge-secondary">{records.length} records</span>
         </div>
         <div className="card-body" style={{ padding: 0 }}>
           <div className="table-container" style={{ border: 'none' }}>
@@ -640,7 +637,7 @@ const MicroStructure = () => {
                       <input 
                         type="checkbox" 
                         onChange={toggleSelectAll} 
-                        checked={filteredRecords.filter(r => r.status === 'HOF_APPROVED').length > 0 && selectedIds.length === filteredRecords.filter(r => r.status === 'HOF_APPROVED').length}
+                        checked={records.filter(r => r.status === 'HOF_APPROVED').length > 0 && selectedIds.length === records.filter(r => r.status === 'HOF_APPROVED').length}
                       />
                     )}
                   </th>
@@ -672,11 +669,11 @@ const MicroStructure = () => {
                       <td colSpan="14"><Skeleton width="100%" height="40px" /></td>
                     </tr>
                   ))
-                ) : filteredRecords.length === 0 ? (
+                ) : records.length === 0 ? (
                   <tr>
                     <td colSpan="14" style={{ textAlign: 'center', padding: '2rem', color: 'var(--color-text-secondary)' }}>No records found</td>
                   </tr>
-                ) : filteredRecords.map((r) => {
+                ) : records.map((r) => {
                   let locations = [];
                   if (r.locationValues) {
                     try {

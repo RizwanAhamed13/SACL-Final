@@ -70,10 +70,9 @@ const ImpactTest = () => {
 
   const useCombos = activeLocations.length > 0 && activeNotches.length > 0;
 
-  const fetchRecords = async () => {
+  const fetchRecords = async (query = '') => {
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      const res = await axios.get('/api/impact-test');
+      const res = await axios.get('/api/impact-test/search', { params: { q: query } });
       const data = res.data.content ?? res.data;
       setRecords(data);
       setHofPendingCount(data.filter(r => r.status === 'HOF_APPROVED').length);
@@ -85,8 +84,11 @@ const ImpactTest = () => {
   };
 
   useEffect(() => {
-    fetchRecords();
-  }, []);
+    const delayDebounceFn = setTimeout(() => {
+      fetchRecords(searchTerm);
+    }, 500);
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchTerm]);
 
   const isOutOfRange = (val, min, max) => {
     if (val === undefined || val === null || val === '') return false;
@@ -359,17 +361,19 @@ const ImpactTest = () => {
           <p className="page-subtitle">Impact energy absorption (Joules) for V-notch specimens</p>
         </div>
         <div className="page-actions" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <div className="search-container" style={{ position: 'relative' }}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }}>
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
             <input 
               type="text" 
-              className="form-input" 
-              placeholder="Search..." 
+              placeholder="Search records..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && fetchRecords()}
-              style={{ padding: '0.5rem', width: '250px' }}
+              className="form-control"
+              style={{ paddingLeft: '32px', width: '200px' }}
             />
-            <button className="btn btn-secondary" onClick={() => fetchRecords()}>Search</button>
           </div>
           {(user?.role?.toUpperCase()?.includes('HOF') || user?.role?.toUpperCase()?.includes('ADMIN') || user?.role?.toUpperCase()?.includes('USER') || user?.role?.toUpperCase()?.includes('QC')) && (
             <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
