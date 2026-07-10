@@ -352,7 +352,11 @@ async function searchAndExpect(page, route, term, expectedTexts, options = {}) {
   const searchInput = page.locator('input[placeholder*="Search"]').first();
   if (await searchInput.count()) {
     await searchInput.fill(term);
-    await clickButton(page, 'Search');
+    const searchBtn = page.getByRole('button', { name: /Search/i }).first();
+    if (await searchBtn.count() > 0) {
+      await searchBtn.click();
+    }
+    await page.waitForTimeout(500);
   }
   for (const expected of expectedTexts) await expectText(page, expected);
 }
