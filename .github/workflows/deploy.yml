@@ -148,7 +148,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and Push Backend
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v7
         with:
           context: ./backend
           file: ./backend/Dockerfile
@@ -156,7 +156,7 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/sacl-backend:latest
 
       - name: Build and Push Frontend
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v7
         with:
           context: ./frontend
           file: ./frontend/Dockerfile
