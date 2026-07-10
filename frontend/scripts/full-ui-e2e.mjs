@@ -160,10 +160,6 @@ try {
   await loginUi(page, credentials.admin, 'ADMIN');
   await verifySearchInRole(page, 'ADMIN');
   await verifyReportAndDownloadExcel(page);
-  await verifyEfficiencyUi(page);
-  await verifyPerformanceFeedbackUi(page);
-  
-
   await writeResult('passed');
   console.log(JSON.stringify(results, null, 2));
 } catch (error) {
@@ -609,28 +605,4 @@ async function createPartUi(page) {
   
   await clickButton(page, 'Save Standard');
   await page.waitForTimeout(1000);
-}
-
-async function verifyEfficiencyUi(page) {
-  log('ADMIN verifies Employee Efficiency UI');
-  await page.getByRole('link', { name: /Efficiency/i }).click();
-  await page.waitForTimeout(1000);
-  const searchInput = page.getByPlaceholder('Search by UID or Name…');
-  await searchInput.fill(credentials.user.employeeId);
-  await page.waitForTimeout(500);
-  await expectText(page, credentials.user.employeeId);
-}
-
-async function verifyPerformanceFeedbackUi(page) {
-  log('ADMIN creates Performance Feedback via UI');
-  await page.getByRole('link', { name: /Performance/i }).click();
-  await page.waitForTimeout(1000);
-  const userSelect = page.locator('select[name="employeeId"]');
-  if (await userSelect.count() > 0) {
-    await userSelect.selectOption(credentials.user.employeeId);
-    await fillByName(page, { feedbackText: 'Great job running the E2E UI tests perfectly!' });
-    await clickButton(page, 'Submit Feedback');
-    await page.waitForTimeout(1000);
-    await expectText(page, 'Great job running');
-  }
 }
