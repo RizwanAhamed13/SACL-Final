@@ -356,7 +356,7 @@ async function searchAndExpect(page, route, term, expectedTexts, options = {}) {
     if (await searchBtn.count() > 0) {
       await searchBtn.click();
     }
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(2000); // Wait for 500ms debounce + API fetch
   }
   for (const expected of expectedTexts) await expectText(page, expected);
 }
