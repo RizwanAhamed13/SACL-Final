@@ -132,24 +132,24 @@ const MICRO_HEADERS = {
   rows: [
     [
       'ID', 'Part Name', 'Inspection Date', 'Heat Code', 'Date Code', 'Location', 'Disa',
-      'Micro Structure Properties', '', '', '', '', '', '', '', '', '', '', 'Remarks'
+      'Micro Structure Properties', '', '', '', '', '', '', '', '', '', '', '', 'Remarks'
     ],
     [
       '', '', '', '', '', '', '',
-      'Nodularity %', 'Graphite Type', 'Count (nos/mm²)',
+      'Nodularity %', 'Graphite Type', 'Count Min (nos/mm²)', 'Count Max (nos/mm²)',
       'Ferrite Min %', 'Ferrite Max %', 'Pearlite Min %', 'Pearlite Max %', 'Carbide Min %', 'Carbide Max %',
       'Size Min', 'Size Max', ''
     ]
   ],
   merges: [
     {s:{r:0,c:0}, e:{r:1,c:0}}, {s:{r:0,c:1}, e:{r:1,c:1}}, {s:{r:0,c:2}, e:{r:1,c:2}}, {s:{r:0,c:3}, e:{r:1,c:3}}, {s:{r:0,c:4}, e:{r:1,c:4}}, {s:{r:0,c:5}, e:{r:1,c:5}}, {s:{r:0,c:6}, e:{r:1,c:6}},
-    {s:{r:0,c:7}, e:{r:0,c:17}},
-    {s:{r:0,c:18}, e:{r:1,c:18}}
+    {s:{r:0,c:7}, e:{r:0,c:18}},
+    {s:{r:0,c:19}, e:{r:1,c:19}}
   ]
 };
 const MICRO_KEYS = [
   'id', 'partName', 'inspectionDate', 'heatCode', 'dateCode', (r) => r.location || r.microLocation, 'disa',
-  'nodularityPercent', 'graphiteType', 'countNosPerMm2',
+  'nodularityPercent', 'graphiteType', (r) => r.countNosPerMm2Min ?? r.countNosPerMm2, (r) => r.countNosPerMm2Max ?? r.countNosPerMm2,
   'ferritePercentMin', 'ferritePercentMax', 'pearlitePercentMin', 'pearlitePercentMax', 'carbidePercentMin', 'carbidePercentMax',
   'sizeMin', 'sizeMax', 'remarks'
 ];
@@ -705,7 +705,7 @@ const Reports = () => {
                       <td>{r.id}</td><td className="part-name">{r.partName}</td>
                       <td>{r.inspectionDate}</td><td style={{ fontWeight: 700 }}>{r.heatCode}</td><td>{r.dateCode}</td><td>{r.location || '—'}</td><td>{r.disa || '—'}</td>
                       <td>{dash(r.nodularityPercent)}</td><td>{dash(r.graphiteType)}</td>
-                      <td>{dash(r.countNosPerMm2)}</td>
+                      <td>{dash(r.countNosPerMm2Min ?? r.countNosPerMm2)}</td><td>{dash(r.countNosPerMm2Max ?? r.countNosPerMm2)}</td>
                       <td>{dash(r.ferritePercentMin)}</td><td>{dash(r.ferritePercentMax)}</td>
                       <td>{dash(r.pearlitePercentMin)}</td><td>{dash(r.pearlitePercentMax)}</td>
                       <td>{dash(r.carbidePercentMin)}</td><td>{dash(r.carbidePercentMax)}</td>

@@ -347,10 +347,6 @@ const Dashboard = () => {
             <QuickCard to="/reports" icon="📑" title="Logging & Reports" desc="Export quality data to Excel"
               color="#065f46" bg="#d1fae5" count={null} loading={false} />
           )}
-          {isAdmin && (
-            <QuickCard to="/efficiency" icon="📈" title="Employee Efficiency" desc="Approval & rejection analytics"
-              color="#1d4ed8" bg="#dbeafe" count={null} loading={false} />
-          )}
         </div>
       </div>
 

@@ -12,10 +12,10 @@ const locKey = (loc) => loc.replace(/[^a-zA-Z0-9]/g, '_');
 const MICRO_SINGLE_FIELDS = [
   { name: 'nodularityPercent', label: 'Nodularity/Graphite Type %', type: 'number', thMin: 'microMinNodularity', thMax: 'microMaxNodularity', placeholder: 'e.g. 90' },
   { name: 'graphiteType', label: 'Graphite Type', type: 'text', placeholder: 'e.g. VI' },
-  { name: 'countNosPerMm2', label: 'Count (Nos/mm²)', type: 'number', thMin: 'microMinCount', thMax: 'microMaxCount', placeholder: 'e.g. 200' },
 ];
 
 const MICRO_RANGE_FIELDS = [
+  { nameMin: 'countNosPerMm2Min', nameMax: 'countNosPerMm2Max', label: 'Count (Nos/mm²)', thMin: 'microMinCount', thMax: 'microMaxCount', step: '1' },
   { nameMin: 'ferritePercentMin', nameMax: 'ferritePercentMax', label: 'Ferrite %', thMin: 'microMinFerrite', thMax: 'microMaxFerrite' },
   { nameMin: 'pearlitePercentMin', nameMax: 'pearlitePercentMax', label: 'Pearlite %', thMin: 'microMinPearlite', thMax: 'microMaxPearlite' },
   { nameMin: 'carbidePercentMin', nameMax: 'carbidePercentMax', label: 'Carbide %', thMin: 'microMinCarbide', thMax: 'microMaxCarbide' },
@@ -42,7 +42,7 @@ const MicroStructure = () => {
     id: null,
     inspectionDate: new Date().toISOString().split('T')[0], partName: '', dateCode: '', disa: '',
     microLocation: '',
-    nodularityPercent: '', graphiteType: '', countNosPerMm2: '', size: '',
+    nodularityPercent: '', graphiteType: '', countNosPerMm2: '', countNosPerMm2Min: '', countNosPerMm2Max: '', size: '',
     ferritePercent: '', pearlitePercent: '', carbidePercent: '',
     ferritePercentMin: '', ferritePercentMax: '', pearlitePercentMin: '', pearlitePercentMax: '',
     carbidePercentMin: '', carbidePercentMax: '', sizeMin: '', sizeMax: '',
@@ -112,7 +112,6 @@ const MicroStructure = () => {
     if (!ts) return;
     const singleFields = [
       { key: 'nodularityPercent', min: ts.microMinNodularity, max: ts.microMaxNodularity },
-      { key: 'countNosPerMm2', min: ts.microMinCount, max: ts.microMaxCount },
     ];
     if (!data.id && locs && locs.length > 0) {
       locs.forEach(loc => {
@@ -254,6 +253,8 @@ const MicroStructure = () => {
             nodularityPercent: formData[`${lk}_nodularityPercent`] || null,
             graphiteType: formData[`${lk}_graphiteType`] || null,
             countNosPerMm2: formData[`${lk}_countNosPerMm2`] || null,
+            countNosPerMm2Min: formData[`${lk}_countNosPerMm2Min`] || null,
+            countNosPerMm2Max: formData[`${lk}_countNosPerMm2Max`] || null,
             size: formData[`${lk}_size`] || null,
             ferritePercent: formData[`${lk}_ferritePercent`] || null,
             pearlitePercent: formData[`${lk}_pearlitePercent`] || null,
@@ -271,7 +272,7 @@ const MicroStructure = () => {
         payload.microLocation = activeLocations.join(',');
         payload.locationValues = JSON.stringify(locationValues);
       } else {
-        ['nodularityPercent', 'countNosPerMm2', 'ferritePercent', 'pearlitePercent', 'carbidePercent', 'ferritePercentMin', 'ferritePercentMax', 'pearlitePercentMin', 'pearlitePercentMax', 'carbidePercentMin', 'carbidePercentMax', 'sizeMin', 'sizeMax'].forEach(k => {
+        ['nodularityPercent', 'countNosPerMm2', 'countNosPerMm2Min', 'countNosPerMm2Max', 'ferritePercent', 'pearlitePercent', 'carbidePercent', 'ferritePercentMin', 'ferritePercentMax', 'pearlitePercentMin', 'pearlitePercentMax', 'carbidePercentMin', 'carbidePercentMax', 'sizeMin', 'sizeMax'].forEach(k => {
           if (payload[k] === '') payload[k] = null;
         });
       }
@@ -292,7 +293,7 @@ const MicroStructure = () => {
         id: null,
         inspectionDate: new Date().toISOString().split('T')[0], partName: '', disa: '', dateCode: '',
         microLocation: '',
-        nodularityPercent: '', graphiteType: '', countNosPerMm2: '', size: '',
+        nodularityPercent: '', graphiteType: '', countNosPerMm2: '', countNosPerMm2Min: '', countNosPerMm2Max: '', size: '',
         ferritePercent: '', pearlitePercent: '', carbidePercent: '',
         ferritePercentMin: '', ferritePercentMax: '', pearlitePercentMin: '', pearlitePercentMax: '',
         carbidePercentMin: '', carbidePercentMax: '', sizeMin: '', sizeMax: '',
@@ -318,6 +319,14 @@ const MicroStructure = () => {
   };
 
   const dash = (val) => (val !== null && val !== undefined && val !== '') ? val : '—';
+  const rangeDash = (min, max, fallback) => {
+    const hasMin = min !== null && min !== undefined && min !== '';
+    const hasMax = max !== null && max !== undefined && max !== '';
+    if (hasMin && hasMax) return `${min}-${max}`;
+    if (hasMin) return `${min}-`;
+    if (hasMax) return `-${max}`;
+    return dash(fallback);
+  };
 
   return (
     <>
@@ -332,7 +341,7 @@ const MicroStructure = () => {
           <p className="page-subtitle">Nodularity, nodule count, matrix composition, and carbide percentage</p>
         </div>
         <div className="page-actions" style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-          {(user?.role?.toUpperCase()?.includes('QC') || user?.role?.toUpperCase()?.includes('ADMIN')) && (
+          {(user?.role?.toUpperCase()?.includes('QC') || user?.role?.toUpperCase()?.includes('ADMIN') || user?.role?.toUpperCase()?.includes('USER')) && (
             <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19" />
@@ -440,10 +449,10 @@ const MicroStructure = () => {
                                     {thHint && <span style={{ color: hasErr ? '#ef4444' : 'var(--color-text-secondary)', fontWeight: 400, marginLeft: '4px' }}>{thHint}</span>}
                                   </label>
                                   <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                                    <input type="number" step="0.1" name={minKey} value={formData[minKey] || ''} onChange={handleChange} className="form-control"
+                                    <input type="number" step={f.step || '0.1'} name={minKey} value={formData[minKey] || ''} onChange={handleChange} className="form-control"
                                       style={errors[minKey] ? { borderColor:'#ef4444', backgroundColor:'#fef2f2', color:'#ef4444' } : {}} placeholder="Min" />
                                     <span style={{ color: '#94a3b8', fontWeight: 600 }}>—</span>
-                                    <input type="number" step="0.1" name={maxKey} value={formData[maxKey] || ''} onChange={handleChange} className="form-control"
+                                    <input type="number" step={f.step || '0.1'} name={maxKey} value={formData[maxKey] || ''} onChange={handleChange} className="form-control"
                                       style={errors[maxKey] ? { borderColor:'#ef4444', backgroundColor:'#fef2f2', color:'#ef4444' } : {}} placeholder="Max" />
                                   </div>
                                   {hasErr && <div style={{ color: '#ef4444', fontSize: '10px', marginTop: '2px', fontWeight: '600' }}>Value out of range!</div>}
@@ -470,9 +479,19 @@ const MicroStructure = () => {
                           <input type="text" name="graphiteType" value={formData.graphiteType} onChange={handleChange} className="form-control" placeholder="e.g. VI" />
                         </div>
                         <div className="form-group">
-                          <label className="form-label">Count (Nos/mm²) <span style={{color: errors.countNosPerMm2 ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.microMinCount, thresholds.microMaxCount) : '(150 Min)'}</span></label>
-                          <input type="number" name="countNosPerMm2" value={formData.countNosPerMm2} onChange={handleChange} className="form-control" style={errors.countNosPerMm2 ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 200" />
-                          {errors.countNosPerMm2 && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
+                          <label className="form-label">Count (Nos/mm²)
+                            <span style={{color: (errors.countNosPerMm2Min || errors.countNosPerMm2Max) ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400, marginLeft:'4px'}}>
+                              {thresholds ? renderThreshold(thresholds.microMinCount, thresholds.microMaxCount) : '(150 Min)'}
+                            </span>
+                          </label>
+                          <div style={{display:'flex',gap:'0.5rem',alignItems:'center'}}>
+                            <input type="number" step="1" name="countNosPerMm2Min" value={formData.countNosPerMm2Min} onChange={handleChange} className="form-control"
+                              style={errors.countNosPerMm2Min ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="Min" />
+                            <span style={{color:'#94a3b8',fontWeight:600}}>—</span>
+                            <input type="number" step="1" name="countNosPerMm2Max" value={formData.countNosPerMm2Max} onChange={handleChange} className="form-control"
+                              style={errors.countNosPerMm2Max ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="Max" />
+                          </div>
+                          {(errors.countNosPerMm2Min || errors.countNosPerMm2Max) && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
                         </div>
                         <div className="form-group">
                           <label className="form-label">Nodule Size
@@ -647,6 +666,8 @@ const MicroStructure = () => {
                       nodularityPercent: r.nodularityPercent,
                       graphiteType: r.graphiteType,
                       countNosPerMm2: r.countNosPerMm2,
+                      countNosPerMm2Min: r.countNosPerMm2Min,
+                      countNosPerMm2Max: r.countNosPerMm2Max,
                       size: r.size,
                       ferritePercent: r.ferritePercent,
                       pearlitePercent: r.pearlitePercent,
@@ -687,7 +708,7 @@ const MicroStructure = () => {
                           <td style={{ fontWeight: 600, color: '#4b5563', fontSize: '12px' }}>{loc}</td>
                           <td style={{ fontSize: '12px' }}>{dash(vals.nodularityPercent)}</td>
                           <td style={{ fontSize: '12px' }}>{dash(vals.graphiteType)}</td>
-                          <td style={{ fontSize: '12px' }}>{dash(vals.countNosPerMm2)}</td>
+                          <td style={{ fontSize: '12px' }}>{rangeDash(vals.countNosPerMm2Min, vals.countNosPerMm2Max, vals.countNosPerMm2)}</td>
                           <td style={{ fontSize: '12px' }}>
                             {vals.sizeMin && vals.sizeMax ? `${vals.sizeMin}-${vals.sizeMax}` : dash(vals.size)}
                           </td>

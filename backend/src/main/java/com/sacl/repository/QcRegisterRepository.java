@@ -22,13 +22,6 @@ public interface QcRegisterRepository extends JpaRepository<QcRegister, Long> {
 
     List<QcRegister> findByStatus(RecordStatus status);
 
-    @Query("SELECT r.createdBy, COUNT(r), " +
-           "SUM(CASE WHEN r.status = com.sacl.model.RecordStatus.HOF_APPROVED OR r.status = com.sacl.model.RecordStatus.HOD_APPROVED THEN 1 ELSE 0 END), " +
-           "SUM(CASE WHEN r.status = com.sacl.model.RecordStatus.HOD_APPROVED THEN 1 ELSE 0 END), " +
-           "MAX(r.date) " +
-           "FROM QcRegister r WHERE r.createdBy IS NOT NULL AND r.createdBy != '' GROUP BY r.createdBy")
-    List<Object[]> getEfficiencyStats();
-
     @Query("SELECT r FROM QcRegister r WHERE " +
            "(:search = '' OR LOWER(r.partName) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            " LOWER(r.heatCode) LIKE LOWER(CONCAT('%', :search, '%')) OR " +

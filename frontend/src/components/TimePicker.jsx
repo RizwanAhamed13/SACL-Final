@@ -67,7 +67,7 @@ const TimePicker = ({ value, onChange, name, className = '' }) => {
   const minutes = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0'));
 
   return (
-    <div className={`time-picker ${className}`} style={{ display: 'flex', gap: '4px' }}>
+    <div className={`time-picker ${className}`} style={{ display: 'flex', gap: '4px' }} data-name={name}>
       <select 
         value={hour} 
         onChange={handleHourChange} 

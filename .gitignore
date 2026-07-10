@@ -40,3 +40,6 @@ mariadb_data/
 .claude/
 .env.production
 .env*.local
+
+# E2E generated artifacts
+frontend/e2e-artifacts/

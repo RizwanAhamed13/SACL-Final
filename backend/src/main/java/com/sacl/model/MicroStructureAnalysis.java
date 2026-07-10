@@ -35,6 +35,8 @@ public class MicroStructureAnalysis {
     private Double nodularityPercent;
     private String graphiteType;
     private Double countNosPerMm2;
+    private Double countNosPerMm2Min;
+    private Double countNosPerMm2Max;
     private String size;
     private Double ferritePercent;
     private Double pearlitePercent;

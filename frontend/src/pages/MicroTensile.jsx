@@ -218,12 +218,12 @@ const MicroTensile = () => {
         const locationValues = {};
         activeLocations.forEach(loc => {
           locationValues[loc] = {
-            maxLoadKn: formData.maxLoadKn || null,
-            yieldLoadKn: formData.yieldLoadKn || null,
-            tensileStrength: formData.tensileStrength || null,
-            yieldStrength02: formData.yieldStrength02 || null,
-            yieldStrength05: formData.yieldStrength05 || null,
-            elongationPercent: formData.elongationPercent || null,
+            maxLoadKn: formData[`${loc}_maxLoadKn`] || formData.maxLoadKn || null,
+            yieldLoadKn: formData[`${loc}_yieldLoadKn`] || formData.yieldLoadKn || null,
+            tensileStrength: formData[`${loc}_tensileStrength`] || formData.tensileStrength || null,
+            yieldStrength02: formData[`${loc}_yieldStrength02`] || formData.yieldStrength02 || null,
+            yieldStrength05: formData[`${loc}_yieldStrength05`] || formData.yieldStrength05 || null,
+            elongationPercent: formData[`${loc}_elongationPercent`] || formData.elongationPercent || null,
           };
         });
         payload.mechLocation = activeLocations.join(',');
@@ -299,7 +299,7 @@ const MicroTensile = () => {
             />
             <button className="btn btn-secondary" onClick={() => fetchRecords()}>Search</button>
           </div>
-          {(user?.role?.toUpperCase()?.includes('HOF') || user?.role?.toUpperCase()?.includes('ADMIN') || user?.role?.toUpperCase()?.includes('USER')) && (
+          {(user?.role?.toUpperCase()?.includes('HOF') || user?.role?.toUpperCase()?.includes('ADMIN') || user?.role?.toUpperCase()?.includes('USER') || user?.role?.toUpperCase()?.includes('QC')) && (
             <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19" />
