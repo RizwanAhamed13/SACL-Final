@@ -43,3 +43,4 @@ mariadb_data/
 
 # E2E generated artifacts
 frontend/e2e-artifacts/
+.env
