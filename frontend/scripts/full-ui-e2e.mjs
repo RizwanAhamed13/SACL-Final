@@ -164,7 +164,14 @@ try {
   await writeResult('passed');
   console.log(JSON.stringify(results, null, 2));
 } catch (error) {
-  const html = await page.evaluate(() => document.body.innerHTML); console.log("DOM SNAPSHOT:", html); results.error = error?.stack || String(error);
+  let html = 'Could not retrieve DOM';
+  try {
+    html = await page.evaluate(() => document.body.innerHTML);
+  } catch (e) {
+    console.log("Could not get DOM snapshot:", e.message);
+  }
+  console.log("DOM SNAPSHOT:", html); 
+  results.error = error?.stack || String(error);
   await writeResult('failed').catch(() => {});
   console.error(JSON.stringify(results, null, 2));
   process.exitCode = 1;
