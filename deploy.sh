@@ -26,3 +26,21 @@ echo "  Your application is now running."
 echo "  Frontend should be accessible on port 80."
 echo "  Check logs using: sudo docker-compose logs -f"
 echo "================================================"
+
+echo ""
+echo "Waiting for backend services to initialize..."
+sleep 10
+
+echo ""
+read -p "Do you want to watch the E2E tests run visually in the browser? (y/n) " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+    echo "Starting Visual E2E Tests..."
+    cd frontend
+    npm install --legacy-peer-deps
+    # Make sure we don't crash from missing playwright browsers on the server
+    npx playwright install chromium
+    ALLOW_PROD_E2E=1 BASE_URL=http://localhost HEADLESS=0 npm run e2e:full-ui
+    cd ..
+fi

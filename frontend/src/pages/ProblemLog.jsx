@@ -187,16 +187,15 @@ const ProblemLog = () => {
       </div>
 
       {showForm && (
-        <div className="modal-overlay">
-          <div className="modal-content" style={{ maxWidth: '600px' }}>
-            <div className="modal-header">
-              <h2>{formData.id ? 'Edit Problem Log' : 'New Problem Log'}</h2>
-              <button className="icon-btn" onClick={resetForm}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-              </button>
+        <div className="form-panel" style={{ display: 'block' }}>
+          <div className="card mb-3">
+            <div className="card-header">
+              <h2 className="card-title">{formData.id ? 'Edit Problem Log' : 'New Problem Log'}</h2>
+              <button className="btn btn-secondary btn-sm" onClick={resetForm}>Cancel</button>
             </div>
             
-            <form onSubmit={handleSubmit}>
+            <div className="card-body">
+              <form onSubmit={handleSubmit} noValidate>
               <div className="form-grid">
                 <div className="form-group">
                   <label>Employee No *</label>
@@ -239,11 +238,12 @@ const ProblemLog = () => {
                 </div>
               </div>
 
-              <div className="modal-footer" style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+              <div className="card-footer" style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
                 <button type="button" className="btn btn-secondary" onClick={resetForm}>Cancel</button>
                 <button type="submit" className="btn btn-primary">Save Record</button>
               </div>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
       )}
