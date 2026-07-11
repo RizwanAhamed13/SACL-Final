@@ -41,6 +41,6 @@ then
     npm install --legacy-peer-deps
     # Make sure we don't crash from missing playwright browsers on the server
     npx playwright install chromium
-    ALLOW_PROD_E2E=1 BASE_URL=http://localhost HEADLESS=0 npm run e2e:full-ui
+    ALLOW_PROD_E2E=1 BASE_URL=http://localhost npm run e2e:full-ui
     cd ..
 fi

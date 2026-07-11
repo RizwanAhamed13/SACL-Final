@@ -129,7 +129,11 @@ try {
     slowMo: SLOW_MO,
     channel: process.env.E2E_BROWSER_CHANNEL || undefined,
   });
-  context = await browser.newContext({ acceptDownloads: true, viewport: { width: 1440, height: 950 } });
+  context = await browser.newContext({ 
+    acceptDownloads: true, 
+    viewport: { width: 1440, height: 950 },
+    recordVideo: { dir: ARTIFACT_DIR, size: { width: 1440, height: 950 } }
+  });
   page = await context.newPage();
   page.on('console', msg => console.log('PAGE LOG:', msg.text()));
   page.on('pageerror', err => console.log('PAGE ERROR:', err.message));
