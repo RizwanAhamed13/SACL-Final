@@ -12,6 +12,7 @@ import QcRegister from './pages/QcRegister';
 import MicroStructure from './pages/MicroStructure';
 import MicroTensile from './pages/MicroTensile';
 import ImpactTest from './pages/ImpactTest';
+import ProblemLog from './pages/ProblemLog';
 import PartNames from './pages/PartNames';
 import UserManagement from './pages/UserManagement';
 import Reports from './pages/Reports';
@@ -45,6 +46,7 @@ const App = () => {
               <Route path="micro-structure" element={<ProtectedRoute requiredPermission="MICRO_STRUCTURE"><MicroStructure /></ProtectedRoute>} />
               <Route path="micro-tensile" element={<ProtectedRoute requiredPermission="TENSILE_TEST"><MicroTensile /></ProtectedRoute>} />
               <Route path="impact-test" element={<ProtectedRoute requiredPermission="IMPACT_TEST"><ImpactTest /></ProtectedRoute>} />
+              <Route path="problem-log" element={<ProtectedRoute requiredPermission="PROBLEM_LOG"><ProblemLog /></ProtectedRoute>} />
 
               <Route path="part-names" element={<ProtectedRoute requiredRole="ADMIN"><PartNames /></ProtectedRoute>} />
               <Route path="users" element={<ProtectedRoute requiredRole="ADMIN"><UserManagement /></ProtectedRoute>} />

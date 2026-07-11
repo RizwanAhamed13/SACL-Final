@@ -160,6 +160,7 @@ try {
   await loginUi(page, credentials.admin, 'ADMIN');
   await verifySearchInRole(page, 'ADMIN');
   await verifyReportAndDownloadExcel(page);
+  await verifyProblemLogUi(page);
   await writeResult('passed');
   console.log(JSON.stringify(results, null, 2));
 } catch (error) {
@@ -605,4 +606,34 @@ async function createPartUi(page) {
   
   await clickButton(page, 'Save Standard');
   await page.waitForTimeout(1000);
+}
+
+async function verifyProblemLogUi(page) {
+  log('ADMIN verifies Problem Log UI');
+  await page.getByRole('link', { name: /Problem Log/i }).click();
+  await page.waitForTimeout(1000);
+  
+  await clickButton(page, 'New Entry');
+  
+  await fillByName(page, {
+    employeeNo: credentials.user.employeeId,
+    problem: 'Test Problem E2E',
+    heatCode: 'H123',
+    qty: '5',
+    reason: 'Test Reason'
+  });
+  
+  await selectPartName(page, data.partName);
+  
+  // Status is already 'Pending' by default
+  await clickButton(page, 'Save Record');
+  await page.waitForTimeout(1000);
+  
+  const searchInput = page.getByPlaceholder('Search by Employee No or ID...');
+  await searchInput.fill(credentials.user.employeeId);
+  await page.waitForTimeout(2000); // debounce time
+  
+  await expectText(page, credentials.user.employeeId);
+  await expectText(page, 'Test Problem E2E');
+  await expectText(page, data.partName);
 }
