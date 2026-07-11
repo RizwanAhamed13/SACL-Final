@@ -200,12 +200,12 @@ const ProblemLog = () => {
               <div className="form-grid">
                 <div className="form-group">
                   <label>Employee No *</label>
-                  <input type="text" className="form-control" value={formData.employeeNo} onChange={e => setFormData({...formData, employeeNo: e.target.value})} required />
+                  <input type="text" name="employeeNo" className="form-control" value={formData.employeeNo} onChange={e => setFormData({...formData, employeeNo: e.target.value})} required />
                 </div>
                 
                 <div className="form-group">
                   <label>Problem *</label>
-                  <input type="text" className="form-control" value={formData.problem} onChange={e => setFormData({...formData, problem: e.target.value})} required />
+                  <input type="text" name="problem" className="form-control" value={formData.problem} onChange={e => setFormData({...formData, problem: e.target.value})} required />
                 </div>
 
                 <div className="form-group">
@@ -215,17 +215,17 @@ const ProblemLog = () => {
 
                 <div className="form-group">
                   <label>Date/Heat Code</label>
-                  <input type="text" className="form-control" value={formData.heatCode} onChange={e => setFormData({...formData, heatCode: e.target.value})} />
+                  <input type="text" name="heatCode" className="form-control" value={formData.heatCode} onChange={e => setFormData({...formData, heatCode: e.target.value})} />
                 </div>
 
                 <div className="form-group">
                   <label>Qty</label>
-                  <input type="number" className="form-control" value={formData.qty} onChange={e => setFormData({...formData, qty: e.target.value})} />
+                  <input type="number" name="qty" className="form-control" value={formData.qty} onChange={e => setFormData({...formData, qty: e.target.value})} />
                 </div>
 
                 <div className="form-group">
                   <label>Status</label>
-                  <select className="form-control" value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})}>
+                  <select name="status" className="form-control" value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})}>
                     <option value="Pending">Pending</option>
                     <option value="Resolved">Resolved</option>
                     <option value="Hold">Hold</option>
@@ -235,7 +235,7 @@ const ProblemLog = () => {
 
                 <div className="form-group" style={{ gridColumn: '1 / -1' }}>
                   <label>Reason</label>
-                  <textarea className="form-control" value={formData.reason} onChange={e => setFormData({...formData, reason: e.target.value})} rows="3"></textarea>
+                  <textarea name="reason" className="form-control" value={formData.reason} onChange={e => setFormData({...formData, reason: e.target.value})} rows="3"></textarea>
                 </div>
               </div>
 
