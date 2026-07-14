@@ -60,6 +60,8 @@ public class MicroStructureController {
         return ResponseEntity.ok(java.util.Collections.singletonMap("approved", count));
     }
 
+    @PreAuthorize("hasAnyRole('HOD','ADMIN')")
+    @PostMapping("/approve-all")
     public ResponseEntity<java.util.Map<String, Object>> approveAll(@AuthenticationPrincipal UserDetails principal) {
         String approvedBy = principal != null ? principal.getUsername() : "HOD";
         int count = service.approveAll(approvedBy);

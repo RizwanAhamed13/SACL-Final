@@ -40,8 +40,8 @@ const ITERATIONS = Number(process.env.E2E_ITERATIONS || 25);
 const credentials = {
   admin: { employeeId: process.env.ADMIN_EMPLOYEE_ID || 'EMP043', password: process.env.ADMIN_PASSWORD || DEFAULT_PASSWORD },
   user: { employeeId: process.env.USER_EMPLOYEE_ID || 'E2E_USER', password: process.env.USER_PASSWORD || DEFAULT_PASSWORD },
-  hof: { employeeId: process.env.HOF_EMPLOYEE_ID || 'E2E_HOF', password: process.env.HOF_PASSWORD || DEFAULT_PASSWORD },
-  hod: { employeeId: process.env.HOD_EMPLOYEE_ID || 'E2E_HOD', password: process.env.HOD_PASSWORD || DEFAULT_PASSWORD },
+  hof: { employeeId: process.env.HOF_EMPLOYEE_ID || 'E2E_HOF', password: process.env.HOF_PASSWORD || 'HOF' },
+  hod: { employeeId: process.env.HOD_EMPLOYEE_ID || 'E2E_HOD', password: process.env.HOD_PASSWORD || 'HOD' },
 };
 
 const data = {
@@ -412,7 +412,12 @@ async function fillByName(page, values) {
 
     const locator = page.locator(`[name="${cssEscape(name)}"]`).first();
     if ((await locator.count()) === 0) continue;
-    await locator.fill(String(value));
+    const tagName = await locator.evaluate(el => el.tagName.toLowerCase());
+    if (tagName === 'select') {
+      await locator.selectOption(String(value));
+    } else {
+      await locator.fill(String(value));
+    }
   }
 }
 

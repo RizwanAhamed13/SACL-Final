@@ -649,6 +649,10 @@ p { color:var(--text-secondary); line-height:var(--line-height-relaxed); }
 .status-hof_approved { background:#ecfdf5; color:#059669; }
 .status-hod_approved { background:#eff6ff; color:#2563eb; }
 .status-rejected    { background:#fef2f2; color:#dc2626; }
+.status-pending     { background:#fff7ed; color:#ea580c; }
+.status-resolved    { background:#ecfdf5; color:#059669; }
+.status-hold        { background:#fef3c7; color:#d97706; }
+.status-scrapped    { background:#fef2f2; color:#dc2626; }
 
 /* Generic status-badge variants used across the app */
 .badge {

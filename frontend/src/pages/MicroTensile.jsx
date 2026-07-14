@@ -43,12 +43,40 @@ const MicroTensile = () => {
     setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
   };
   
+  const getSelectableRecords = () => {
+    const isHof = user?.role?.toUpperCase()?.includes('HOF');
+    const isHod = user?.role?.toUpperCase()?.includes('HOD');
+    const isAdmin = user?.role?.toUpperCase()?.includes('ADMIN');
+    
+    if (isHod || (isAdmin && records.some(r => r.status === 'HOF_APPROVED'))) {
+      return records.filter(r => r.status === 'HOF_APPROVED');
+    }
+    if (isHof || isAdmin) {
+      return records.filter(r => (r.status || 'QC_ENTRY') === 'QC_ENTRY');
+    }
+    return [];
+  };
+
+  const isSelectableRow = (r) => {
+    const isHof = user?.role?.toUpperCase()?.includes('HOF');
+    const isHod = user?.role?.toUpperCase()?.includes('HOD');
+    const isAdmin = user?.role?.toUpperCase()?.includes('ADMIN');
+    
+    if (isHod || (isAdmin && r.status === 'HOF_APPROVED')) {
+      return r.status === 'HOF_APPROVED';
+    }
+    if (isHof || (isAdmin && (r.status || 'QC_ENTRY') === 'QC_ENTRY')) {
+      return (r.status || 'QC_ENTRY') === 'QC_ENTRY';
+    }
+    return false;
+  };
+
   const toggleSelectAll = () => {
-    const pending = records.filter(r => r.status === 'HOF_APPROVED');
-    if (selectedIds.length === pending.length && pending.length > 0) {
+    const selectable = getSelectableRecords();
+    if (selectedIds.length === selectable.length && selectable.length > 0) {
       setSelectedIds([]);
     } else {
-      setSelectedIds(pending.map(r => r.id));
+      setSelectedIds(selectable.map(r => r.id));
     }
   };
 
@@ -312,7 +340,7 @@ const MicroTensile = () => {
               Add Test
             </button>
           )}
-          {(user?.role?.toUpperCase()?.includes('HOD') || user?.role?.toUpperCase()?.includes('ADMIN')) && hofPendingCount > 0 && (
+          {(user?.role?.toUpperCase()?.includes('HOD') || user?.role?.toUpperCase()?.includes('ADMIN') || user?.role?.toUpperCase()?.includes('HOF')) && getSelectableRecords().length > 0 && (
             <button
               className="btn btn-secondary"
               style={{ background: 'linear-gradient(135deg,#059669,#047857)', color: '#fff', border: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}
@@ -321,7 +349,7 @@ const MicroTensile = () => {
               <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="20 6 9 17 4 12" />
               </svg>
-              Approve {selectedIds.length > 0 ? `Selected (${selectedIds.length})` : `All (${hofPendingCount})`}
+              Approve {selectedIds.length > 0 ? `Selected (${selectedIds.length})` : `All (${getSelectableRecords().length})`}
             </button>
           )}
         </div>
@@ -354,7 +382,13 @@ const MicroTensile = () => {
                     </div>
                     <div className="form-group">
                       <label className="form-label">DISA</label>
-                      <input type="text" name="disa" value={formData.disa || ''} onChange={handleChange} className="form-control" placeholder="e.g. D1234" />
+                      <select name="disa" value={formData.disa || ''} onChange={handleChange} className="form-control">
+                        <option value="">Select</option>
+                        <option>DISA I</option>
+                        <option>DISA II</option>
+                        <option>DISA III</option>
+                        <option>DISA IV</option>
+                      </select>
                     </div>
                     {formData.id && (
                       <div className="form-group">
@@ -501,11 +535,11 @@ const MicroTensile = () => {
               <thead>
                 <tr>
                   <th rowSpan="2" style={{ width: '40px', textAlign: 'center' }}>
-                    {(user?.role?.toUpperCase()?.includes('HOD') || user?.role?.toUpperCase()?.includes('ADMIN')) && (
+                    {getSelectableRecords().length > 0 && (
                       <input 
                         type="checkbox" 
                         onChange={toggleSelectAll} 
-                        checked={records.filter(r => r.status === 'HOF_APPROVED').length > 0 && selectedIds.length === records.filter(r => r.status === 'HOF_APPROVED').length}
+                        checked={selectedIds.length === getSelectableRecords().length && getSelectableRecords().length > 0}
                       />
                     )}
                   </th>
@@ -567,7 +601,7 @@ const MicroTensile = () => {
                       {locations.map(([loc, vals], idx) => (
                         <tr key={`${r.id}-${loc}`}>
                     <td style={{ textAlign: 'center' }}>
-                      {(user?.role?.toUpperCase()?.includes('HOD') || user?.role?.toUpperCase()?.includes('ADMIN')) && r.status === 'HOF_APPROVED' && (
+                      {isSelectableRow(r) && (
                         <input 
                           type="checkbox" 
                           checked={selectedIds.includes(r.id)} 
@@ -645,7 +679,11 @@ const MicroTensile = () => {
                                     </button>
                                   )}
 
-                                  
+                                  {(user?.role?.toUpperCase()?.includes('HOD') || user?.role?.toUpperCase()?.includes('ADMIN')) && (r.status || 'QC_ENTRY') === 'HOF_APPROVED' && (
+                                    <button className="btn btn-primary btn-sm" onClick={() => handleApprove(r, 'HOD_APPROVED', tableRemarks[r.id])} style={{ padding: '0.2rem 0.6rem', fontSize: '12px', background: '#2563eb', border: 'none' }}>
+                                      Approve HOD
+                                    </button>
+                                  )}
 
                                   </div>
                                 </td>
@@ -675,8 +713,29 @@ const MicroTensile = () => {
           setApproveAllModal(false);
           setApproveAllLoading(true);
           try {
-            const res = await selectedIds.length > 0 ? axios.post('/api/micro-tensile/approve-bulk', selectedIds) : axios.post('/api/micro-tensile/approve-all');
-            toast.success(`${res.data.approved} Tensile Test records approved!`);
+            const selectable = getSelectableRecords();
+            const isHofApproval = selectable.some(r => (r.status || 'QC_ENTRY') === 'QC_ENTRY');
+            const idsToApprove = selectedIds.length > 0 ? selectedIds : selectable.map(r => r.id);
+            
+            if (isHofApproval) {
+              const promises = idsToApprove.map(id => {
+                const record = records.find(r => r.id === id);
+                const payload = {
+                  ...record,
+                  status: 'HOF_APPROVED',
+                  remarks: tableRemarks[id] || record.remarks,
+                  hofApprovedBy: user.employeeId || user.fullName
+                };
+                return axios.put(`/api/micro-tensile/${id}`, payload);
+              });
+              await Promise.all(promises);
+              toast.success(`${idsToApprove.length} Tensile Test records approved by HOF!`);
+            } else {
+              const res = selectedIds.length > 0 
+                ? await axios.post('/api/micro-tensile/approve-bulk', selectedIds) 
+                : await axios.post('/api/micro-tensile/approve-all');
+              toast.success(`${res.data.approved ?? idsToApprove.length} Tensile Test records approved by HOD!`);
+            }
             fetchRecords();
             setSelectedIds([]);
           } catch (err) {
@@ -685,9 +744,9 @@ const MicroTensile = () => {
             setApproveAllLoading(false);
           }
         }}
-        title={selectedIds.length > 0 ? "Approve Selected Records" : "HOD Bulk Approval"}
-        message={`${selectedIds.length > 0 ? `Approve ${selectedIds.length} selected` : `Approve all ${hofPendingCount}`} pending HOF-approved Tensile Test records in one shot?`}
-        confirmText={approveAllLoading ? 'Approving...' : 'Approve All'}
+        title={selectedIds.length > 0 ? "Approve Selected Records" : "Bulk Approval"}
+        message={`${selectedIds.length > 0 ? `Approve ${selectedIds.length} selected` : `Approve all ${getSelectableRecords().length}`} pending records in one shot?`}
+        confirmText={approveAllLoading ? 'Approving...' : 'Approve'}
       />
     </>
   );

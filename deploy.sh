@@ -10,14 +10,14 @@ if ! command -v docker &> /dev/null; then
     exit 1
 fi
 
-echo "Pulling latest images from Docker Hub..."
-sudo docker-compose pull
+echo "Building latest images from local source..."
+docker compose build
 
 echo "Stopping existing containers..."
-sudo docker-compose down
+docker compose down
 
 echo "Starting application containers..."
-sudo docker-compose up -d
+docker compose up --build -d
 
 echo ""
 echo "================================================"
