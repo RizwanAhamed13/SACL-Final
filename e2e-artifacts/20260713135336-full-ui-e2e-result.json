@@ -1,0 +1,59 @@
+{
+  "baseUrl": "http://localhost:5173",
+  "apiUrl": "http://localhost:5173/api",
+  "runId": "20260713135336",
+  "partName": "E2E_FULL_UI_20260713135336",
+  "dateCode": "D20260713135336",
+  "heatCode": "H20260713135336",
+  "iterations": 2,
+  "steps": [
+    {
+      "at": "2026-07-13T13:53:42.578Z",
+      "step": "Setup users and part through UI"
+    },
+    {
+      "at": "2026-07-13T13:53:42.578Z",
+      "step": "Login UI as ADMIN"
+    },
+    {
+      "at": "2026-07-13T13:53:43.342Z",
+      "step": "ADMIN creates E2E Users via UI"
+    },
+    {
+      "at": "2026-07-13T13:53:48.841Z",
+      "step": "ADMIN creates Part Name via UI"
+    },
+    {
+      "at": "2026-07-13T13:53:52.107Z",
+      "step": "Login UI as USER"
+    },
+    {
+      "at": "2026-07-13T13:53:52.460Z",
+      "step": "USER enters QC Register (2 records)"
+    },
+    {
+      "at": "2026-07-13T13:54:14.848Z",
+      "step": "USER enters Micro Structure (2 records)"
+    },
+    {
+      "at": "2026-07-13T13:54:45.541Z",
+      "step": "USER enters Tensile Test (2 records)"
+    },
+    {
+      "at": "2026-07-13T13:54:57.641Z",
+      "step": "USER enters Impact Test (2 records)"
+    },
+    {
+      "at": "2026-07-13T13:55:13.111Z",
+      "step": "USER views/searches all visible form records"
+    },
+    {
+      "at": "2026-07-13T13:55:21.639Z",
+      "step": "Login UI as HOF"
+    }
+  ],
+  "downloadedExcel": null,
+  "resultJson": "C:\\Users\\Subikshan\\Downloads\\SACL-Final-main (2)\\SACL-Final-main\\e2e-artifacts\\20260713135336-full-ui-e2e-result.json",
+  "error": "page.waitForURL: Timeout 30000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"**/*/\" until \"load\"\n============================================================\n    at loginUi (C:\\Users\\Subikshan\\Downloads\\SACL-Final-main (2)\\SACL-Final-main\\frontend\\scripts\\full-ui-e2e.mjs:194:10)\n    at async file:///C:/Users/Subikshan/Downloads/SACL-Final-main%20(2)/SACL-Final-main/frontend/scripts/full-ui-e2e.mjs:156:3",
+  "status": "failed"
+}

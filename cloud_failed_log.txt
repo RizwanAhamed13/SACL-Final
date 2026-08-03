@@ -1,0 +1,271 @@
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	﻿2026-07-11T04:24:00.9905156Z ##[group]Run cd frontend
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:24:00.9905462Z [36;1mcd frontend[0m
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:24:00.9905696Z [36;1mnpm run e2e:full-ui[0m
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:24:00.9937685Z shell: /usr/bin/bash -e {0}
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:24:00.9937935Z env:
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:24:00.9938251Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.11-10/x64
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:24:00.9938773Z   JAVA_HOME_21_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.11-10/x64
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:24:00.9939158Z   HEADLESS: 1
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:24:00.9939397Z   BASE_URL: http://localhost:5173
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:24:00.9939663Z ##[endgroup]
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:24:01.1098375Z 
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:24:01.1101454Z > frontend@0.0.0 e2e:full-ui
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:24:01.1102463Z > node scripts/full-ui-e2e.mjs
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:24:01.1102709Z 
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:24:04.1229354Z [full-ui-e2e] Setup users and part through UI
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:24:04.1231918Z [full-ui-e2e] Login UI as ADMIN
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:24:04.4540342Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:24:04.4725099Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:24:04.5274008Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:24:05.1413772Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:24:05.1452129Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:24:05.1614188Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:24:05.2777031Z [full-ui-e2e] ADMIN creates E2E Users via UI
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:24:11.3052519Z [full-ui-e2e] ADMIN creates Part Name via UI
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:24:13.3734073Z [full-ui-e2e] Login UI as USER
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:24:13.3986833Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:24:13.4062750Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:24:13.4298494Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:24:13.6121502Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:24:13.6194744Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:24:13.6351570Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:24:13.7024369Z [full-ui-e2e] USER enters QC Register (25 records)
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:24:13.7426127Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:24:13.7470652Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:24:13.7652790Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:25:51.9246751Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:25:51.9317421Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:25:51.9571423Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:25:54.0680397Z [full-ui-e2e] USER enters Micro Structure (25 records)
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:25:54.0847575Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:25:54.0929919Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:25:54.1086668Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:27:57.1585458Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:27:57.1677555Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:27:57.2030222Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:27:59.3582821Z [full-ui-e2e] USER enters Tensile Test (25 records)
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:27:59.3583949Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:27:59.3584652Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:27:59.3623375Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:29:19.4457806Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:29:19.4505764Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:29:19.4792760Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:29:21.5801595Z [full-ui-e2e] USER enters Impact Test (25 records)
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:29:21.5966412Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:29:21.6039051Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:29:21.6171725Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:30:45.0059728Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:30:45.0130633Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:30:45.0345844Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:30:47.1321406Z [full-ui-e2e] USER views/searches all visible form records
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:30:47.1476142Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:30:47.1544212Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:30:47.1662170Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:30:49.2809101Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:30:49.2916713Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:30:49.3007840Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:30:51.3896458Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:30:51.3940915Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:30:51.4089520Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:30:53.5060576Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:30:53.5100711Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:30:53.5241468Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:30:55.6063572Z [full-ui-e2e] Login UI as HOF
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:30:55.6287172Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:30:55.6359230Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:30:55.6611660Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:30:55.8374676Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:30:55.8432286Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:30:55.8562230Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:30:55.9397143Z [full-ui-e2e] HOF views/searches all visible form records
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:30:55.9803494Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:30:55.9875653Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:30:56.0070739Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:30:58.1427055Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:30:58.1548593Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:30:58.1744389Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:31:00.2764257Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:31:00.2811077Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:31:00.2966986Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:31:02.4099253Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:31:02.4119763Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:31:02.4277099Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:31:04.5141072Z [full-ui-e2e] HOF approves all 25 records through UI
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:31:04.5297963Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:31:04.5351976Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:31:04.5476820Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:31:23.9556573Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:31:23.9645162Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:31:23.9870074Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:31:42.8109714Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:31:42.8176677Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:31:42.8410118Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:32:01.5383241Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:32:01.5435581Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:32:01.5543892Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:32:20.2597485Z [full-ui-e2e] Login UI as HOD
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:32:20.2857444Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:32:20.2912975Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:32:20.3154076Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:32:20.4895284Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:32:20.4994171Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:32:20.5150482Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:32:20.5919610Z [full-ui-e2e] HOD views/searches all visible form records
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:32:20.6543122Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:32:20.6579913Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:32:20.6747934Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:32:22.7905994Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:32:22.7932628Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:32:22.8079285Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:32:24.9126802Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:32:24.9164954Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:32:24.9309388Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:32:27.0295961Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:32:27.0333001Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:32:27.0468945Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:32:29.1294761Z [full-ui-e2e] HOD approves all 25 records through UI
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:32:29.1455178Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:32:29.1519264Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:32:29.1653184Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:33:32.1396760Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:33:32.1470571Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:33:32.1724763Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:34:02.3264065Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:34:02.3312492Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:34:02.3552849Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:34:26.8886481Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:34:26.8981977Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:34:26.9173857Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:34:53.1032563Z [full-ui-e2e] Login UI as ADMIN
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:34:53.1234069Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:34:53.1288978Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:34:53.1547769Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:34:53.3269937Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:34:53.3326490Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:34:53.3476237Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:34:53.4275751Z [full-ui-e2e] ADMIN views/searches all visible form records
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:34:53.4775782Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:34:53.4840192Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:34:53.4982010Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:34:55.6114116Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:34:55.6149265Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:34:55.6312565Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:34:57.7541241Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:34:57.7590506Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:34:57.7729844Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:34:59.8785643Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:34:59.8834716Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:34:59.8989010Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:01.9819621Z [full-ui-e2e] ADMIN searches report and downloads Excel
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:01.9992952Z PAGE LOG: [vite] connecting...
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:02.0099011Z PAGE LOG: [vite] connected.
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:02.0151645Z PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:04.6173396Z [full-ui-e2e] Verify downloaded Excel workbook
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:04.7585284Z [full-ui-e2e] ADMIN verifies Problem Log UI
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0763480Z DOM SNAPSHOT: 
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0841184Z     <div id="root"><div data-rht-toaster="" style="position: fixed; z-index: 9999; inset: 16px; pointer-events: none;"></div><div class="app-container"><aside class="sidebar  "><div class="sidebar-header"><div class="sidebar-logo"><div class="logo-icon"><img alt="SACL" src="/src/assets/image.png" style="width: 32px; height: 32px; object-fit: contain;"></div><div class="logo-text"><span class="logo-title">SACL</span><span class="logo-subtitle">Quality System</span></div></div></div><nav class="sidebar-nav"><div class="nav-section"><div class="nav-section-title">Main</div><a class="nav-link " href="/" data-discover="true"><svg class="nav-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg>Dashboard</a></div><div class="nav-section"><div class="nav-section-title">Quality Forms</div><a class="nav-link " href="/qc-register" data-discover="true"><svg class="nav-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>QC Register</a><a class="nav-link " href="/micro-structure" data-discover="true"><svg class="nav-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>Micro Structure</a><a class="nav-link " href="/micro-tensile" data-discover="true"><svg class="nav-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>Tensile Test</a><a class="nav-link " href="/impact-test" data-discover="true"><svg class="nav-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>Impact Test</a><a class="nav-link active" href="/problem-log" data-discover="true" aria-current="page"><svg class="nav-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>Problem Log</a></div><div class="nav-section"><div class="nav-section-title">Administration</div><a class="nav-link " href="/part-names" data-discover="true"><svg class="nav-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"></path></svg>Part Names</a><a class="nav-link " href="/users" data-discover="true"><svg class="nav-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>User Management</a><a class="nav-link " href="/reports" data-discover="true"><svg class="nav-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Logging &amp; Reports</a></div></nav><div style="padding: 1rem 0.75rem; border-top: 1px solid rgba(255, 255, 255, 0.1); margin-top: auto; flex-shrink: 0;"><div style="display: flex; align-items: center; gap: 0.625rem; padding: 0.625rem 0.75rem; margin-bottom: 0.5rem; background: rgba(255, 255, 255, 0.07); border-radius: 10px;"><div style="width: 30px; height: 30px; border-radius: 8px; background: linear-gradient(135deg, rgb(255, 123, 33), rgb(232, 106, 20)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 12px; font-weight: 700; color: rgb(255, 255, 255);">A</div><div style="min-width: 0px;"><div style="font-size: 0.75rem; font-weight: 600; color: rgb(255, 255, 255); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;">Administrator</div><div style="font-size: 0.65rem; color: rgba(255, 255, 255, 0.45); line-height: 1.2; text-transform: uppercase; letter-spacing: 0.04em;">ADMIN</div></div></div><button style="width: 100%; display: flex; align-items: center; gap: 0.625rem; padding: 0.5rem 0.75rem; background: rgba(239, 68, 68, 0.12); border-width: medium; border-style: none; border-color: currentcolor; border-image: initial; cursor: pointer; color: rgb(252, 165, 165); border-radius: 8px; font-weight: 600; font-size: 0.8rem; transition: 0.15s; letter-spacing: -0.01em;"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>Sign Out</button></div></aside><div class="main-content "><header class="header"><div style="display: flex; align-items: center; gap: 0.75rem;"><button class="sidebar-toggle" title="Toggle sidebar"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button><div style="display: flex; align-items: center; gap: 0.5rem;"><span style="width: 6px; height: 6px; border-radius: 50%; background: rgb(255, 123, 33); display: inline-block;"></span><span class="header-title">SACL Quality Management</span></div></div><div class="header-actions"><div class="header-user"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>ADMIN</div></div></header><main class="content-area"><div class="page-container fade-in"><div class="page-header"><div><h1 class="page-title">Problem Log</h1><p class="page-subtitle">Track and manage employee production issues</p></div><button class="btn btn-primary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>New Entry</button></div><div class="filters-section"><div class="search-box"><svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><input placeholder="Search by Employee No or ID..." type="text" value="E2E_USER"><button class="clear-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div></div><div class="table-container"><table class="data-table"><thead><tr><th>ID</th><th>Employee No</th><th>Problem</th><th>Part Name</th><th>Date/Heat Code</th><th>Qty</th><th>Status</th><th>Reason</th><th class="actions-col">Actions</th></tr></thead><tbody><tr><td colspan="9" style="text-align: center; padding: 2rem; color: rgb(100, 116, 139);">No records found</td></tr></tbody></table></div><div class="modal-overlay"><div class="modal-content" style="max-width: 600px;"><div class="modal-header"><h2>New Problem Log</h2><button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div><form><div class="form-grid"><div class="form-group"><label>Employee No *</label><input class="form-control" required="" type="text" value=""></div><div class="form-group"><label>Problem *</label><input class="form-control" required="" type="text" value=""></div><div class="form-group"><label>Part Name *</label><div class="css-b62m3t-container"><span id="react-select-5-live-region" class="css-1f43avz-a11yText-A11yText"></span><span aria-live="polite" aria-atomic="false" aria-relevant="additions text" role="log" class="css-1f43avz-a11yText-A11yText"></span><div class="css-zjg6ig-control"><div class="css-hlgwow"><div class="css-1dimb5e-singleValue">E2E_FULL_UI_20260711042401</div><div class="css-19bb58m" data-value=""><input class="" autocapitalize="none" autocomplete="off" autocorrect="off" id="react-select-5-input" spellcheck="false" tabindex="0" aria-autocomplete="list" aria-expanded="false" aria-haspopup="true" role="combobox" aria-activedescendant="" type="text" value="" style="color: inherit; background: 0px center; opacity: 0; width: 100%; grid-area: 1 / 2; font: inherit; min-width: 2px; border: 0px; margin: 0px; outline: 0px; padding: 0px;"></div></div><div class="css-1wy0on6"><div class="css-1xc3v61-indicatorContainer" aria-hidden="true"><svg height="20" width="20" viewBox="0 0 20 20" aria-hidden="true" focusable="false" class="css-tj5bde-Svg"><path d="M14.348 14.849c-0.469 0.469-1.229 0.469-1.697 0l-2.651-3.030-2.651 3.029c-0.469 0.469-1.229 0.469-1.697 0-0.469-0.469-0.469-1.229 0-1.697l2.758-3.15-2.759-3.152c-0.469-0.469-0.469-1.228 0-1.697s1.228-0.469 1.697 0l2.652 3.031 2.651-3.031c0.469-0.469 1.228-0.469 1.697 0s0.469 1.229 0 1.697l-2.758 3.152 2.758 3.15c0.469 0.469 0.469 1.229 0 1.698z"></path></svg></div><span class="css-1u9des2-indicatorSeparator"></span><div class="css-1xc3v61-indicatorContainer" aria-hidden="true"><svg height="20" width="20" viewBox="0 0 20 20" aria-hidden="true" focusable="false" class="css-tj5bde-Svg"><path d="M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z"></path></svg></div></div></div></div></div><div class="form-group"><label>Date/Heat Code</label><input class="form-control" type="text" value=""></div><div class="form-group"><label>Qty</label><input class="form-control" type="number" value=""></div><div class="form-group"><label>Status</label><select class="form-control"><option value="Pending">Pending</option><option value="Resolved">Resolved</option><option value="Hold">Hold</option><option value="Scrapped">Scrapped</option></select></div><div class="form-group" style="grid-column: 1 / -1;"><label>Reason</label><textarea class="form-control" rows="3"></textarea></div></div><div class="modal-footer" style="margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 1rem;"><button type="button" class="btn btn-secondary">Cancel</button><button type="submit" class="btn btn-primary">Save Record</button></div></form></div></div></div></main><footer class="footer">SACL Quality Management System © 2026</footer></div><div id="sidebarOverlay" class="sidebar-overlay "></div></div></div>
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0915611Z {
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0916270Z     <script type="module" src="/src/main.jsx"></script>
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0917218Z   "baseUrl": "http://localhost:5173",
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0943030Z   "apiUrl": "http://localhost:5173/api",
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0943516Z   
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0943915Z   "runId": "20260711042401",
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0944454Z   "partName": "E2E_FULL_UI_20260711042401",
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0945030Z   "dateCode": "D20260711042401",
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0945544Z   "heatCode": "H20260711042401",
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0946045Z   "iterations": 25,
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0946446Z   "steps": [
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0946821Z     {
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0947235Z       "at": "2026-07-11T04:24:04.122Z",
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0947833Z       "step": "Setup users and part through UI"
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0948368Z     },
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0948738Z     {
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0949151Z       "at": "2026-07-11T04:24:04.123Z",
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0949685Z       "step": "Login UI as ADMIN"
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0950170Z     },
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0950345Z 
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0950355Z 
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0963442Z     {
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0963879Z       "at": "2026-07-11T04:24:05.276Z",
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0964539Z       "step": "ADMIN creates E2E Users via UI"
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0965097Z     },
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0965462Z     {
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0965894Z       "at": "2026-07-11T04:24:10.443Z",
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0966509Z       "step": "ADMIN creates Part Name via UI"
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0967047Z     },
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0967419Z     {
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0968191Z       "at": "2026-07-11T04:24:13.373Z",
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0968721Z       "step": "Login UI as USER"
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0969169Z     },
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0969574Z     {
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0969986Z       "at": "2026-07-11T04:24:13.699Z",
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0970595Z       "step": "USER enters QC Register (25 records)"
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0971345Z     },
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0971906Z     {
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0972353Z       "at": "2026-07-11T04:25:54.067Z",
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0973001Z       "step": "USER enters Micro Structure (25 records)"
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0973636Z     },
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0974076Z     {
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0975239Z       "at": "2026-07-11T04:27:59.307Z",
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0975984Z       "step": "USER enters Tensile Test (25 records)"
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0976574Z     },
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0976965Z     {
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0977408Z       "at": "2026-07-11T04:29:21.579Z",
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0978038Z       "step": "USER enters Impact Test (25 records)"
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0978620Z     },
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0978987Z     {
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0979410Z       "at": "2026-07-11T04:30:47.131Z",
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0980080Z       "step": "USER views/searches all visible form records"
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0980696Z     },
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0981061Z     {
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0981453Z       "at": "2026-07-11T04:30:55.606Z",
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.0983566Z       "step": "Login UI as HOF"
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.1002465Z     },
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.1002976Z     {
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.1003511Z       "at": "2026-07-11T04:30:55.937Z",
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.1004213Z       "step": "HOF views/searches all visible form records"
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.1004741Z     },
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.1005159Z     {
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.1006847Z       "at": "2026-07-11T04:31:04.513Z",
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.1007539Z       "step": "HOF approves all 25 records through UI"
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.1007917Z     },
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.1008110Z     {
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.1008340Z       "at": "2026-07-11T04:32:20.259Z",
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.1008660Z       "step": "Login UI as HOD"
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.1008909Z     },
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.1009091Z     {
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.1009306Z       "at": "2026-07-11T04:32:20.590Z",
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.1009676Z       "step": "HOD views/searches all visible form records"
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.1009989Z     },
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.1010174Z     {
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.1010635Z       "at": "2026-07-11T04:32:29.129Z",
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.1011338Z       "step": "HOD approves all 25 records through UI"
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.9669484Z     },
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.9669959Z     {
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.9670366Z       "at": "2026-07-11T04:34:53.103Z",
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.9670865Z       "step": "Login UI as ADMIN"
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.9671253Z     },
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.9671509Z     {
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.9672159Z       "at": "2026-07-11T04:34:53.425Z",
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.9672798Z       "step": "ADMIN views/searches all visible form records"
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.9673394Z     },
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.9673620Z     {
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.9673941Z       "at": "2026-07-11T04:35:01.981Z",
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.9674407Z       "step": "ADMIN searches report and downloads Excel"
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.9674827Z     },
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.9675051Z     {
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.9675345Z       "at": "2026-07-11T04:35:04.616Z",
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.9675773Z       "step": "Verify downloaded Excel workbook"
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.9676177Z     },
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.9676395Z     {
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.9676643Z       "at": "2026-07-11T04:35:04.758Z",
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.9677064Z       "step": "ADMIN verifies Problem Log UI"
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.9677444Z     }
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.9677659Z   ],
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.9678495Z   "downloadedExcel": "/home/runner/work/SACL-Final/SACL-Final/frontend/e2e-artifacts/20260711042401-Sakthi_Autos_Quality_Report_2026-07-11.xlsx",
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.9679754Z   "resultJson": "/home/runner/work/SACL-Final/SACL-Final/frontend/e2e-artifacts/20260711042401-full-ui-e2e-result.json",
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.9680484Z   "excelVerified": true,
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.9683015Z   "error": "page.waitForFunction: Timeout 30000ms exceeded.\n    at expectText (/home/runner/work/SACL-Final/SACL-Final/frontend/scripts/full-ui-e2e.mjs:430:14)\n    at verifyProblemLogUi (/home/runner/work/SACL-Final/SACL-Final/frontend/scripts/full-ui-e2e.mjs:636:9)\n    at async file:///home/runner/work/SACL-Final/SACL-Final/frontend/scripts/full-ui-e2e.mjs:163:3",
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.9685038Z   "status": "failed"
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.9685360Z }
+Run Full UI E2E Tests (MS SQL)	Run Full UI E2E Tests	2026-07-11T04:35:40.9696868Z ##[error]Process completed with exit code 1.

@@ -1,0 +1,259 @@
+Build and Push Docker Images	Build and Push Frontend	﻿2026-07-10T10:53:45.0873891Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.0875205Z ##[group]Run docker/build-push-action@v4
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.0875488Z with:
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.0875680Z   context: ./frontend
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.0875906Z   file: ./frontend/Dockerfile
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.0876140Z   push: true
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.0876403Z   tags: ***/sacl-frontend:latest
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.0876646Z   load: false
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.0876840Z   no-cache: false
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.0877038Z   pull: false
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.0879644Z   github-token: ***
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.0879864Z ##[endgroup]
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2299218Z (node:3401) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2300199Z (Use `node --trace-deprecation ...` to show where the warning was created)
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2352924Z ##[group]GitHub Actions runtime token ACs
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2382493Z refs/heads/main: read/write
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2383903Z ##[endgroup]
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2384602Z ##[group]Docker info
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2413550Z [command]/usr/bin/docker version
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2615436Z Client: Docker Engine - Community
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2618261Z  Version:           28.0.4
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2618857Z  API version:       1.48
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2619368Z  Go version:        go1.23.7
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2619875Z  Git commit:        b8034c0
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2620401Z  Built:             Tue Mar 25 15:07:16 2025
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2620953Z  OS/Arch:           linux/amd64
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2621447Z  Context:           default
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2621777Z 
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2622091Z Server: Docker Engine - Community
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2622419Z  Engine:
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2622613Z   Version:          28.0.4
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2623131Z   API version:      1.48 (minimum version 1.24)
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2623686Z   Go version:       go1.23.7
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2624181Z   Git commit:       6430e49
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2624684Z   Built:            Tue Mar 25 15:07:16 2025
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2625203Z   OS/Arch:          linux/amd64
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2625698Z   Experimental:     false
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2626603Z  containerd:
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2626975Z   Version:          v2.2.5
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2627509Z   GitCommit:        e53c7c1516c3b2bff98eb76f1f4117477e6f4e66
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2628312Z  runc:
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2628656Z   Version:          1.3.6
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2629069Z   GitCommit:        v1.3.6-0-g491b69ba
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2629971Z  docker-init:
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2630340Z   Version:          0.19.0
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2630735Z   GitCommit:        de40ad0
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.2657279Z [command]/usr/bin/docker info
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3235676Z Client: Docker Engine - Community
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3236655Z  Version:    28.0.4
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3237284Z  Context:    default
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3237700Z  Debug Mode: false
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3238476Z  Plugins:
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3238835Z   buildx: Docker Buildx (Docker Inc.)
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3239305Z     Version:  v0.35.0
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3239783Z     Path:     /usr/libexec/docker/cli-plugins/docker-buildx
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3240369Z   compose: Docker Compose (Docker Inc.)
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3240824Z     Version:  v2.38.2
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3241295Z     Path:     /usr/libexec/docker/cli-plugins/docker-compose
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3241640Z 
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3241720Z Server:
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3241907Z  Containers: 1
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3242108Z   Running: 1
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3242325Z   Paused: 0
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3242511Z   Stopped: 0
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3242699Z  Images: 7
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3242890Z  Server Version: 28.0.4
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3243116Z  Storage Driver: overlay2
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3243353Z   Backing Filesystem: extfs
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3243960Z   Supports d_type: true
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3244185Z   Using metacopy: false
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3244417Z   Native Overlay Diff: false
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3244682Z   userxattr: false
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3244949Z  Logging Driver: json-file
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3245186Z  Cgroup Driver: systemd
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3245401Z  Cgroup Version: 2
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3245599Z  Plugins:
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3245783Z   Volume: local
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3246018Z   Network: bridge host ipvlan macvlan null overlay
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3246445Z   Log: awslogs fluentd gcplogs gelf journald json-file local splunk syslog
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3246830Z  Swarm: inactive
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3247053Z  Runtimes: io.containerd.runc.v2 runc
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3247332Z  Default Runtime: runc
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3247557Z  Init Binary: docker-init
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3248148Z  containerd version: e53c7c1516c3b2bff98eb76f1f4117477e6f4e66
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3248541Z  runc version: v1.3.6-0-g491b69ba
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3249044Z  init version: de40ad0
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3249368Z  Security Options:
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3249573Z   apparmor
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3249757Z   seccomp
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3249945Z    Profile: builtin
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3250213Z   cgroupns
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3250499Z  Kernel Version: 6.17.0-1018-azure
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3250768Z  Operating System: Ubuntu 24.04.4 LTS
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3251026Z  OSType: linux
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3251234Z  Architecture: x86_64
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3251443Z  CPUs: 4
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3251630Z  Total Memory: 15.61GiB
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3251849Z  Name: runnervm5mmn9
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3252079Z  ID: e9594903-afeb-464a-937b-0a2f459cc4b5
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3252356Z  Docker Root Dir: /var/lib/docker
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3252661Z  Debug Mode: false
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3253138Z  Username: ***
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3253504Z  Experimental: false
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3253888Z  Insecure Registries:
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3254269Z   ::1/128
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3254578Z   127.0.0.0/8
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3254920Z  Live Restore Enabled: false
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3255192Z 
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3255777Z ##[endgroup]
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3256355Z ##[group]Proxy configuration
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3256784Z No proxy configuration found
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3257402Z ##[endgroup]
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3786832Z ##[group]Buildx version
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.3809835Z [command]/usr/bin/docker buildx version
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.4288467Z github.com/docker/buildx v0.35.0 a319e5b15052cf6557ceb666eb8ff6e32380b782
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.4318081Z ##[endgroup]
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:45.8124854Z [command]/usr/bin/docker buildx build --file ./frontend/Dockerfile --iidfile /tmp/docker-actions-toolkit-s2Fx51/iidfile --tag ***/sacl-frontend:latest --metadata-file /tmp/docker-actions-toolkit-s2Fx51/metadata-file --push ./frontend
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.1271477Z #0 building with "builder-5a4268c3-3855-4d76-bd96-b48fc15c674c" instance using docker-container driver
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.1272336Z 
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.1272615Z #1 [internal] load build definition from Dockerfile
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.1273129Z #1 transferring dockerfile: 467B done
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.1273477Z #1 DONE 0.0s
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.1273616Z 
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.1273811Z #2 [auth] library/nginx:pull token for registry-1.docker.io
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.1274211Z #2 DONE 0.0s
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.1274349Z 
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.1274537Z #3 [auth] library/node:pull token for registry-1.docker.io
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.1274927Z #3 DONE 0.0s
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.1275065Z 
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.1275283Z #4 [internal] load metadata for docker.io/library/nginx:stable-alpine
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.5210588Z #4 ...
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.5211035Z 
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.5211385Z #5 [internal] load metadata for docker.io/library/node:20-alpine
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.5211875Z #5 DONE 0.6s
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.6760701Z 
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.6764787Z #4 [internal] load metadata for docker.io/library/nginx:stable-alpine
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.6778461Z #4 DONE 0.6s
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.6779185Z 
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.6779364Z #6 [internal] load .dockerignore
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.6779840Z #6 transferring context: 89B done
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.6780140Z #6 DONE 0.0s
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.6780383Z 
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.6780568Z #7 [internal] load build context
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.6781047Z #7 transferring context: 1.12MB 0.0s done
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.6781539Z #7 DONE 0.0s
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.6781749Z 
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.6782582Z #8 [build 1/6] FROM docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.6784755Z #8 resolve docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293 0.0s done
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.6786491Z #8 sha256:fff4e2c1b189bf87d63ad8bd07f7f4eb288d6f2b6a07a8bb44c60e8c075d2096 445B / 445B 0.1s done
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.7797771Z #8 sha256:b2cbbfe903b0821005780971ddc5892edcc4ce74c5a48d82e1d2b382edac3122 1.26MB / 1.26MB 0.1s done
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.7800689Z #8 sha256:6a0ac1617861a677b045b7ff88545213ec31c0ff08763195a70a4a5adda577bb 3.86MB / 3.86MB 0.1s done
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.7802049Z #8 extracting sha256:6a0ac1617861a677b045b7ff88545213ec31c0ff08763195a70a4a5adda577bb
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.7803217Z #8 sha256:4feea04c154301db6f4a496efa397b3db96603b1c009c797cfdde77bea8b3287 43.23MB / 43.23MB 0.2s done
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.9791251Z #8 ...
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.9792043Z 
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.9794704Z #9 [stage-1 1/3] FROM docker.io/library/nginx:stable-alpine@sha256:0d3b80406a13a767339fbe2f41406d6c7da727ab89cf8fae399e81f780f814d1
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.9796354Z #9 resolve docker.io/library/nginx:stable-alpine@sha256:0d3b80406a13a767339fbe2f41406d6c7da727ab89cf8fae399e81f780f814d1 0.0s done
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.9798162Z #9 sha256:b264ebfe1e4251ad76c8fd2afe6195e806268c4e21ba61a54695d075e3bf39fe 1.21kB / 1.21kB 0.1s done
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.9799585Z #9 sha256:440503bb46cabd1979a41645dbbc263ef369a604b30bac3652848206e7108bbd 1.40kB / 1.40kB 0.1s done
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.9800885Z #9 sha256:278fa14e43da8662fc63fb54817d89af38d827e0b48d96b42f98aa856216b81a 405B / 405B 0.1s done
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.9802171Z #9 sha256:7d9cfad643ec786c3f1615bf34e06ab3db76bd608ad45596fa80ce280f845713 956B / 956B 0.1s done
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.9803309Z #9 sha256:c79d40162f281479a472d6d2ec1b998ff1c2223c0e58305377d20a40b1c2298d 627B / 627B 0.1s done
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.9804513Z #9 sha256:1deb20213977c1182954baceb40b9c0817823a61b284716ae1fa87a94f99a393 1.87MB / 1.87MB 0.1s done
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.9805681Z #9 extracting sha256:1deb20213977c1182954baceb40b9c0817823a61b284716ae1fa87a94f99a393 0.1s done
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.9806859Z #9 sha256:f72ca00031358d34c7e480b2ea1e790ac65895f3bf1e216d2c40b36b483b879f 20.25MB / 20.25MB 0.1s done
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.9814587Z #9 DONE 0.4s
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.9815481Z 
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.9816165Z #8 [build 1/6] FROM docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.9817494Z #8 extracting sha256:6a0ac1617861a677b045b7ff88545213ec31c0ff08763195a70a4a5adda577bb 0.1s done
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:46.9818787Z #8 extracting sha256:4feea04c154301db6f4a496efa397b3db96603b1c009c797cfdde77bea8b3287
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:47.4056265Z #8 ...
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:47.4057611Z 
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:47.4060033Z #9 [stage-1 1/3] FROM docker.io/library/nginx:stable-alpine@sha256:0d3b80406a13a767339fbe2f41406d6c7da727ab89cf8fae399e81f780f814d1
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:47.4061819Z #9 extracting sha256:c79d40162f281479a472d6d2ec1b998ff1c2223c0e58305377d20a40b1c2298d done
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:47.4063011Z #9 extracting sha256:7d9cfad643ec786c3f1615bf34e06ab3db76bd608ad45596fa80ce280f845713 done
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:47.4064278Z #9 extracting sha256:278fa14e43da8662fc63fb54817d89af38d827e0b48d96b42f98aa856216b81a done
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:47.4065470Z #9 extracting sha256:b264ebfe1e4251ad76c8fd2afe6195e806268c4e21ba61a54695d075e3bf39fe done
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:47.4066586Z #9 extracting sha256:440503bb46cabd1979a41645dbbc263ef369a604b30bac3652848206e7108bbd done
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:47.4067737Z #9 extracting sha256:f72ca00031358d34c7e480b2ea1e790ac65895f3bf1e216d2c40b36b483b879f 0.4s done
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:47.4069139Z #9 DONE 0.8s
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:47.5566602Z 
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:47.5567435Z #8 [build 1/6] FROM docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:47.8036993Z #8 extracting sha256:4feea04c154301db6f4a496efa397b3db96603b1c009c797cfdde77bea8b3287 1.0s done
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:47.8038142Z #8 DONE 1.2s
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:47.9856000Z 
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:47.9856980Z #8 [build 1/6] FROM docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:47.9858070Z #8 extracting sha256:b2cbbfe903b0821005780971ddc5892edcc4ce74c5a48d82e1d2b382edac3122 0.0s done
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:47.9858855Z #8 extracting sha256:fff4e2c1b189bf87d63ad8bd07f7f4eb288d6f2b6a07a8bb44c60e8c075d2096 done
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:47.9859374Z #8 DONE 1.3s
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:47.9859504Z 
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:47.9859615Z #10 [build 2/6] WORKDIR /app
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:48.0929596Z #10 DONE 0.3s
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:48.2526046Z 
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:48.2526612Z #11 [build 3/6] COPY package*.json ./
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:48.2527469Z #11 DONE 0.0s
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:48.2528069Z 
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:48.2528292Z #12 [build 4/6] RUN npm install
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.4966029Z #12 1.394 npm error code ERESOLVE
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5351052Z #12 1.394 npm error ERESOLVE could not resolve
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5351838Z #12 1.394 npm error
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5352507Z #12 1.395 npm error While resolving: @testing-library/react@14.3.1
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5353395Z #12 1.395 npm error Found: react@19.2.6
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5354240Z #12 1.395 npm error node_modules/react
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5354972Z #12 1.395 npm error   react@"^19.2.6" from the root project
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5355890Z #12 1.395 npm error   peer react@">=16.8.0" from @emotion/react@11.14.0
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5356813Z #12 1.395 npm error   node_modules/@emotion/react
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5357681Z #12 1.395 npm error     @emotion/react@"^11.8.1" from react-select@5.10.2
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5358750Z #12 1.395 npm error     node_modules/react-select
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5359543Z #12 1.395 npm error       react-select@"^5.10.2" from the root project
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5360555Z #12 1.395 npm error   9 more (@emotion/use-insertion-effect-with-fallbacks, ...)
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5361482Z #12 1.395 npm error
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5362130Z #12 1.395 npm error Could not resolve dependency:
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5362858Z #12 1.395 npm error peer react@"^18.0.0" from @testing-library/react@14.3.1
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5363646Z #12 1.395 npm error node_modules/@testing-library/react
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5364331Z #12 1.395 npm error   dev @testing-library/react@"^14.2.1" from the root project
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5365666Z #12 1.395 npm error
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5366358Z #12 1.395 npm error Conflicting peer dependency: react@18.3.1
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5367207Z #12 1.395 npm error node_modules/react
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5368221Z #12 1.395 npm error   peer react@"^18.0.0" from @testing-library/react@14.3.1
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5368981Z #12 1.395 npm error   node_modules/@testing-library/react
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5369726Z #12 1.395 npm error     dev @testing-library/react@"^14.2.1" from the root project
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5370461Z #12 1.395 npm error
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5371499Z #12 1.395 npm error Fix the upstream dependency conflict, or retry
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5372795Z #12 1.395 npm error this command with --force or --legacy-peer-deps
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5374178Z #12 1.395 npm error to accept an incorrect (and potentially broken) dependency resolution.
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5375236Z #12 1.395 npm error
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5375842Z #12 1.395 npm error
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5376691Z #12 1.395 npm error For a full report see:
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5378019Z #12 1.395 npm error /root/.npm/_logs/2026-07-10T10_53_48_229Z-eresolve-report.txt
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5379320Z #12 1.399 npm notice
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5380348Z #12 1.399 npm notice New major version of npm available! 10.8.2 -> 12.0.0
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5381970Z #12 1.399 npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.0.0
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5383077Z #12 1.399 npm notice To update run: npm install -g npm@12.0.0
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5383916Z #12 1.399 npm notice
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5384901Z #12 1.400 npm error A complete log of this run can be found in: /root/.npm/_logs/2026-07-10T10_53_48_229Z-debug-0.log
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5386552Z #12 ERROR: process "/bin/sh -c npm install" did not complete successfully: exit code: 1
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5387423Z ------
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5388089Z  > [build 4/6] RUN npm install:
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5388667Z 1.395 npm error
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5389140Z 1.395 npm error
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5389638Z 1.395 npm error For a full report see:
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5390440Z 1.395 npm error /root/.npm/_logs/2026-07-10T10_53_48_229Z-eresolve-report.txt
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5391217Z 1.399 npm notice
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5391885Z 1.399 npm notice New major version of npm available! 10.8.2 -> 12.0.0
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5392989Z 1.399 npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.0.0
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5393970Z 1.399 npm notice To update run: npm install -g npm@12.0.0
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5394621Z 1.399 npm notice
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5395571Z 1.400 npm error A complete log of this run can be found in: /root/.npm/_logs/2026-07-10T10_53_48_229Z-debug-0.log
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5396367Z ------
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5423409Z Dockerfile:5
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5424073Z --------------------
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5424492Z    3 |     WORKDIR /app
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5424893Z    4 |     COPY package*.json ./
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5425344Z    5 | >>> RUN npm install
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5425721Z    6 |     COPY . .
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5426221Z    7 |     # You can set the production API URL during build time
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5426786Z --------------------
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5427585Z ERROR: failed to build: failed to solve: process "/bin/sh -c npm install" did not complete successfully: exit code: 1
+Build and Push Docker Images	Build and Push Frontend	2026-07-10T10:53:49.5520604Z ##[error]buildx failed with: ERROR: failed to build: failed to solve: process "/bin/sh -c npm install" did not complete successfully: exit code: 1

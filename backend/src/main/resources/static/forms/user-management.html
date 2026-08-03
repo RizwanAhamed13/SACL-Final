@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Management — SACL</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .role-badge {
+      display: inline-block;
+      padding: .2rem .6rem;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .03em;
+    }
+    .role-admin      { background:#fef3c7; color:#92400e; }
+    .role-supervisor { background:#dbeafe; color:#1e40af; }
+    .role-qc         { background:#d1fae5; color:#065f46; }
+    .role-viewer     { background:#f3f4f6; color:#374151; }
+    .status-badge {
+      display: inline-block;
+      padding: .2rem .6rem;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .status-active   { background:#d1fae5; color:#065f46; }
+    .status-inactive { background:#fee2e2; color:#991b1b; }
+    .action-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: .3rem .5rem;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 500;
+      transition: background .15s;
+    }
+    .action-btn-edit   { color: #2563eb; }
+    .action-btn-edit:hover { background: #eff6ff; }
+    .action-btn-delete { color: #dc2626; }
+    .action-btn-delete:hover { background: #fef2f2; }
+  </style>
+</head>
+<body>
+<div class="app-container">
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <div class="logo-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        </div>
+        <div class="logo-text">
+          <span class="logo-title" style="color:var(--color-text-primary)">SACL</span>
+          <span class="logo-subtitle">Quality System</span>
+        </div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Main</div>
+        <a href="../index.html" class="nav-link">
+          <svg class="nav-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Quality Forms</div>
+        <a href="qc-register.html" class="nav-link">
+          <svg class="nav-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          QC Register
+        </a>
+        <a href="micro-structure.html" class="nav-link">
+          <svg class="nav-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Micro Structure
+        </a>
+        <a href="micro-tensile.html" class="nav-link">
+          <svg class="nav-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Tensile Test
+        </a>
+        <a href="impact-test.html" class="nav-link">
+          <svg class="nav-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Impact Test
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Administration</div>
+        <a href="part-names.html" class="nav-link">
+          <svg class="nav-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+          Part Names
+        </a>
+        <a href="user-management.html" class="nav-link active">
+          <svg class="nav-link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          User Management
+        </a>
+      </div>
+    </nav>
+  </aside>
+
+  <div class="main-content">
+    <header class="header">
+      <div style="display:flex;align-items:center;gap:.75rem">
+        <button class="sidebar-toggle" onclick="toggleSidebar()" title="Toggle sidebar">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <span class="header-title">User Management</span>
+      </div>
+      <div class="header-actions"><div class="header-user">Administration</div></div>
+    </header>
+
+    <main class="content-area">
+      <div class="breadcrumb">
+        <a href="../index.html" class="breadcrumb-item">Home</a>
+        <span class="breadcrumb-item active">User Management</span>
+      </div>
+
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">User Management</h1>
+          <p class="page-subtitle">Create and manage system users and their roles</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-primary" onclick="openAddForm()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add User
+          </button>
+        </div>
+      </div>
+
+      <!-- Form Panel -->
+      <div class="form-panel" id="formPanel">
+        <div class="card mb-3">
+          <div class="card-header">
+            <h2 class="card-title" id="formTitle">Add User</h2>
+            <button class="btn btn-secondary btn-sm" onclick="cancelForm()">Cancel</button>
+          </div>
+          <div class="card-body">
+            <form id="userForm" novalidate>
+              <div class="form-section">
+                <div class="form-section-title">Account Details</div>
+                <div class="form-row form-row-4">
+                  <div class="form-group">
+                    <label class="form-label required">Employee ID</label>
+                    <input type="text" id="employeeId" class="form-control" placeholder="e.g. EMP001" required />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label required">Full Name</label>
+                    <input type="text" id="fullName" class="form-control" placeholder="e.g. Rajesh Kumar" required />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label required">Username</label>
+                    <input type="text" id="username" class="form-control" placeholder="e.g. rajesh.kumar" required />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" id="passwordLabel">Password <span style="color:var(--color-text-secondary);font-weight:400" id="passwordHint"></span></label>
+                    <input type="password" id="password" class="form-control" placeholder="Enter password" />
+                  </div>
+                </div>
+                <div class="form-row form-row-3">
+                  <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="email" class="form-control" placeholder="e.g. rajesh@sacl.com" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label required">Role</label>
+                    <select id="role" class="form-control" required>
+                      <option value="">Select Role</option>
+                      <option value="Admin">Admin</option>
+                      <option value="Supervisor">Supervisor</option>
+                      <option value="QC Engineer">QC Engineer</option>
+                      <option value="Viewer">Viewer</option>
+                    </select>
+                  </div>
+                  <div class="form-group" id="activeGroup" style="display:none">
+                    <label class="form-label">Status</label>
+                    <select id="active" class="form-control">
+                      <option value="true">Active</option>
+                      <option value="false">Inactive</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card-footer" style="margin:0 -1.5rem -1.5rem;border-radius:0 0 var(--radius-xl) var(--radius-xl)">
+                <div style="display:flex;gap:1rem">
+                  <button type="button" class="btn btn-secondary" onclick="cancelForm()">Cancel</button>
+                  <button type="button" class="btn btn-primary" onclick="saveUser()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    Save User
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Users Table -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">System Users</h2>
+          <span id="recordCount" class="badge badge-secondary">0 users</span>
+        </div>
+        <div class="card-body" style="padding:0">
+          <div class="table-container" style="border:none">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Employee ID</th>
+                  <th>Full Name</th>
+                  <th>Username</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="recordsBody">
+                <tr><td colspan="8" class="text-center text-muted" style="padding:2rem">No users found. Click "Add User" to get started.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer class="footer">SACL Quality Management System &copy; 2024</footer>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+  <div id="sidebarOverlay" class="sidebar-overlay" onclick="closeMobileSidebar()"></div>
+
+<script src="../js/api.js"></script>
+<script>
+  initSidebar();
+
+  let editingId = null;
+
+  function roleBadge(role) {
+    const cls = role === 'Admin' ? 'role-admin'
+              : role === 'Supervisor' ? 'role-supervisor'
+              : role === 'QC Engineer' ? 'role-qc'
+              : 'role-viewer';
+    return `<span class="role-badge ${cls}">${role || '—'}</span>`;
+  }
+
+  function statusBadge(active) {
+    return active
+      ? '<span class="status-badge status-active">Active</span>'
+      : '<span class="status-badge status-inactive">Inactive</span>';
+  }
+
+  async function loadRecords() {
+    try {
+      const data = await apiGet(API.USERS);
+      const tbody = document.getElementById('recordsBody');
+      document.getElementById('recordCount').textContent = data.length + ' user' + (data.length !== 1 ? 's' : '');
+      if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted" style="padding:2rem">No users found.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.map(u => `
+        <tr>
+          <td><strong>${dash(u.employeeId)}</strong></td>
+          <td><strong>${dash(u.fullName)}</strong></td>
+          <td>${dash(u.username)}</td>
+          <td>${dash(u.email)}</td>
+          <td>${roleBadge(u.role)}</td>
+          <td>${statusBadge(u.active)}</td>
+          <td>${fmtDate(u.createdAt)}</td>
+          <td style="white-space:nowrap">
+            <button class="action-btn action-btn-edit" onclick="openEditForm('${escJs(u.employeeId)}','${escJs(u.fullName)}','${escJs(u.username)}','${escJs(u.email)}','${escJs(u.role)}',${u.active})">Edit</button>
+            <button class="action-btn action-btn-delete" onclick="deleteUser('${escJs(u.employeeId)}','${escJs(u.fullName)}')">Delete</button>
+          </td>
+        </tr>`).join('');
+    } catch (e) { console.warn('Backend not available:', e.message); }
+  }
+
+  function escJs(v) { return (v || '').replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
+
+  function openAddForm() {
+    editingId = null;
+    document.getElementById('formTitle').textContent = 'Add User';
+    document.getElementById('employeeId').value = '';
+    document.getElementById('employeeId').disabled = false;
+    document.getElementById('fullName').value = '';
+    document.getElementById('username').value = '';
+    document.getElementById('username').disabled = false;
+    document.getElementById('password').value = '';
+    document.getElementById('email').value = '';
+    document.getElementById('role').value = '';
+    document.getElementById('passwordHint').textContent = '';
+    document.getElementById('activeGroup').style.display = 'none';
+    document.getElementById('formPanel').classList.add('open');
+    document.getElementById('formPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function openEditForm(employeeId, fullName, username, email, role, active) {
+    editingId = employeeId;
+    document.getElementById('formTitle').textContent = 'Edit User';
+    document.getElementById('employeeId').value = employeeId;
+    document.getElementById('employeeId').disabled = true;
+    document.getElementById('fullName').value = fullName;
+    document.getElementById('username').value = username;
+    document.getElementById('username').disabled = true;
+    document.getElementById('password').value = '';
+    document.getElementById('email').value = email === '—' ? '' : email;
+    document.getElementById('role').value = role;
+    document.getElementById('active').value = String(active);
+    document.getElementById('passwordHint').textContent = '(leave blank to keep current)';
+    document.getElementById('activeGroup').style.display = '';
+    document.getElementById('formPanel').classList.add('open');
+    document.getElementById('formPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function cancelForm() {
+    document.getElementById('formPanel').classList.remove('open');
+    editingId = null;
+  }
+
+  async function saveUser() {
+    const employeeId = document.getElementById('employeeId').value.trim();
+    const fullName = document.getElementById('fullName').value.trim();
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+    const email    = document.getElementById('email').value.trim();
+    const role     = document.getElementById('role').value;
+
+    if (!employeeId || !fullName || !username || !role) {
+      showToast('Employee ID, Full Name, Username and Role are required.', 'error');
+      return;
+    }
+    if (!editingId && !password) {
+      showToast('Password is required when creating a user.', 'error');
+      return;
+    }
+
+    const payload = { employeeId, fullName, username, email: email || null, role };
+    if (password) payload.password = password;
+    if (editingId) payload.active = document.getElementById('active').value === 'true';
+
+    try {
+      if (editingId) {
+        await apiPut(API.USERS, editingId, payload);
+        showToast('User updated successfully!', 'success');
+      } else {
+        await apiPost(API.USERS, payload);
+        showToast('User created successfully!', 'success');
+      }
+      cancelForm();
+      loadRecords();
+    } catch (err) {
+      showToast('Error: ' + err.message, 'error');
+    }
+  }
+
+  async function deleteUser(employeeId, name) {
+    if (!confirm(`Delete user "${name}"? This cannot be undone.`)) return;
+    try {
+      await apiDelete(API.USERS, employeeId);
+      showToast('User deleted.', 'success');
+      loadRecords();
+    } catch (err) {
+      showToast('Error: ' + err.message, 'error');
+    }
+  }
+
+  loadRecords();
+</script>
+</body>
+</html>

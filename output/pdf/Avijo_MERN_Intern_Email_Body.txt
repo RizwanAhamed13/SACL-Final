@@ -1,0 +1,18 @@
+Subject: MERN Developer Intern - Rizwan Ahamed H
+
+Dear Avijo Team,
+
+I am Rizwan Ahamed H, a Computer Science undergraduate currently pursuing B.E. CSE at Dr. Mahalingam College of Engineering and Technology. I am writing to apply for the MERN Full Stack Developer Intern role at Avijo.
+
+I have hands-on experience building and maintaining production web applications, REST APIs, authentication flows, role-based access systems, database-backed modules, and deployment workflows. My recent work includes a live production quality control system with React.js, JavaScript, Spring Boot, MySQL, JWT authentication, RBAC, audit trails, and real user workflows, along with a self-hosted developer platform involving APIs, Docker, Nginx, security hardening, and performance-focused backend systems.
+
+Avijo's mission to build secure, scalable healthtech products for India's digital healthcare ecosystem strongly interests me. I would be excited to contribute to real product modules, collaborate with designers and developers, debug and improve existing codebases, and learn directly from the team while building technology that can improve healthcare access and safety.
+
+I have attached my resume for your review. I would be grateful for the opportunity to discuss how I can contribute as a MERN Full Stack Developer Intern.
+
+Regards,
+Rizwan Ahamed H
++91 7708959715
+rizwanahamed2726@gmail.com
+LinkedIn: linkedin.com/in/rizwan-ahamed-7b236832a
+GitHub: github.com/RizwanAhamed13
