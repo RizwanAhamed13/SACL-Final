@@ -10,7 +10,7 @@ import Skeleton from '../components/Skeleton';
 const locKey = (loc) => loc.replace(/[^a-zA-Z0-9]/g, '_');
 
 const MICRO_SINGLE_FIELDS = [
-  { name: 'nodularityPercent', label: 'Nodularity/Graphite Type %', type: 'number', thMin: 'microMinNodularity', thMax: 'microMaxNodularity', placeholder: 'e.g. 90' },
+  { name: 'nodularityPercent', label: 'Nodularity/Graphite Type %', type: 'text', thMin: 'microMinNodularity', thMax: 'microMaxNodularity', placeholder: 'e.g. 90 or 85-95' },
   { name: 'graphiteType', label: 'Graphite Type', type: 'text', placeholder: 'e.g. VI' },
 ];
 
@@ -26,9 +26,9 @@ const MICRO_RANGE_FIELDS = [
 const MICRO_FIELDS = [
   ...MICRO_SINGLE_FIELDS,
   { name: 'size', label: 'Nodule Size', type: 'text', placeholder: 'e.g. 6' },
-  { name: 'ferritePercent', label: 'Ferrite %', type: 'number', thMin: 'microMinFerrite', thMax: 'microMaxFerrite', placeholder: 'e.g. 5' },
-  { name: 'pearlitePercent', label: 'Pearlite %', type: 'number', thMin: 'microMinPearlite', thMax: 'microMaxPearlite', placeholder: 'e.g. 95' },
-  { name: 'carbidePercent', label: 'Carbide %', type: 'number', thMin: 'microMinCarbide', thMax: 'microMaxCarbide', placeholder: 'e.g. 0.5' },
+  { name: 'ferritePercent', label: 'Ferrite %', type: 'text', thMin: 'microMinFerrite', thMax: 'microMaxFerrite', placeholder: 'e.g. 5' },
+  { name: 'pearlitePercent', label: 'Pearlite %', type: 'text', thMin: 'microMinPearlite', thMax: 'microMaxPearlite', placeholder: 'e.g. 95' },
+  { name: 'carbidePercent', label: 'Carbide %', type: 'text', thMin: 'microMinCarbide', thMax: 'microMaxCarbide', placeholder: 'e.g. 0.5' },
 ];
 
 const MicroStructure = () => {
@@ -132,8 +132,23 @@ const MicroStructure = () => {
     if (val === undefined || val === null || val === '') return false;
     const hasMin = min !== null && min !== undefined && min !== '';
     const hasMax = max !== null && max !== undefined && max !== '';
-    if (!hasMin && !hasMax) return false; // no threshold set — accept any value
-    const num = parseFloat(val);
+    if (!hasMin && !hasMax) return false;
+
+    const str = String(val).trim();
+    if (str.includes('-') && !str.startsWith('-')) {
+      const parts = str.split('-').map(s => s.trim()).filter(s => s !== '');
+      if (parts.length === 2) {
+        const low = parseFloat(parts[0]);
+        const high = parseFloat(parts[1]);
+        if (isNaN(low) || isNaN(high)) return false;
+        if (low > high) return true;
+        if (hasMin && low < parseFloat(min)) return true;
+        if (hasMax && high > parseFloat(max)) return true;
+        return false;
+      }
+    }
+
+    const num = parseFloat(str);
     if (isNaN(num)) return false;
     if (hasMin && num < parseFloat(min)) return true;
     if (hasMax && num > parseFloat(max)) return true;
@@ -524,7 +539,7 @@ const MicroStructure = () => {
                       <div className="form-row form-row-3">
                         <div className="form-group">
                           <label className="form-label">Nodularity/Graphite Type % <span style={{color: errors.nodularityPercent ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.microMinNodularity, thresholds.microMaxNodularity) : '(85 Min)'}</span></label>
-                          <input type="number" name="nodularityPercent" value={formData.nodularityPercent} onChange={handleChange} className="form-control" style={errors.nodularityPercent ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 90" />
+                          <input type="text" name="nodularityPercent" value={formData.nodularityPercent} onChange={handleChange} className="form-control" style={errors.nodularityPercent ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 90 or 85-95" />
                           {errors.nodularityPercent && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
                         </div>
                         <div className="form-group">

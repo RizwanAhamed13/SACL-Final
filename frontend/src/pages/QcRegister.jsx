@@ -120,8 +120,23 @@ const QcRegister = () => {
     if (val === undefined || val === null || val === '') return false;
     const hasMin = min !== null && min !== undefined && min !== '';
     const hasMax = max !== null && max !== undefined && max !== '';
-    if (!hasMin && !hasMax) return false; // no threshold set — accept any value
-    const num = parseFloat(val);
+    if (!hasMin && !hasMax) return false;
+
+    const str = String(val).trim();
+    if (str.includes('-') && !str.startsWith('-')) {
+      const parts = str.split('-').map(s => s.trim()).filter(s => s !== '');
+      if (parts.length === 2) {
+        const low = parseFloat(parts[0]);
+        const high = parseFloat(parts[1]);
+        if (isNaN(low) || isNaN(high)) return false;
+        if (low > high) return true;
+        if (hasMin && low < parseFloat(min)) return true;
+        if (hasMax && high > parseFloat(max)) return true;
+        return false;
+      }
+    }
+
+    const num = parseFloat(str);
     if (isNaN(num)) return false;
     if (hasMin && num < parseFloat(min)) return true;
     if (hasMax && num > parseFloat(max)) return true;
@@ -376,56 +391,56 @@ const QcRegister = () => {
                   <div className="form-row form-row-4">
                     <div className="form-group">
                       <label className="form-label">C <span style={{color: errors.compositionC ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.qcMinC, thresholds.qcMaxC) : '[Min: 3.00] [Max: 4.00]'}</span></label>
-                      <input type="number" step="0.01" name="compositionC" value={formData.compositionC} onChange={handleChange} className="form-control" style={errors.compositionC ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="3.55" />
+                      <input type="text" name="compositionC" value={formData.compositionC} onChange={handleChange} className="form-control" style={errors.compositionC ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 3.55 or 3.40-3.60" />
                       {errors.compositionC && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
                     </div>
                     <div className="form-group">
                       <label className="form-label">Si <span style={{color: errors.compositionSi ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.qcMinSi, thresholds.qcMaxSi) : '[Min: 2.00] [Max: 3.00]'}</span></label>
-                      <input type="number" step="0.01" name="compositionSi" value={formData.compositionSi} onChange={handleChange} className="form-control" style={errors.compositionSi ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="2.55" />
+                      <input type="text" name="compositionSi" value={formData.compositionSi} onChange={handleChange} className="form-control" style={errors.compositionSi ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 2.55" />
                       {errors.compositionSi && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
                     </div>
                     <div className="form-group">
                       <label className="form-label">Mn <span style={{color: errors.compositionMn ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.qcMinMn, thresholds.qcMaxMn) : '[Min: 0.10] [Max: 0.50]'}</span></label>
-                      <input type="number" step="0.01" name="compositionMn" value={formData.compositionMn} onChange={handleChange} className="form-control" style={errors.compositionMn ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="0.25" />
+                      <input type="text" name="compositionMn" value={formData.compositionMn} onChange={handleChange} className="form-control" style={errors.compositionMn ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 0.25" />
                       {errors.compositionMn && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
                     </div>
                     <div className="form-group">
                       <label className="form-label">P <span style={{color: errors.compositionP ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.qcMinP, thresholds.qcMaxP) : '[Max: 0.05]'}</span></label>
-                      <input type="number" step="0.001" name="compositionP" value={formData.compositionP} onChange={handleChange} className="form-control" style={errors.compositionP ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="0.03" />
+                      <input type="text" name="compositionP" value={formData.compositionP} onChange={handleChange} className="form-control" style={errors.compositionP ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 0.03" />
                       {errors.compositionP && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Exceeds limit!</div>}
                     </div>
                   </div>
                   <div className="form-row form-row-4">
                     <div className="form-group">
                       <label className="form-label">S <span style={{color: errors.compositionS ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.qcMinS, thresholds.qcMaxS) : '[Max: 0.02]'}</span></label>
-                      <input type="number" step="0.001" name="compositionS" value={formData.compositionS} onChange={handleChange} className="form-control" style={errors.compositionS ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="0.012" />
+                      <input type="text" name="compositionS" value={formData.compositionS} onChange={handleChange} className="form-control" style={errors.compositionS ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 0.012" />
                       {errors.compositionS && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Exceeds limit!</div>}
                     </div>
                     <div className="form-group">
                       <label className="form-label">Mg First <span style={{color: errors.compositionMgFirst ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.qcMinMg, thresholds.qcMaxMg) : '[Min: 0.015] [Max: 0.050]'}</span></label>
-                      <input type="number" step="0.001" name="compositionMgFirst" value={formData.compositionMgFirst} onChange={handleChange} className="form-control" style={errors.compositionMgFirst ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="0.035" />
+                      <input type="text" name="compositionMgFirst" value={formData.compositionMgFirst} onChange={handleChange} className="form-control" style={errors.compositionMgFirst ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 0.035" />
                       {errors.compositionMgFirst && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
                     </div>
                     <div className="form-group">
                       <label className="form-label">Mg Last <span style={{color: errors.compositionMgLast ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.qcMinMg, thresholds.qcMaxMg) : '[Min: 0.015] [Max: 0.050]'}</span></label>
-                      <input type="number" step="0.001" name="compositionMgLast" value={formData.compositionMgLast} onChange={handleChange} className="form-control" style={errors.compositionMgLast ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="0.035" />
+                      <input type="text" name="compositionMgLast" value={formData.compositionMgLast} onChange={handleChange} className="form-control" style={errors.compositionMgLast ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 0.035" />
                       {errors.compositionMgLast && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
                     </div>
                     <div className="form-group">
                       <label className="form-label">Cu <span style={{color: errors.compositionCu ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.qcMinCu, thresholds.qcMaxCu) : '[Max: 0.20]'}</span></label>
-                      <input type="number" step="0.01" name="compositionCu" value={formData.compositionCu} onChange={handleChange} className="form-control" style={errors.compositionCu ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="0.05" />
+                      <input type="text" name="compositionCu" value={formData.compositionCu} onChange={handleChange} className="form-control" style={errors.compositionCu ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 0.05" />
                       {errors.compositionCu && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Exceeds limit!</div>}
                     </div>
                   </div>
                   <div className="form-row form-row-4">
                     <div className="form-group">
                       <label className="form-label">Cr <span style={{color: errors.compositionCr ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.qcMinCr, thresholds.qcMaxCr) : '[Max: 0.05]'}</span></label>
-                      <input type="number" step="0.01" name="compositionCr" value={formData.compositionCr} onChange={handleChange} className="form-control" style={errors.compositionCr ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="0.02" />
+                      <input type="text" name="compositionCr" value={formData.compositionCr} onChange={handleChange} className="form-control" style={errors.compositionCr ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 0.02" />
                       {errors.compositionCr && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Exceeds limit!</div>}
                     </div>
                     <div className="form-group">
                       <label className="form-label">Sn <span style={{color: errors.compositionSn ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.qcMinSn, thresholds.qcMaxSn) : '[Max: 0.01]'}</span></label>
-                      <input type="number" step="0.001" name="compositionSn" value={formData.compositionSn} onChange={handleChange} className="form-control" style={errors.compositionSn ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="0.005" />
+                      <input type="text" name="compositionSn" value={formData.compositionSn} onChange={handleChange} className="form-control" style={errors.compositionSn ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 0.005" />
                       {errors.compositionSn && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
                     </div>
                   </div>
@@ -451,11 +466,11 @@ const QcRegister = () => {
                           )}
                         </label>
                         <div style={{display:'flex', gap:'0.5rem', alignItems:'center'}}>
-                          <input type="number" name="pouringTempStart" value={formData.pouringTempStart} onChange={handleChange} className="form-control"
+                          <input type="text" name="pouringTempStart" value={formData.pouringTempStart} onChange={handleChange} className="form-control"
                             style={errors.pouringTempStart ? { borderColor:'#ef4444', backgroundColor:'#fef2f2', color:'#ef4444' } : {}}
                             placeholder="Start" />
                           <span style={{color:'#94a3b8', fontWeight:600}}>—</span>
-                          <input type="number" name="pouringTempEnd" value={formData.pouringTempEnd} onChange={handleChange} className="form-control"
+                          <input type="text" name="pouringTempEnd" value={formData.pouringTempEnd} onChange={handleChange} className="form-control"
                             style={errors.pouringTempEnd ? { borderColor:'#ef4444', backgroundColor:'#fef2f2', color:'#ef4444' } : {}}
                             placeholder="End" />
                         </div>
@@ -468,7 +483,7 @@ const QcRegister = () => {
                     <div className="form-group"><label className="form-label">F/C No / Heat No</label><input type="text" name="fcNoHeatNo" value={formData.fcNoHeatNo} onChange={handleChange} className="form-control" placeholder="e.g. F1/H2" /></div>
                     <div className="form-group"><label className="form-label">Con No</label><input type="text" name="conNo" value={formData.conNo} onChange={handleChange} className="form-control" /></div>
                     <div className="form-group"><label className="form-label">Tapping Time</label><TimePicker name="tappingTime" value={formData.tappingTime} onChange={handleChange} /></div>
-                    <div className="form-group"><label className="form-label">Tapping Wt (Kgs)</label><input type="number" name="tappingWtKgs" value={formData.tappingWtKgs} onChange={handleChange} className="form-control" /></div>
+                    <div className="form-group"><label className="form-label">Tapping Wt (Kgs)</label><input type="text" name="tappingWtKgs" value={formData.tappingWtKgs} onChange={handleChange} className="form-control" /></div>
                   </div>
                   <div className="form-row form-row-4">
 
@@ -476,7 +491,7 @@ const QcRegister = () => {
                   <div className="form-row form-row-4">
                     <div className="form-group">
                       <label className="form-label">Mg (Kgs) <span style={{color: errors.mgKgs ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds && (thresholds.ppMinMgKgs || thresholds.ppMaxMgKgs) ? renderThreshold(thresholds.ppMinMgKgs, thresholds.ppMaxMgKgs) : ''}</span></label>
-                      <input type="number" step="0.01" name="mgKgs" value={formData.mgKgs} onChange={handleChange} className="form-control" style={errors.mgKgs ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
+                      <input type="text" name="mgKgs" value={formData.mgKgs} onChange={handleChange} className="form-control" style={errors.mgKgs ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
                       {errors.mgKgs && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
                     </div>
                     <div className="form-group">
@@ -487,11 +502,11 @@ const QcRegister = () => {
                           </span>
                         )}
                       </label>
-                      <input type="number" step="0.001" name="resMgConvertorPercent" value={formData.resMgConvertorPercent} onChange={handleChange} className="form-control"
+                      <input type="text" name="resMgConvertorPercent" value={formData.resMgConvertorPercent} onChange={handleChange} className="form-control"
                         style={errors.resMgConvertorPercent ? { borderColor:'#ef4444', backgroundColor:'#fef2f2', color:'#ef4444' } : {}} />
                       {errors.resMgConvertorPercent && <div style={{color:'#ef4444',fontSize:'10px',marginTop:'2px',fontWeight:'600'}}>Value out of range!</div>}
                     </div>
-                    <div className="form-group"><label className="form-label">Rec of Mg %</label><input type="number" step="0.01" name="recMgPercent" value={formData.recMgPercent} onChange={handleChange} className="form-control" /></div>
+                    <div className="form-group"><label className="form-label">Rec of Mg %</label><input type="text" name="recMgPercent" value={formData.recMgPercent} onChange={handleChange} className="form-control" /></div>
                     <div className="form-group">
                       <label className="form-label">Stream Inoculant (gms/Sec) <span style={{color: errors.streamInnoculant ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds && (thresholds.ppMinStreamInnoculant || thresholds.ppMaxStreamInnoculant) ? renderThreshold(thresholds.ppMinStreamInnoculant, thresholds.ppMaxStreamInnoculant) : ''}</span></label>
                       <input type="text" name="streamInnoculant" value={formData.streamInnoculant} onChange={handleChange} className="form-control" style={errors.streamInnoculant ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
@@ -508,11 +523,11 @@ const QcRegister = () => {
                         )}
                       </label>
                       <div style={{display:'flex', gap:'0.5rem', alignItems:'center'}}>
-                        <input type="number" step="0.1" name="pTimeSecStart" value={formData.pTimeSecStart} onChange={handleChange} className="form-control"
+                        <input type="text" name="pTimeSecStart" value={formData.pTimeSecStart} onChange={handleChange} className="form-control"
                           style={errors.pTimeSecStart ? { borderColor:'#ef4444', backgroundColor:'#fef2f2', color:'#ef4444' } : {}}
                           placeholder="Start" />
                         <span style={{color:'#94a3b8', fontWeight:600}}>—</span>
-                        <input type="number" step="0.1" name="pTimeSecEnd" value={formData.pTimeSecEnd} onChange={handleChange} className="form-control"
+                        <input type="text" name="pTimeSecEnd" value={formData.pTimeSecEnd} onChange={handleChange} className="form-control"
                           style={errors.pTimeSecEnd ? { borderColor:'#ef4444', backgroundColor:'#fef2f2', color:'#ef4444' } : {}}
                           placeholder="End" />
                       </div>
@@ -526,33 +541,33 @@ const QcRegister = () => {
                   <div className="form-row form-row-4">
                     <div className="form-group">
                       <label className="form-label">C <span style={{color: errors.correctiveC ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds && renderThreshold(thresholds.corrMinC, thresholds.corrMaxC)}</span></label>
-                      <input type="number" step="0.1" name="correctiveC" value={formData.correctiveC} onChange={handleChange} className="form-control" style={errors.correctiveC ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
+                      <input type="text" name="correctiveC" value={formData.correctiveC} onChange={handleChange} className="form-control" style={errors.correctiveC ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
                     </div>
                     <div className="form-group">
                       <label className="form-label">Si <span style={{color: errors.correctiveSi ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds && renderThreshold(thresholds.corrMinSi, thresholds.corrMaxSi)}</span></label>
-                      <input type="number" step="0.1" name="correctiveSi" value={formData.correctiveSi} onChange={handleChange} className="form-control" style={errors.correctiveSi ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
+                      <input type="text" name="correctiveSi" value={formData.correctiveSi} onChange={handleChange} className="form-control" style={errors.correctiveSi ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
                     </div>
                     <div className="form-group">
                       <label className="form-label">Mn <span style={{color: errors.correctiveMn ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds && renderThreshold(thresholds.corrMinMn, thresholds.corrMaxMn)}</span></label>
-                      <input type="number" step="0.1" name="correctiveMn" value={formData.correctiveMn} onChange={handleChange} className="form-control" style={errors.correctiveMn ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
+                      <input type="text" name="correctiveMn" value={formData.correctiveMn} onChange={handleChange} className="form-control" style={errors.correctiveMn ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
                     </div>
                     <div className="form-group">
                       <label className="form-label">S <span style={{color: errors.correctiveS ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds && renderThreshold(thresholds.corrMinS, thresholds.corrMaxS)}</span></label>
-                      <input type="number" step="0.1" name="correctiveS" value={formData.correctiveS} onChange={handleChange} className="form-control" style={errors.correctiveS ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
+                      <input type="text" name="correctiveS" value={formData.correctiveS} onChange={handleChange} className="form-control" style={errors.correctiveS ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
                     </div>
                   </div>
                   <div className="form-row form-row-3">
                     <div className="form-group">
                       <label className="form-label">Cr <span style={{color: errors.correctiveCr ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds && renderThreshold(thresholds.corrMinCr, thresholds.corrMaxCr)}</span></label>
-                      <input type="number" step="0.1" name="correctiveCr" value={formData.correctiveCr} onChange={handleChange} className="form-control" style={errors.correctiveCr ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
+                      <input type="text" name="correctiveCr" value={formData.correctiveCr} onChange={handleChange} className="form-control" style={errors.correctiveCr ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
                     </div>
                     <div className="form-group">
                       <label className="form-label">Cu <span style={{color: errors.correctiveCu ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds && renderThreshold(thresholds.corrMinCu, thresholds.corrMaxCu)}</span></label>
-                      <input type="number" step="0.1" name="correctiveCu" value={formData.correctiveCu} onChange={handleChange} className="form-control" style={errors.correctiveCu ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
+                      <input type="text" name="correctiveCu" value={formData.correctiveCu} onChange={handleChange} className="form-control" style={errors.correctiveCu ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
                     </div>
                     <div className="form-group">
                       <label className="form-label">Sn <span style={{color: errors.correctiveSn ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds && renderThreshold(thresholds.corrMinSn, thresholds.corrMaxSn)}</span></label>
-                      <input type="number" step="0.1" name="correctiveSn" value={formData.correctiveSn} onChange={handleChange} className="form-control" style={errors.correctiveSn ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
+                      <input type="text" name="correctiveSn" value={formData.correctiveSn} onChange={handleChange} className="form-control" style={errors.correctiveSn ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
                     </div>
                   </div>
                 </div>

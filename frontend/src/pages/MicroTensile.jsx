@@ -8,12 +8,12 @@ import ConfirmModal from '../components/ConfirmModal';
 import Skeleton from '../components/Skeleton';
 
 const TENSILE_FIELDS = [
-  { name: 'maxLoadKn', label: 'Max Load (KN)', type: 'number', step: '0.1', placeholder: 'e.g. 10.5' },
-  { name: 'yieldLoadKn', label: 'Yield Load (KN)', type: 'number', step: '0.1', placeholder: 'e.g. 7.2' },
-  { name: 'tensileStrength', label: 'Tensile Strength / UTS', type: 'number', step: '0.1', thMin: 'tensileMinStrength', thMax: 'tensileMaxStrength', placeholder: 'e.g. 540' },
-  { name: 'yieldStrength02', label: 'Yield Strength @0.2%', type: 'number', step: '0.1', thMin: 'tensileMinYield', thMax: 'tensileMaxYield', placeholder: 'e.g. 350' },
-  { name: 'yieldStrength05', label: 'Yield Strength @0.5%', type: 'number', step: '0.1', thMin: 'tensileMinYield05', thMax: 'tensileMaxYield05', placeholder: 'e.g. 300' },
-  { name: 'elongationPercent', label: 'Elongation %', type: 'number', step: '0.1', thMin: 'tensileMinElongation', thMax: 'tensileMaxElongation', placeholder: 'e.g. 14' },
+  { name: 'maxLoadKn', label: 'Max Load (KN)', type: 'text', placeholder: 'e.g. 10.5 or 10-12' },
+  { name: 'yieldLoadKn', label: 'Yield Load (KN)', type: 'text', placeholder: 'e.g. 7.2 or 7-9' },
+  { name: 'tensileStrength', label: 'Tensile Strength / UTS', type: 'text', thMin: 'tensileMinStrength', thMax: 'tensileMaxStrength', placeholder: 'e.g. 540 or 520-560' },
+  { name: 'yieldStrength02', label: 'Yield Strength @0.2%', type: 'text', thMin: 'tensileMinYield', thMax: 'tensileMaxYield', placeholder: 'e.g. 350 or 340-360' },
+  { name: 'yieldStrength05', label: 'Yield Strength @0.5%', type: 'text', thMin: 'tensileMinYield05', thMax: 'tensileMaxYield05', placeholder: 'e.g. 300 or 300-320' },
+  { name: 'elongationPercent', label: 'Elongation %', type: 'text', thMin: 'tensileMinElongation', thMax: 'tensileMaxElongation', placeholder: 'e.g. 14 or 12-16' },
 ];
 
 const MicroTensile = () => {
@@ -43,6 +43,7 @@ const MicroTensile = () => {
     setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
   };
   
+
   const getSelectableRecords = () => {
     const isHof = user?.role?.toUpperCase()?.includes('HOF');
     const isHod = user?.role?.toUpperCase()?.includes('HOD');
@@ -112,8 +113,23 @@ const MicroTensile = () => {
     if (val === undefined || val === null || val === '') return false;
     const hasMin = min !== null && min !== undefined && min !== '';
     const hasMax = max !== null && max !== undefined && max !== '';
-    if (!hasMin && !hasMax) return false; // no threshold set — accept any value
-    const num = parseFloat(val);
+    if (!hasMin && !hasMax) return false;
+
+    const str = String(val).trim();
+    if (str.includes('-') && !str.startsWith('-')) {
+      const parts = str.split('-').map(s => s.trim()).filter(s => s !== '');
+      if (parts.length === 2) {
+        const low = parseFloat(parts[0]);
+        const high = parseFloat(parts[1]);
+        if (isNaN(low) || isNaN(high)) return false;
+        if (low > high) return true;
+        if (hasMin && low < parseFloat(min)) return true;
+        if (hasMax && high > parseFloat(max)) return true;
+        return false;
+      }
+    }
+
+    const num = parseFloat(str);
     if (isNaN(num)) return false;
     if (hasMin && num < parseFloat(min)) return true;
     if (hasMax && num > parseFloat(max)) return true;
@@ -173,22 +189,16 @@ const MicroTensile = () => {
       } catch (e) { console.error("Error parsing locationValues", e); }
     }
     
-    // Ensure mechLocation is populated for UI rendering
-    let currentLocs = record.mechLocation ? record.mechLocation.split(',').filter(Boolean) : [];
-    if (currentLocs.length === 0 && discoveredLocs.length > 0) currentLocs = discoveredLocs;
-    if (currentLocs.length === 0) currentLocs = ['TRA'];
-
-    setFormData({
+    const locString = record.mechLocation || discoveredLocs.join(',');
+    const loadedData = {
       ...record,
       ...flatLocData,
-      mechLocation: currentLocs.join(','),
+      mechLocation: locString,
       dateOfInspection: record.dateOfInspection ? record.dateOfInspection.split('T')[0] : ''
-    });
-    fetchThresholds(record.item, {
-      ...record,
-      ...flatLocData,
-      dateOfInspection: record.dateOfInspection ? record.dateOfInspection.split('T')[0] : ''
-    });
+    };
+    
+    setFormData(loadedData);
+    fetchThresholds(record.item, loadedData);
     setShowForm(true);
   };
 
@@ -218,7 +228,10 @@ const MicroTensile = () => {
     const { name, value } = e.target;
     const nextData = { ...formData, [name]: value };
     setFormData(nextData);
-    if (thresholds) validateAll(nextData, thresholds, activeLocations);
+    if (thresholds) {
+      const locs = activeLocations;
+      validateAll(nextData, thresholds, locs);
+    }
   };
 
   const handlePartNameChange = (val) => {
@@ -248,27 +261,34 @@ const MicroTensile = () => {
         const locationValues = {};
         activeLocations.forEach(loc => {
           locationValues[loc] = {
-            maxLoadKn: formData[`${loc}_maxLoadKn`] || formData.maxLoadKn || null,
-            yieldLoadKn: formData[`${loc}_yieldLoadKn`] || formData.yieldLoadKn || null,
-            tensileStrength: formData[`${loc}_tensileStrength`] || formData.tensileStrength || null,
-            yieldStrength02: formData[`${loc}_yieldStrength02`] || formData.yieldStrength02 || null,
-            yieldStrength05: formData[`${loc}_yieldStrength05`] || formData.yieldStrength05 || null,
-            elongationPercent: formData[`${loc}_elongationPercent`] || formData.elongationPercent || null,
+            maxLoadKn: formData[`${loc}_maxLoadKn`] || null,
+            yieldLoadKn: formData[`${loc}_yieldLoadKn`] || null,
+            tensileStrength: formData[`${loc}_tensileStrength`] || null,
+            yieldStrength02: formData[`${loc}_yieldStrength02`] || null,
+            yieldStrength05: formData[`${loc}_yieldStrength05`] || null,
+            elongationPercent: formData[`${loc}_elongationPercent`] || null,
           };
         });
-        payload.mechLocation = activeLocations.join(',');
         payload.locationValues = JSON.stringify(locationValues);
+        payload.mechLocation = activeLocations.join(',');
+        
+        const firstLoc = activeLocations[0];
+        payload.maxLoadKn = formData[`${firstLoc}_maxLoadKn`] || null;
+        payload.yieldLoadKn = formData[`${firstLoc}_yieldLoadKn`] || null;
+        payload.tensileStrength = formData[`${firstLoc}_tensileStrength`] || null;
+        payload.yieldStrength02 = formData[`${firstLoc}_yieldStrength02`] || null;
+        payload.yieldStrength05 = formData[`${firstLoc}_yieldStrength05`] || null;
+        payload.elongationPercent = formData[`${firstLoc}_elongationPercent`] || null;
       } else {
-        ['maxLoadKn', 'yieldLoadKn', 'tensileStrength', 'yieldStrength02', 'yieldStrength05', 'elongationPercent', 'barDiaMm', 'gaugeLengthMm'].forEach(k => {
-          if (payload[k] === '') payload[k] = null;
-        });
+        payload.locationValues = null;
       }
 
-      if (payload.id) {
-        if (user?.role?.toUpperCase()?.includes('HOD') && payload.status === 'HOF_APPROVED') {
-          payload = { ...payload, status: 'HOD_APPROVED', hodApprovedBy: user.employeeId || user.fullName };
+      if (formData.id) {
+        if (user?.role?.toUpperCase()?.includes('HOD') && formData.status === 'HOF_APPROVED') {
+          payload.status = 'HOD_APPROVED';
+          payload.hodApprovedBy = user.employeeId || user.fullName;
         }
-        await axios.put(`/api/micro-tensile/${payload.id}`, payload);
+        await axios.put(`/api/micro-tensile/${formData.id}`, payload);
         toast.success('Updated successfully');
       } else {
         payload.createdBy = user.employeeId || user.fullName;
@@ -281,9 +301,9 @@ const MicroTensile = () => {
         dateOfInspection: new Date().toISOString().split('T')[0], item: '', dateCode: '', disa: '',
         barDiaMm: '', gaugeLengthMm: '', mechLocation: '',
         maxLoadKn: '', yieldLoadKn: '', tensileStrength: '', yieldStrength02: '', yieldStrength05: '', elongationPercent: '',
-        remarks: '',
-        status: 'QC_ENTRY', hofApprovedBy: '', hodApprovedBy: '', createdBy: ''
+        remarks: ''
       });
+      setThresholds(null);
       setErrors({});
       fetchRecords();
     } catch (err) {
@@ -296,10 +316,13 @@ const MicroTensile = () => {
   };
 
   const renderThreshold = (min, max) => {
-    if (min !== null && min !== undefined && max !== null && max !== undefined && min !== '' && max !== '') return `(${min}–${max})`;
-    if (max !== null && max !== undefined && max !== '') return `(Max ${max})`;
-    if (min !== null && min !== undefined && min !== '') return `(${min} Min)`;
-    return '';
+    const minText = (min !== null && min !== undefined && min !== '') ? `Min: ${min}` : '';
+    const maxText = (max !== null && max !== undefined && max !== '') ? `Max: ${max}` : '';
+    
+    if (minText && maxText) return `[${minText}] [${maxText}]`;
+    if (minText) return `[${minText}]`;
+    if (maxText) return `[${maxText}]`;
+    return '(—)';
   };
 
   const dash = (val) => (val !== null && val !== undefined && val !== '') ? val : '—';
@@ -313,8 +336,8 @@ const MicroTensile = () => {
 
       <div className="page-header">
         <div>
-          <h1 className="page-title">Micro Tensile Test Report</h1>
-          <p className="page-subtitle">Bar dia, gauge length, max/yield load, tensile strength, elongation — DISA I/II/III/IV</p>
+          <h1 className="page-title">Tensile Test Register</h1>
+          <p className="page-subtitle">Mechanical properties &amp; elongation log</p>
         </div>
         <div className="page-actions" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           <div className="search-container" style={{ position: 'relative' }}>
@@ -331,7 +354,7 @@ const MicroTensile = () => {
               style={{ paddingLeft: '32px', width: '200px' }}
             />
           </div>
-          {(user?.role?.toUpperCase()?.includes('HOF') || user?.role?.toUpperCase()?.includes('ADMIN') || user?.role?.toUpperCase()?.includes('USER') || user?.role?.toUpperCase()?.includes('QC')) && (
+          {(user?.role?.toUpperCase()?.includes('QC') || user?.role?.toUpperCase()?.includes('ADMIN') || user?.role?.toUpperCase()?.includes('USER')) && (
             <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19" />
@@ -359,21 +382,20 @@ const MicroTensile = () => {
         <div className="form-panel" style={{ display: 'block' }}>
           <div className="card mb-3">
             <div className="card-header">
-              <h2 className="card-title">{formData.id ? 'Edit Tensile Test' : 'Add Tensile Test'}</h2>
+              <h2 className="card-title">{formData.id ? 'Edit Tensile Test' : 'Add New Tensile Test'}</h2>
               <button className="btn btn-secondary btn-sm" onClick={() => setShowForm(false)}>Cancel</button>
             </div>
             <div className="card-body">
               <form onSubmit={handleSubmit} noValidate>
-
                 <div className="form-section">
-                  <div className="form-section-title">Test Reference</div>
-                  <div className="form-row form-row-3">
+                  <div className="form-section-title">Specimen Identification</div>
+                  <div className="form-row form-row-4">
                     <div className="form-group">
                       <label className="form-label required">Date of Inspection</label>
                       <input type="date" name="dateOfInspection" value={formData.dateOfInspection} onChange={handleChange} className="form-control" required />
                     </div>
                     <div className="form-group">
-                      <label className="form-label">Item / Part Name</label>
+                      <label className="form-label">Part Name</label>
                       <PartNameSelect value={formData.item} onChange={handlePartNameChange} />
                     </div>
                     <div className="form-group">
@@ -390,12 +412,6 @@ const MicroTensile = () => {
                         <option>DISA IV</option>
                       </select>
                     </div>
-                    {formData.id && (
-                      <div className="form-group">
-                        <label className="form-label">Location</label>
-                        <input type="text" value={formData.mechLocation || '—'} readOnly className="form-control" style={{ background: '#f8fafc', color: '#64748b' }} />
-                      </div>
-                    )}
                   </div>
                 </div>
 
@@ -406,13 +422,13 @@ const MicroTensile = () => {
                       <label className="form-label">Bar Dia <span style={{color: errors.barDiaMm ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>
                         (mm, 5±0.06) {thresholds && (thresholds.barDiaMin || thresholds.barDiaMax) ? renderThreshold(thresholds.barDiaMin, thresholds.barDiaMax) : ''}
                       </span></label>
-                      <input type="number" step="0.01" name="barDiaMm" value={formData.barDiaMm} onChange={handleChange} className="form-control"
+                      <input type="text" name="barDiaMm" value={formData.barDiaMm} onChange={handleChange} className="form-control"
                         style={errors.barDiaMm ? { borderColor:'#ef4444', backgroundColor:'#fef2f2', color:'#ef4444' } : {}} placeholder="e.g. 5.00" />
                       {errors.barDiaMm && <div style={{color:'#ef4444',fontSize:'10px',marginTop:'2px',fontWeight:'600'}}>Value out of range!</div>}
                     </div>
                     <div className="form-group">
                       <label className="form-label">Gauge Length Lo <span style={{color:'var(--color-text-secondary)', fontWeight:400}}>(mm)</span></label>
-                      <input type="number" step="0.1" name="gaugeLengthMm" value={formData.gaugeLengthMm} onChange={handleChange} className="form-control" placeholder="e.g. 25" />
+                      <input type="text" name="gaugeLengthMm" value={formData.gaugeLengthMm} onChange={handleChange} className="form-control" placeholder="e.g. 25" />
                     </div>
                   </div>
                 </div>
@@ -436,7 +452,7 @@ const MicroTensile = () => {
                                   {f.label}
                                   {thHint && <span style={{ color: hasErr ? '#ef4444' : 'var(--color-text-secondary)', fontWeight: 400, marginLeft: '4px' }}>{thHint}</span>}
                                 </label>
-                                <input type={f.type} step={f.step} name={`${loc}_${f.name}`} value={formData[`${loc}_${f.name}`] || ''} onChange={handleChange} className="form-control" placeholder={f.placeholder} style={hasErr ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
+                                <input type={f.type} name={`${loc}_${f.name}`} value={formData[`${loc}_${f.name}`] || ''} onChange={handleChange} className="form-control" placeholder={f.placeholder} style={hasErr ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
                                 {hasErr && <div style={{ color: '#ef4444', fontSize: '10px', marginTop: '2px', fontWeight: '600' }}>Value out of range!</div>}
                               </div>
                             );
@@ -451,32 +467,32 @@ const MicroTensile = () => {
                     <div className="form-row form-row-3">
                       <div className="form-group">
                         <label className="form-label">Max Load <span style={{color:'var(--color-text-secondary)', fontWeight:400}}>(KN)</span></label>
-                        <input type="number" step="0.1" name="maxLoadKn" value={formData.maxLoadKn} onChange={handleChange} className="form-control" placeholder="e.g. 10.5" />
+                        <input type="text" name="maxLoadKn" value={formData.maxLoadKn} onChange={handleChange} className="form-control" placeholder="e.g. 10.5 or 10-12" />
                       </div>
                       <div className="form-group">
                         <label className="form-label">Yield Load <span style={{color:'var(--color-text-secondary)', fontWeight:400}}>(KN)</span></label>
-                        <input type="number" step="0.1" name="yieldLoadKn" value={formData.yieldLoadKn} onChange={handleChange} className="form-control" placeholder="e.g. 7.2" />
+                        <input type="text" name="yieldLoadKn" value={formData.yieldLoadKn} onChange={handleChange} className="form-control" placeholder="e.g. 7.2 or 7-9" />
                       </div>
                     </div>
                     <div className="form-row form-row-3">
                       <div className="form-group">
                         <label className="form-label">Tensile Strength / UTS <span style={{color: errors.tensileStrength ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.tensileMinStrength, thresholds.tensileMaxStrength) : '(500 Min)'}</span></label>
-                        <input type="number" step="0.1" name="tensileStrength" value={formData.tensileStrength} onChange={handleChange} className="form-control" style={errors.tensileStrength ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 540" />
+                        <input type="text" name="tensileStrength" value={formData.tensileStrength} onChange={handleChange} className="form-control" style={errors.tensileStrength ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 540 or 520-560" />
                         {errors.tensileStrength && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
                       </div>
                       <div className="form-group">
                         <label className="form-label">Yield Strength @0.2% <span style={{color: errors.yieldStrength02 ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.tensileMinYield, thresholds.tensileMaxYield) : '(320 Min)'}</span></label>
-                        <input type="number" step="0.1" name="yieldStrength02" value={formData.yieldStrength02} onChange={handleChange} className="form-control" style={errors.yieldStrength02 ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 350" />
+                        <input type="text" name="yieldStrength02" value={formData.yieldStrength02} onChange={handleChange} className="form-control" style={errors.yieldStrength02 ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 350 or 340-360" />
                         {errors.yieldStrength02 && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
                       </div>
                       <div className="form-group">
                         <label className="form-label">Yield Strength @0.5% <span style={{color: errors.yieldStrength05 ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.tensileMinYield05, thresholds.tensileMaxYield05) : ''}</span></label>
-                        <input type="number" step="0.1" name="yieldStrength05" value={formData.yieldStrength05} onChange={handleChange} className="form-control" style={errors.yieldStrength05 ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 300" />
+                        <input type="text" name="yieldStrength05" value={formData.yieldStrength05} onChange={handleChange} className="form-control" style={errors.yieldStrength05 ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 300 or 300-320" />
                         {errors.yieldStrength05 && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
                       </div>
                       <div className="form-group">
                         <label className="form-label">Elongation % <span style={{color: errors.elongationPercent ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.tensileMinElongation, thresholds.tensileMaxElongation) : '(10 Min)'}</span></label>
-                        <input type="number" step="0.1" name="elongationPercent" value={formData.elongationPercent} onChange={handleChange} className="form-control" style={errors.elongationPercent ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 14" />
+                        <input type="text" name="elongationPercent" value={formData.elongationPercent} onChange={handleChange} className="form-control" style={errors.elongationPercent ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 14 or 12-16" />
                         {errors.elongationPercent && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
                       </div>
                     </div>

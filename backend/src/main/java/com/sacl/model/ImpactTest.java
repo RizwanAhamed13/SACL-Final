@@ -27,9 +27,9 @@ public class ImpactTest {
     private String specification;
     private String mechLocation;
 
-    private Double observedValue1;
-    private Double observedValue2;
-    private Double observedValue3;
+    private String observedValue1;
+    private String observedValue2;
+    private String observedValue3;
     private String testType;
     private String notchType; // "Unotch", "Vnotch", "Unnotch"
 

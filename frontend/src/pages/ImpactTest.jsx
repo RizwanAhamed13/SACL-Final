@@ -8,9 +8,9 @@ import ConfirmModal from '../components/ConfirmModal';
 import Skeleton from '../components/Skeleton';
 
 const IMPACT_FIELDS = [
-  { name: 'observedValue1', label: 'Observed Value 1 (J)', placeholder: 'e.g. 14.5' },
-  { name: 'observedValue2', label: 'Observed Value 2 (J)', placeholder: 'e.g. 13.8' },
-  { name: 'observedValue3', label: 'Observed Value 3 (J)', placeholder: 'e.g. 15.2' },
+  { name: 'observedValue1', label: 'Observed Value 1 (J)', placeholder: 'e.g. 14.5 or 12-16' },
+  { name: 'observedValue2', label: 'Observed Value 2 (J)', placeholder: 'e.g. 13.8 or 12-16' },
+  { name: 'observedValue3', label: 'Observed Value 3 (J)', placeholder: 'e.g. 15.2 or 12-16' },
 ];
 
 const NOTCH_LABEL = { Unnotch: 'Un-notch', Unotch: 'U-notch', Vnotch: 'V-notch' };
@@ -122,8 +122,23 @@ const ImpactTest = () => {
     if (val === undefined || val === null || val === '') return false;
     const hasMin = min !== null && min !== undefined && min !== '';
     const hasMax = max !== null && max !== undefined && max !== '';
-    if (!hasMin && !hasMax) return false; // no threshold set — accept any value
-    const num = parseFloat(val);
+    if (!hasMin && !hasMax) return false;
+
+    const str = String(val).trim();
+    if (str.includes('-') && !str.startsWith('-')) {
+      const parts = str.split('-').map(s => s.trim()).filter(s => s !== '');
+      if (parts.length === 2) {
+        const low = parseFloat(parts[0]);
+        const high = parseFloat(parts[1]);
+        if (isNaN(low) || isNaN(high)) return false;
+        if (low > high) return true;
+        if (hasMin && low < parseFloat(min)) return true;
+        if (hasMax && high > parseFloat(max)) return true;
+        return false;
+      }
+    }
+
+    const num = parseFloat(str);
     if (isNaN(num)) return false;
     if (hasMin && num < parseFloat(min)) return true;
     if (hasMax && num > parseFloat(max)) return true;
@@ -505,7 +520,7 @@ const ImpactTest = () => {
                                       {thHint && <span style={{ color: hasErr ? '#ef4444' : 'var(--color-text-secondary)', fontWeight: 400, marginLeft: '4px' }}>{thHint}</span>}
                                     </label>
                                     <input
-                                      type="number" step="0.1"
+                                      type="text"
                                       name={errKey}
                                       value={formData[errKey] || ''}
                                       onChange={handleChange}
@@ -543,7 +558,7 @@ const ImpactTest = () => {
                                   {thHint && <span style={{ color: hasErr ? '#ef4444' : 'var(--color-text-secondary)', fontWeight: 400, marginLeft: '4px' }}>{thHint}</span>}
                                 </label>
                                 <input
-                                  type="number" step="0.1"
+                                  type="text"
                                   name={`${loc}_${f.name}`}
                                   value={formData[`${loc}_${f.name}`] || ''}
                                   onChange={handleChange}
@@ -565,17 +580,17 @@ const ImpactTest = () => {
                     <div className="form-row form-row-3">
                       <div className="form-group">
                         <label className="form-label">Observed Value 1 <span style={{color: errors.observedValue1 ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.impactMinSpec, thresholds.impactMaxSpec) : '(12 Min)'}</span></label>
-                        <input type="number" step="0.1" name="observedValue1" value={formData.observedValue1} onChange={handleChange} className="form-control" style={errors.observedValue1 ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 14.5" />
+                        <input type="text" name="observedValue1" value={formData.observedValue1} onChange={handleChange} className="form-control" style={errors.observedValue1 ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 14.5 or 12-16" />
                         {errors.observedValue1 && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
                       </div>
                       <div className="form-group">
                         <label className="form-label">Observed Value 2 <span style={{color: errors.observedValue2 ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.impactMinSpec, thresholds.impactMaxSpec) : '(12 Min)'}</span></label>
-                        <input type="number" step="0.1" name="observedValue2" value={formData.observedValue2} onChange={handleChange} className="form-control" style={errors.observedValue2 ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 13.8" />
+                        <input type="text" name="observedValue2" value={formData.observedValue2} onChange={handleChange} className="form-control" style={errors.observedValue2 ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 13.8 or 12-16" />
                         {errors.observedValue2 && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
                       </div>
                       <div className="form-group">
                         <label className="form-label">Observed Value 3 <span style={{color: errors.observedValue3 ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>{thresholds ? renderThreshold(thresholds.impactMinSpec, thresholds.impactMaxSpec) : '(12 Min)'}</span></label>
-                        <input type="number" step="0.1" name="observedValue3" value={formData.observedValue3} onChange={handleChange} className="form-control" style={errors.observedValue3 ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 15.2" />
+                        <input type="text" name="observedValue3" value={formData.observedValue3} onChange={handleChange} className="form-control" style={errors.observedValue3 ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} placeholder="e.g. 15.2 or 12-16" />
                         {errors.observedValue3 && <div style={{color:'#ef4444', fontSize:'10px', marginTop:'2px', fontWeight:'600'}}>Value out of range!</div>}
                       </div>
                     </div>

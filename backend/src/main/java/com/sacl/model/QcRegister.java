@@ -36,38 +36,38 @@ public class QcRegister {
 
     // Metal Composition (%)
     @Column(name = "composition_c")
-    private Double compositionC;
+    private String compositionC;
 
     @Column(name = "composition_si")
-    private Double compositionSi;
+    private String compositionSi;
 
     @Column(name = "composition_mn")
-    private Double compositionMn;
+    private String compositionMn;
 
     @Column(name = "composition_p")
-    private Double compositionP;
+    private String compositionP;
 
     @Column(name = "composition_s")
-    private Double compositionS;
+    private String compositionS;
 
     @Column(name = "composition_mg_first")
-    private Double compositionMgFirst;
+    private String compositionMgFirst;
 
     @Column(name = "composition_mg_last")
-    private Double compositionMgLast;
+    private String compositionMgLast;
 
     @Column(name = "composition_cu")
-    private Double compositionCu;
+    private String compositionCu;
 
     @Column(name = "composition_cr")
-    private Double compositionCr;
+    private String compositionCr;
 
     @Column(name = "composition_sn")
-    private Double compositionSn;
+    private String compositionSn;
 
     private String timeOfPouringStart;
     private String timeOfPouringEnd;
-    private Double pouringTemp;
+    private String pouringTemp;
     private String ppCode;
     private String treatmentNo;
     private String fcNoHeatNo;
@@ -76,45 +76,45 @@ public class QcRegister {
 
     // Corrective Addition (Kgs)
     @Column(name = "corrective_c")
-    private Double correctiveC;
+    private String correctiveC;
 
     @Column(name = "corrective_si")
-    private Double correctiveSi;
+    private String correctiveSi;
 
     @Column(name = "corrective_mn")
-    private Double correctiveMn;
+    private String correctiveMn;
 
     @Column(name = "corrective_s")
-    private Double correctiveS;
+    private String correctiveS;
 
     @Column(name = "corrective_cr")
-    private Double correctiveCr;
+    private String correctiveCr;
 
     @Column(name = "corrective_cu")
-    private Double correctiveCu;
+    private String correctiveCu;
 
     @Column(name = "corrective_sn")
-    private Double correctiveSn;
+    private String correctiveSn;
 
-    private Double tappingWtKgs;
-    private Double mgKgs;
-    private Double resMgConvertorPercent;
-    private Double recMgPercent;
-    private Double streamInnoculant;
+    private String tappingWtKgs;
+    private String mgKgs;
+    private String resMgConvertorPercent;
+    private String recMgPercent;
+    private String streamInnoculant;
 
     @JsonProperty("pTimeSec")
     @JsonAlias("ptimeSec")
-    private Double pTimeSec;
-    private Double pouringTempStart;
-    private Double pouringTempEnd;
+    private String pTimeSec;
+    private String pouringTempStart;
+    private String pouringTempEnd;
 
     @JsonProperty("pTimeSecStart")
     @JsonAlias("ptimeSecStart")
-    private Double pTimeSecStart;
+    private String pTimeSecStart;
 
     @JsonProperty("pTimeSecEnd")
     @JsonAlias("ptimeSecEnd")
-    private Double pTimeSecEnd;
+    private String pTimeSecEnd;
 
     @Column(length = 4000)
     private String remarks;

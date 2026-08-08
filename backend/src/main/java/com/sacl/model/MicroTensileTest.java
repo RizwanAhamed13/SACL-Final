@@ -31,14 +31,14 @@ public class MicroTensileTest {
     @Column(length = 4000)
     private String locationValues;
 
-    private Double barDiaMm;
-    private Double gaugeLengthMm;
-    private Double maxLoadKn;
-    private Double yieldLoadKn;
-    private Double tensileStrength;
-    private Double yieldStrength02;
-    private Double yieldStrength05;
-    private Double elongationPercent;
+    private String barDiaMm;
+    private String gaugeLengthMm;
+    private String maxLoadKn;
+    private String yieldLoadKn;
+    private String tensileStrength;
+    private String yieldStrength02;
+    private String yieldStrength05;
+    private String elongationPercent;
 
     @Column(length = 4000)
     private String remarks;

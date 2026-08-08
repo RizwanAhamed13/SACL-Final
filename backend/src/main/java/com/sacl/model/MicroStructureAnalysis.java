@@ -32,15 +32,15 @@ public class MicroStructureAnalysis {
     private String locationValues;
 
     // Micro Structure
-    private Double nodularityPercent;
+    private String nodularityPercent;
     private String graphiteType;
-    private Double countNosPerMm2;
+    private String countNosPerMm2;
     private Double countNosPerMm2Min;
     private Double countNosPerMm2Max;
     private String size;
-    private Double ferritePercent;
-    private Double pearlitePercent;
-    private Double carbidePercent;
+    private String ferritePercent;
+    private String pearlitePercent;
+    private String carbidePercent;
     private Double ferritePercentMin;
     private Double ferritePercentMax;
     private Double pearlitePercentMin;
