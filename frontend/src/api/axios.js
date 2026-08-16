@@ -30,7 +30,8 @@ instance.interceptors.response.use(
       localStorage.removeItem('user');
       localStorage.removeItem('token');
       if (window.location.pathname !== '/login') {
-         toast.error("Your session has expired! Please copy any unsaved work to your clipboard before logging in again.", { duration: 15000 });
+         toast.error("Your session has expired! Please log in again.", { id: 'session-expired' });
+         window.location.href = '/login';
       }
     }
     return Promise.reject(error);

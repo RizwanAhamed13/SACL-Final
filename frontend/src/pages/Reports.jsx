@@ -88,7 +88,7 @@ const styleTitleRow = (ws, rowIdx, colCount, bgHex) => {
 const QC_HEADERS = {
   rows: [
     [
-      'ID', 'Part Name', 'Date', 'Heat Code', 'Date Code', 'Disa', 'Moulds',
+      'ID', 'Part Name', 'Date', 'Date Code', 'Heat Code', 'Disa', 'Moulds',
       'Metal Composition (%)', '', '', '', '', '', '', '', '', '',
       'Process Parameters', '', '', '', '', '', '',
       'Tapping Time', 'Tapping Wt (kg)',
@@ -117,7 +117,7 @@ const QC_HEADERS = {
   ]
 };
 const QC_KEYS = [
-  'id', 'partName', 'date', 'heatCode', 'dateCode', 'disa', 'qtyMoulds',
+  'id', 'partName', 'date', 'dateCode', 'heatCode', 'disa', 'qtyMoulds',
   'compositionC', 'compositionSi', 'compositionMn', 'compositionP', 'compositionS',
   'compositionMgFirst', 'compositionMgLast', 'compositionCu', 'compositionCr', 'compositionSn',
   'timeOfPouringStart', 'timeOfPouringEnd', (r) => (r.pouringTempStart || r.pouringTempEnd) ? `${r.pouringTempStart || '-'} - ${r.pouringTempEnd || '-'}` : r.pouringTemp, 'ppCode', 'treatmentNo', 'fcNoHeatNo', 'conNo',
@@ -131,7 +131,7 @@ const QC_KEYS = [
 const MICRO_HEADERS = {
   rows: [
     [
-      'ID', 'Part Name', 'Inspection Date', 'Heat Code', 'Date Code', 'Location', 'Disa',
+      'ID', 'Part Name', 'Inspection Date', 'Date Code', 'Heat Code', 'Location', 'Disa',
       'Micro Structure Properties', '', '', '', '', '', '', '', '', '', '', '', 'Remarks'
     ],
     [
@@ -148,7 +148,7 @@ const MICRO_HEADERS = {
   ]
 };
 const MICRO_KEYS = [
-  'id', 'partName', 'inspectionDate', 'heatCode', 'dateCode', (r) => r.location || r.microLocation, 'disa',
+  'id', 'partName', 'inspectionDate', 'dateCode', 'heatCode', (r) => r.location || r.microLocation, 'disa',
   'nodularityPercent', 'graphiteType', (r) => r.countNosPerMm2Min ?? r.countNosPerMm2, (r) => r.countNosPerMm2Max ?? r.countNosPerMm2,
   (r) => r.ferritePercentMin ?? r.ferritePercent, (r) => r.ferritePercentMax ?? r.ferritePercent,
   (r) => r.pearlitePercentMin ?? r.pearlitePercent, (r) => r.pearlitePercentMax ?? r.pearlitePercent,
@@ -159,7 +159,7 @@ const MICRO_KEYS = [
 const TENSILE_HEADERS = {
   rows: [
     [
-      'ID', 'Item', 'Inspection Date', 'Heat Code', 'Date Code', 'Location', 'Disa',
+      'ID', 'Item', 'Inspection Date', 'Date Code', 'Heat Code', 'Location', 'Disa',
       'Specimen Dimensions', '', 'Mechanical Properties', '', '', '', '', '', 'Remarks'
     ],
     [
@@ -176,7 +176,7 @@ const TENSILE_HEADERS = {
   ]
 };
 const TENSILE_KEYS = [
-  'id', 'item', 'dateOfInspection', 'heatCode', 'dateCode', (r) => r.location || r.mechLocation, 'disa',
+  'id', 'item', 'dateOfInspection', 'dateCode', 'heatCode', (r) => r.location || r.mechLocation, 'disa',
   'barDiaMm', 'gaugeLengthMm', 'maxLoadKn', 'yieldLoadKn',
   'tensileStrength', 'yieldStrength02', 'yieldStrength05', 'elongationPercent',
   'remarks'
@@ -660,7 +660,7 @@ const Reports = () => {
                   : results.qcRegister.map(r => (
                     <tr key={r.id}>
                       <td>{r.id}</td><td className="part-name">{r.partName}</td><td>{r.date}</td>
-                      <td style={{ fontWeight: 700 }}>{r.heatCode}</td><td>{r.dateCode}</td>
+                      <td>{r.dateCode}</td><td style={{ fontWeight: 700 }}>{r.heatCode}</td>
                       <td>{r.disa}</td><td>{r.qtyMoulds}</td>
                       <td>{dash(r.compositionC)}</td><td>{dash(r.compositionSi)}</td><td>{dash(r.compositionMn)}</td>
                       <td>{dash(r.compositionP)}</td><td>{dash(r.compositionS)}</td>
@@ -705,7 +705,7 @@ const Reports = () => {
                   : results.microStructure.map((r, idx) => (
                     <tr key={`${r.id}-${r.location}-${idx}`}>
                       <td>{r.id}</td><td className="part-name">{r.partName}</td>
-                      <td>{r.inspectionDate}</td><td style={{ fontWeight: 700 }}>{r.heatCode}</td><td>{r.dateCode}</td><td>{r.location || r.microLocation || '—'}</td><td>{r.disa || '—'}</td>
+                      <td>{r.inspectionDate}</td><td>{r.dateCode}</td><td style={{ fontWeight: 700 }}>{r.heatCode}</td><td>{r.location || r.microLocation || '—'}</td><td>{r.disa || '—'}</td>
                       <td>{dash(r.nodularityPercent)}</td><td>{dash(r.graphiteType)}</td>
                       <td>{dash(r.countNosPerMm2Min ?? r.countNosPerMm2)}</td><td>{dash(r.countNosPerMm2Max ?? r.countNosPerMm2)}</td>
                       <td>{dash(r.ferritePercentMin ?? r.ferritePercent)}</td><td>{dash(r.ferritePercentMax ?? r.ferritePercent)}</td>
@@ -742,7 +742,7 @@ const Reports = () => {
                   : results.microTensile.map((r, idx) => (
                     <tr key={`${r.id}-${r.location}-${idx}`}>
                       <td>{r.id}</td><td className="part-name">{r.item}</td>
-                      <td>{r.dateOfInspection}</td><td style={{ fontWeight: 700 }}>{r.heatCode}</td><td>{r.dateCode}</td><td>{r.location || r.mechLocation || '—'}</td><td>{r.disa || '—'}</td>
+                      <td>{r.dateOfInspection}</td><td>{r.dateCode}</td><td style={{ fontWeight: 700 }}>{r.heatCode}</td><td>{r.location || r.mechLocation || '—'}</td><td>{r.disa || '—'}</td>
                       <td>{dash(r.barDiaMm)}</td><td>{dash(r.gaugeLengthMm)}</td>
                       <td>{dash(r.maxLoadKn)}</td><td>{dash(r.yieldLoadKn)}</td>
                       <td>{dash(r.tensileStrength)}</td><td>{dash(r.yieldStrength02)}</td>
