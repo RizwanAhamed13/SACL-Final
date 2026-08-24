@@ -166,6 +166,14 @@ public class PartName {
     private String microLocations;
     private String mechLocations;
 
+    // Material Test Report metadata
+    private String customer;
+    private String partNo;
+    private String revNo;
+    private String revDate;
+    private String material;
+    private String specification;
+
     private Boolean active = true;
 
     @Column(updatable = false)

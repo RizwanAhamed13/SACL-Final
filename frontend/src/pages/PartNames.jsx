@@ -7,6 +7,7 @@ import ConfirmModal from '../components/ConfirmModal';
 
 const emptyForm = {
   name: '', description: '', active: 'true',
+  customer: '', partNo: '', revNo: '', revDate: '', material: '', specification: '',
   qcMinC: '', qcMaxC: '', qcMinSi: '', qcMaxSi: '', qcMinMn: '', qcMaxMn: '', qcMinP: '', qcMaxP: '', qcMinS: '', qcMaxS: '', qcMinMg: '', qcMaxMg: '', qcMinCu: '', qcMaxCu: '', qcMinCr: '', qcMaxCr: '', qcMinSn: '', qcMaxSn: '',
   microMinNodularity: '', microMaxNodularity: '', microMinCount: '', microMaxCount: '', microSize: '', microMinFerrite: '', microMaxFerrite: '', microMinPearlite: '', microMaxPearlite: '', microMinCarbide: '', microMaxCarbide: '',
   microLocations: '',
@@ -70,6 +71,12 @@ const PartNames = () => {
       name: part.name,
       description: part.description || '',
       active: part.active ? 'true' : 'false',
+      customer: part.customer || '',
+      partNo: part.partNo || '',
+      revNo: part.revNo || '',
+      revDate: part.revDate || '',
+      material: part.material || '',
+      specification: part.specification || '',
       qcMinC: part.qcMinC ?? '', qcMaxC: part.qcMaxC ?? '', qcMinSi: part.qcMinSi ?? '', qcMaxSi: part.qcMaxSi ?? '', qcMinMn: part.qcMinMn ?? '', qcMaxMn: part.qcMaxMn ?? '', qcMinP: part.qcMinP ?? '', qcMaxP: part.qcMaxP ?? '', qcMinS: part.qcMinS ?? '', qcMaxS: part.qcMaxS ?? '', qcMinMg: part.qcMinMg ?? '', qcMaxMg: part.qcMaxMg ?? '', qcMinCu: part.qcMinCu ?? '', qcMaxCu: part.qcMaxCu ?? '', qcMinCr: part.qcMinCr ?? '', qcMaxCr: part.qcMaxCr ?? '', qcMinSn: part.qcMinSn ?? '', qcMaxSn: part.qcMaxSn ?? '',
       microMinNodularity: part.microMinNodularity ?? '', microMaxNodularity: part.microMaxNodularity ?? '', microMinCount: part.microMinCount ?? '', microMaxCount: part.microMaxCount ?? '', microSize: part.microSize ?? '', microMinFerrite: part.microMinFerrite ?? '', microMaxFerrite: part.microMaxFerrite ?? '', microMinPearlite: part.microMinPearlite ?? '', microMaxPearlite: part.microMaxPearlite ?? '', microMinCarbide: part.microMinCarbide ?? '', microMaxCarbide: part.microMaxCarbide ?? '',
       microLocations: part.microLocations ?? '',
@@ -104,6 +111,12 @@ const PartNames = () => {
     const payload = {
       name: formData.name.trim(),
       description: formData.description.trim() || null,
+      customer: formData.customer?.trim() || null,
+      partNo: formData.partNo?.trim() || null,
+      revNo: formData.revNo?.trim() || null,
+      revDate: formData.revDate?.trim() || null,
+      material: formData.material?.trim() || null,
+      specification: formData.specification?.trim() || null,
       qcMinC: n(formData.qcMinC), qcMaxC: n(formData.qcMaxC), qcMinSi: n(formData.qcMinSi), qcMaxSi: n(formData.qcMaxSi), qcMinMn: n(formData.qcMinMn), qcMaxMn: n(formData.qcMaxMn), qcMinP: n(formData.qcMinP), qcMaxP: n(formData.qcMaxP), qcMinS: n(formData.qcMinS), qcMaxS: n(formData.qcMaxS), qcMinMg: n(formData.qcMinMg), qcMaxMg: n(formData.qcMaxMg), qcMinCu: n(formData.qcMinCu), qcMaxCu: n(formData.qcMaxCu), qcMinCr: n(formData.qcMinCr), qcMaxCr: n(formData.qcMaxCr), qcMinSn: n(formData.qcMinSn), qcMaxSn: n(formData.qcMaxSn),
       microMinNodularity: n(formData.microMinNodularity), microMaxNodularity: n(formData.microMaxNodularity), microMinCount: n(formData.microMinCount), microMaxCount: n(formData.microMaxCount), microSize: formData.microSize || null, microMinFerrite: n(formData.microMinFerrite), microMaxFerrite: n(formData.microMaxFerrite), microMinPearlite: n(formData.microMinPearlite), microMaxPearlite: n(formData.microMaxPearlite), microMinCarbide: n(formData.microMinCarbide), microMaxCarbide: n(formData.microMaxCarbide),
       microLocations: formData.microLocations || null,
@@ -215,6 +228,38 @@ const PartNames = () => {
                   <div className="col-md-6">
                     <label className="form-label required">Part Name</label>
                     <input type="text" name="name" value={formData.name} onChange={handleChange} className="form-control" placeholder="e.g. YTA KNUCKLE" required disabled={editingId !== null} />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Description</label>
+                    <input type="text" name="description" value={formData.description} onChange={handleChange} className="form-control" placeholder="Description of the part" />
+                  </div>
+                </div>
+
+                {/* Material Test Report Metadata */}
+                <div className="form-section-title">Material Test Report (MTR) Details</div>
+                <div className="row g-3">
+                  <div className="col-md-4">
+                    <label className="form-label">Customer</label>
+                    <input type="text" name="customer" value={formData.customer} onChange={handleChange} className="form-control" placeholder="e.g. MARUTI SUZUKI INDIA LTD" />
+                  </div>
+                  <div className="col-md-4">
+                    <label className="form-label">Part No</label>
+                    <input type="text" name="partNo" value={formData.partNo} onChange={handleChange} className="form-control" placeholder="e.g. 43511 - 55K10" />
+                  </div>
+                  <div className="col-md-4">
+                    <label className="form-label">Rev No &amp; Date</label>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <input type="text" name="revNo" value={formData.revNo} onChange={handleChange} className="form-control" style={{ width: '80px' }} placeholder="Rev No" />
+                      <input type="text" name="revDate" value={formData.revDate} onChange={handleChange} className="form-control" placeholder="Rev Date (e.g. 17.06.19)" />
+                    </div>
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Material (our side input)</label>
+                    <input type="text" name="material" value={formData.material} onChange={handleChange} className="form-control" placeholder="e.g. FC250A (SES N 3121)" />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Specification</label>
+                    <input type="text" name="specification" value={formData.specification} onChange={handleChange} className="form-control" placeholder="e.g. IS 210" />
                   </div>
                 </div>
 
