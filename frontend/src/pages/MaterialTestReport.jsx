@@ -413,7 +413,7 @@ const MaterialTestReport = () => {
                 </div>
               </div>
               <div className="col-md-3">
-                <label className="form-label">Hardness (HRB) (Min/Max)</label>
+                <label className="form-label">Hardness (HBW) (Min/Max)</label>
                 <div style={{ display: 'flex', gap: '5px' }}>
                   <input type="text" name="obsMinHardness" value={formData.obsMinHardness} onChange={handleInputChange} className="form-control" placeholder="Min" />
                   <input type="text" name="obsMaxHardness" value={formData.obsMaxHardness} onChange={handleInputChange} className="form-control" placeholder="Max" />
@@ -555,7 +555,7 @@ const MaterialTestReport = () => {
                       <th style={{ width: '10%' }}>Graphite Type</th>
                       <th style={{ width: '6.5%' }}>Size</th>
                       <th style={{ width: '6.5%' }}>Ferrite %</th>
-                      <th style={{ width: '6.5%' }}>Hardness (HRB)</th>
+                      <th style={{ width: '6.5%' }}>Hardness (HBW)</th>
                       <th style={{ width: '7%' }}>T.Strength N/mm2</th>
                     </tr>
                   </thead>
