@@ -132,11 +132,11 @@ const MaterialTestReport = () => {
         specMinS: formatNum(meta.qcMinS), specMaxS: formatNum(meta.qcMaxS),
         specMinCu: formatNum(meta.qcMinCu), specMaxCu: formatNum(meta.qcMaxCu),
         specMinCr: formatNum(meta.qcMinCr), specMaxCr: formatNum(meta.qcMaxCr),
-        specGraphiteType: 'Type A + B (Type B:20% Max)',
-        specMinSize: formatNum(meta.microSizeMin) || '3', specMaxSize: formatNum(meta.microSizeMax) || '6',
-        specMinFerrite: formatNum(meta.microMinFerrite) || '', specMaxFerrite: meta.microMaxFerrite ? `${meta.microMaxFerrite}% Max` : '5% Max',
-        specMinHardness: '85', specMaxHardness: '98',
-        specTensile: meta.tensileMinStrength ? `${meta.tensileMinStrength} (Min)` : '260 (Min)',
+        specGraphiteType: meta.specGraphiteType || '',
+        specMinSize: formatNum(meta.microSizeMin), specMaxSize: formatNum(meta.microSizeMax),
+        specMinFerrite: formatNum(meta.microMinFerrite), specMaxFerrite: meta.microMaxFerrite ? `${meta.microMaxFerrite}% Max` : '',
+        specMinHardness: formatNum(meta.hardnessMin), specMaxHardness: formatNum(meta.hardnessMax),
+        specTensile: meta.tensileMinStrength ? `${meta.tensileMinStrength} (Min)` : '',
 
         // Observed values
         obsMinC: formatNum(obs.c?.min), obsMaxC: formatNum(obs.c?.max),
@@ -369,8 +369,67 @@ const MaterialTestReport = () => {
               </div>
             </div>
 
+            {/* Specification Chemical Composition % */}
+            <div className="mtr-editor-title" style={{ background: '#f8fafc', padding: '6px 10px', borderRadius: '6px', borderLeft: '4px solid #3b82f6' }}>
+              Specification Limits — Chemical Composition %
+            </div>
+            <div className="row g-3">
+              {[
+                { name: 'C', minKey: 'specMinC', maxKey: 'specMaxC' },
+                { name: 'Si', minKey: 'specMinSi', maxKey: 'specMaxSi' },
+                { name: 'Mn', minKey: 'specMinMn', maxKey: 'specMaxMn' },
+                { name: 'P', minKey: 'specMinP', maxKey: 'specMaxP' },
+                { name: 'S', minKey: 'specMinS', maxKey: 'specMaxS' },
+                { name: 'Cu', minKey: 'specMinCu', maxKey: 'specMaxCu' },
+                { name: 'Cr', minKey: 'specMinCr', maxKey: 'specMaxCr' },
+              ].map(item => (
+                <div className="col-md-3" key={item.name}>
+                  <label className="form-label" style={{ fontWeight: 600, fontSize: '12px' }}>Spec {item.name} (%)</label>
+                  <div style={{ display: 'flex', gap: '5px' }}>
+                    <input type="text" name={item.minKey} value={formData[item.minKey]} onChange={handleInputChange} className="form-control" placeholder="Min" />
+                    <input type="text" name={item.maxKey} value={formData[item.maxKey]} onChange={handleInputChange} className="form-control" placeholder="Max" />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Specification Microstructure & Mechanical Properties */}
+            <div className="mtr-editor-title" style={{ background: '#f8fafc', padding: '6px 10px', borderRadius: '6px', borderLeft: '4px solid #3b82f6', marginTop: '20px' }}>
+              Specification Limits — Microstructure &amp; Mechanical Properties
+            </div>
+            <div className="row g-3">
+              <div className="col-md-4">
+                <label className="form-label" style={{ fontWeight: 600, fontSize: '12px' }}>Spec Graphite Type</label>
+                <input type="text" name="specGraphiteType" value={formData.specGraphiteType} onChange={handleInputChange} className="form-control" placeholder="e.g. Type A + B (Type B:20% Max)" />
+              </div>
+              <div className="col-md-4">
+                <label className="form-label" style={{ fontWeight: 600, fontSize: '12px' }}>Spec Nodule Size (Min / Max)</label>
+                <div style={{ display: 'flex', gap: '5px' }}>
+                  <input type="text" name="specMinSize" value={formData.specMinSize} onChange={handleInputChange} className="form-control" placeholder="Min (e.g. 3)" />
+                  <input type="text" name="specMaxSize" value={formData.specMaxSize} onChange={handleInputChange} className="form-control" placeholder="Max (e.g. 6)" />
+                </div>
+              </div>
+              <div className="col-md-4">
+                <label className="form-label" style={{ fontWeight: 600, fontSize: '12px' }}>Spec Ferrite % (Max)</label>
+                <input type="text" name="specMaxFerrite" value={formData.specMaxFerrite} onChange={handleInputChange} className="form-control" placeholder="e.g. 5% Max" />
+              </div>
+              <div className="col-md-6">
+                <label className="form-label" style={{ fontWeight: 600, fontSize: '12px' }}>Spec Hardness (HBW) (Min / Max)</label>
+                <div style={{ display: 'flex', gap: '5px' }}>
+                  <input type="text" name="specMinHardness" value={formData.specMinHardness} onChange={handleInputChange} className="form-control" placeholder="Min (e.g. 85)" />
+                  <input type="text" name="specMaxHardness" value={formData.specMaxHardness} onChange={handleInputChange} className="form-control" placeholder="Max (e.g. 98)" />
+                </div>
+              </div>
+              <div className="col-md-6">
+                <label className="form-label" style={{ fontWeight: 600, fontSize: '12px' }}>Spec Tensile Strength N/mm²</label>
+                <input type="text" name="specTensile" value={formData.specTensile} onChange={handleInputChange} className="form-control" placeholder="e.g. 260 (Min)" />
+              </div>
+            </div>
+
             {/* Chemistry section */}
-            <div className="mtr-editor-title">Observed Chemical Composition %</div>
+            <div className="mtr-editor-title" style={{ background: '#f8fafc', padding: '6px 10px', borderRadius: '6px', borderLeft: '4px solid #10b981', marginTop: '20px' }}>
+              Observed Values — Chemical Composition %
+            </div>
             <div className="row g-3">
               {[
                 { name: 'C', minKey: 'obsMinC', maxKey: 'obsMaxC' },
@@ -382,7 +441,7 @@ const MaterialTestReport = () => {
                 { name: 'Cr', minKey: 'obsMinCr', maxKey: 'obsMaxCr' },
               ].map(item => (
                 <div className="col-md-3" key={item.name}>
-                  <label className="form-label" style={{ fontWeight: 700 }}>{item.name} (%)</label>
+                  <label className="form-label" style={{ fontWeight: 600, fontSize: '12px' }}>Obs {item.name} (%)</label>
                   <div style={{ display: 'flex', gap: '5px' }}>
                     <input type="text" name={item.minKey} value={formData[item.minKey]} onChange={handleInputChange} className="form-control" placeholder="Min" />
                     <input type="text" name={item.maxKey} value={formData[item.maxKey]} onChange={handleInputChange} className="form-control" placeholder="Max" />
@@ -392,7 +451,9 @@ const MaterialTestReport = () => {
             </div>
 
             {/* Micro & Mechanical */}
-            <div className="mtr-editor-title">Observed Microstructure &amp; Mechanical Properties</div>
+            <div className="mtr-editor-title" style={{ background: '#f8fafc', padding: '6px 10px', borderRadius: '6px', borderLeft: '4px solid #10b981', marginTop: '20px' }}>
+              Observed Values — Microstructure &amp; Mechanical Properties
+            </div>
             <div className="row g-3">
               <div className="col-md-3">
                 <label className="form-label">Graphite Type</label>

@@ -337,7 +337,7 @@ const MicroTensile = () => {
       <div className="page-header">
         <div>
           <h1 className="page-title">Tensile Test Register</h1>
-          <p className="page-subtitle">Mechanical properties &amp; elongation log</p>
+          <p className="page-subtitle">Mechanical properties &amp; elongation log — QF/08/FYQ-12 · Rev.01 dt 29.05.2024</p>
         </div>
         <div className="page-actions" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           <div className="search-container" style={{ position: 'relative' }}>

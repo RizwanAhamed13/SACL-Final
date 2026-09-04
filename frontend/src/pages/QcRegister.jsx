@@ -297,7 +297,7 @@ const QcRegister = () => {
       <div className="page-header">
         <div>
           <h1 className="page-title">Quality Control Register</h1>
-          <p className="page-subtitle">Daily chemical composition &amp; metal treatment log — DISA I/II/III/IV</p>
+          <p className="page-subtitle">Daily chemical composition &amp; metal treatment log — QF/08/FBQ-03 · Rev.01 dt 01.04.2022</p>
         </div>
         <div className="page-actions" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           <div className="search-container" style={{ position: 'relative' }}>

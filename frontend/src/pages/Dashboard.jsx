@@ -250,16 +250,16 @@ const Dashboard = () => {
       {/* ── Stat Cards ─────────────────────────────────────── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(210px,1fr))', gap: '1rem', marginBottom: '1.75rem' }}>
         {hasAccess('QC_REGISTER') && (
-          <StatCard label="QC Register Entries" value={stats.qc} icon="📋" color="#1e3a5f" bg="#dbeafe" loading={loading} to="/qc-register" />
+          <StatCard label="QC Register Entries" value={stats.qc} icon="📋" color="#1e3a5f" bg="#dbeafe" loading={loading} to="/qc-register" sub="QF/08/FBQ-03 · Rev.01 dt 01.04.2022" />
         )}
         {hasAccess('MICRO_STRUCTURE') && (
-          <StatCard label="Micro Structure Records" value={stats.ms} icon="🔬" color="#134e4a" bg="#ccfbf1" loading={loading} to="/micro-structure" />
+          <StatCard label="Micro Structure Records" value={stats.ms} icon="🔬" color="#134e4a" bg="#ccfbf1" loading={loading} to="/micro-structure" sub="QF/08/FYQ-13 · Rev.01 dt 29.05.2024" />
         )}
         {hasAccess('TENSILE_TEST') && (
-          <StatCard label="Tensile Test Reports" value={stats.mt} icon="📊" color="#78350f" bg="#fef3c7" loading={loading} to="/micro-tensile" />
+          <StatCard label="Tensile Test Reports" value={stats.mt} icon="📊" color="#78350f" bg="#fef3c7" loading={loading} to="/micro-tensile" sub="QF/08/FYQ-12 · Rev.01 dt 29.05.2024" />
         )}
         {hasAccess('IMPACT_TEST') && (
-          <StatCard label="Impact Test Reports" value={stats.it} icon="⚡" color="#3b0764" bg="#f3e8ff" loading={loading} to="/impact-test" />
+          <StatCard label="Impact Test Reports" value={stats.it} icon="⚡" color="#3b0764" bg="#f3e8ff" loading={loading} to="/impact-test" sub="QF/08/FYQ-19 · Rev.01 dt 29.05.2024" />
         )}
       </div>
 
@@ -328,19 +328,19 @@ const Dashboard = () => {
         </div>
         <div style={{ padding: '1.25rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: '1rem' }}>
           {hasAccess('QC_REGISTER') && (
-            <QuickCard to="/qc-register" icon="📋" title="QC Register" desc="QF/08/FBQ-03 · Rev.02"
+            <QuickCard to="/qc-register" icon="📋" title="QC Register" desc="QF/08/FBQ-03 · Rev.01 dt 01.04.2022"
               color="#1e3a5f" bg="#dbeafe" count={stats.qc} loading={loading} />
           )}
           {hasAccess('MICRO_STRUCTURE') && (
-            <QuickCard to="/micro-structure" icon="🔬" title="Micro Structure" desc="QF/08/FYQ-13 · Rev.01"
+            <QuickCard to="/micro-structure" icon="🔬" title="Micro Structure" desc="QF/08/FYQ-13 · Rev.01 dt 29.05.2024"
               color="#134e4a" bg="#ccfbf1" count={stats.ms} loading={loading} />
           )}
           {hasAccess('TENSILE_TEST') && (
-            <QuickCard to="/micro-tensile" icon="📊" title="Micro Tensile Test" desc="QF/08/FYQ-12 · Rev.01"
+            <QuickCard to="/micro-tensile" icon="📊" title="Micro Tensile Test" desc="QF/08/FYQ-12 · Rev.01 dt 29.05.2024"
               color="#78350f" bg="#fef3c7" count={stats.mt} loading={loading} />
           )}
           {hasAccess('IMPACT_TEST') && (
-            <QuickCard to="/impact-test" icon="⚡" title="Impact Test" desc="QF/08/FYQ-19 · Rev.01"
+            <QuickCard to="/impact-test" icon="⚡" title="Impact Test" desc="QF/08/FYQ-19 · Rev.01 dt 29.05.2024"
               color="#3b0764" bg="#f3e8ff" count={stats.it} loading={loading} />
           )}
           {isAdmin && (

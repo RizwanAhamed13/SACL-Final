@@ -386,7 +386,7 @@ const MicroStructure = () => {
       <div className="page-header">
         <div>
           <h1 className="page-title">Micro Structure Analysis</h1>
-          <p className="page-subtitle">Nodularity, nodule count, matrix composition, and carbide percentage</p>
+          <p className="page-subtitle">Nodularity, nodule count, matrix composition, and carbide percentage — QF/08/FYQ-13 · Rev.01 dt 29.05.2024</p>
         </div>
         <div className="page-actions" style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
           <div className="search-container" style={{ position: 'relative' }}>

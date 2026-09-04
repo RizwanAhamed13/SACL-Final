@@ -401,7 +401,7 @@ const ImpactTest = () => {
       <div className="page-header">
         <div>
           <h1 className="page-title">Charpy Impact Test Report</h1>
-          <p className="page-subtitle">Impact energy absorption (Joules) for V-notch specimens</p>
+          <p className="page-subtitle">Impact energy absorption (Joules) for V-notch specimens — QF/08/FYQ-19 · Rev.01 dt 29.05.2024</p>
         </div>
         <div className="page-actions" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           <div className="search-container" style={{ position: 'relative' }}>
