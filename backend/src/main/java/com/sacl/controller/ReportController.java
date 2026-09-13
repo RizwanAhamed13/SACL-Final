@@ -42,6 +42,11 @@ public class ReportController {
         return s != null && !s.trim().isEmpty();
     }
 
+    private boolean equalsTrimmed(String s1, String s2) {
+        if (s1 == null || s2 == null) return false;
+        return s1.trim().equalsIgnoreCase(s2.trim());
+    }
+
     private boolean matchesAny(String value, String... filters) {
         if (value == null) return false;
         String v = value.toLowerCase();
@@ -61,32 +66,28 @@ public class ReportController {
 
         // QC Register
         List<QcRegister> qc = qcRepo.findAll().stream()
-            .filter(r -> r.getStatus() == RecordStatus.HOD_APPROVED &&
-                         (!hasValue(partName) || matchesAny(r.getPartName(), partName)) &&
+            .filter(r -> (!hasValue(partName) || matchesAny(r.getPartName(), partName)) &&
                          (!hasValue(dateCode) || matchesAny(r.getDateCode(), dateCode)) &&
                          (!hasValue(heatCode) || matchesAny(r.getHeatCode(), heatCode)))
             .collect(Collectors.toList());
 
         // Micro Structure
         List<MicroStructureAnalysis> micro = microRepo.findAll().stream()
-            .filter(r -> r.getStatus() == RecordStatus.HOD_APPROVED &&
-                         (!hasValue(partName) || matchesAny(r.getPartName(), partName)) &&
+            .filter(r -> (!hasValue(partName) || matchesAny(r.getPartName(), partName)) &&
                          (!hasValue(dateCode) || matchesAny(r.getDateCode(), dateCode)) &&
                          (!hasValue(heatCode) || matchesAny(r.getHeatCode(), heatCode)))
             .collect(Collectors.toList());
 
         // Tensile Test
         List<MicroTensileTest> tensile = tensileRepo.findAll().stream()
-            .filter(r -> r.getStatus() == RecordStatus.HOD_APPROVED &&
-                         (!hasValue(partName) || matchesAny(r.getItem(), partName)) &&
+            .filter(r -> (!hasValue(partName) || matchesAny(r.getItem(), partName)) &&
                          (!hasValue(dateCode) || matchesAny(r.getDateCode(), dateCode)) &&
                          (!hasValue(heatCode) || matchesAny(r.getHeatCode(), heatCode)))
             .collect(Collectors.toList());
 
         // Impact Test (no heatCode field)
         List<ImpactTest> impact = impactRepo.findAll().stream()
-            .filter(r -> r.getStatus() == RecordStatus.HOD_APPROVED &&
-                         (!hasValue(partName) || matchesAny(r.getPartName(), partName)) &&
+            .filter(r -> (!hasValue(partName) || matchesAny(r.getPartName(), partName)) &&
                          (!hasValue(dateCode) || matchesAny(r.getDateCode(), dateCode)))
             .collect(Collectors.toList());
 
@@ -104,27 +105,31 @@ public class ReportController {
             @RequestParam String partName,
             @RequestParam String dateCode) {
 
-        PartName part = partNameRepo.findByName(partName);
+        final String cleanPartName = partName != null ? partName.trim() : "";
+        final String cleanDateCode = dateCode != null ? dateCode.trim() : "";
+
+        // Flexible case-insensitive, trimmed lookup for PartName master data
+        PartName part = partNameRepo.findAll().stream()
+            .filter(p -> p.getName() != null && equalsTrimmed(p.getName(), cleanPartName))
+            .findFirst()
+            .orElseGet(() -> partNameRepo.findByName(partName));
         
-        // 1. Fetch QC Register records (HOD APPROVED)
+        // 1. Fetch QC Register records (matching Part Name & Date Code)
         List<QcRegister> qcRecords = qcRepo.findAll().stream()
-            .filter(r -> r.getStatus() == RecordStatus.HOD_APPROVED &&
-                         r.getPartName().equalsIgnoreCase(partName) &&
-                         r.getDateCode().equalsIgnoreCase(dateCode))
+            .filter(r -> r.getPartName() != null && equalsTrimmed(r.getPartName(), cleanPartName) &&
+                         r.getDateCode() != null && equalsTrimmed(r.getDateCode(), cleanDateCode))
             .collect(Collectors.toList());
 
-        // 2. Fetch Micro Structure records (HOD APPROVED)
+        // 2. Fetch Micro Structure records (matching Part Name & Date Code)
         List<MicroStructureAnalysis> microRecords = microRepo.findAll().stream()
-            .filter(r -> r.getStatus() == RecordStatus.HOD_APPROVED &&
-                         r.getPartName().equalsIgnoreCase(partName) &&
-                         r.getDateCode().equalsIgnoreCase(dateCode))
+            .filter(r -> r.getPartName() != null && equalsTrimmed(r.getPartName(), cleanPartName) &&
+                         r.getDateCode() != null && equalsTrimmed(r.getDateCode(), cleanDateCode))
             .collect(Collectors.toList());
 
-        // 3. Fetch Tensile records (HOD APPROVED)
+        // 3. Fetch Tensile records (matching Part Name & Date Code)
         List<MicroTensileTest> tensileRecords = tensileRepo.findAll().stream()
-            .filter(r -> r.getStatus() == RecordStatus.HOD_APPROVED &&
-                         r.getItem().equalsIgnoreCase(partName) &&
-                         r.getDateCode().equalsIgnoreCase(dateCode))
+            .filter(r -> r.getItem() != null && equalsTrimmed(r.getItem(), cleanPartName) &&
+                         r.getDateCode() != null && equalsTrimmed(r.getDateCode(), cleanDateCode))
             .collect(Collectors.toList());
 
         // Chemistry values lists
