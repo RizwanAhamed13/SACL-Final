@@ -415,51 +415,77 @@ const MicroTensile = () => {
                   </div>
                 </div>
 
-                <div className="form-section">
-                  <div className="form-section-title">Specimen Data</div>
-                  <div className="form-row form-row-3">
-                    <div className="form-group">
-                      <label className="form-label">Bar Dia <span style={{color: errors.barDiaMm ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>
-                        (mm, 5±0.06) {thresholds && (thresholds.barDiaMin || thresholds.barDiaMax) ? renderThreshold(thresholds.barDiaMin, thresholds.barDiaMax) : ''}
-                      </span></label>
-                      <input type="text" name="barDiaMm" value={formData.barDiaMm} onChange={handleChange} className="form-control"
-                        style={errors.barDiaMm ? { borderColor:'#ef4444', backgroundColor:'#fef2f2', color:'#ef4444' } : {}} placeholder="e.g. 5.00" />
-                      {errors.barDiaMm && <div style={{color:'#ef4444',fontSize:'10px',marginTop:'2px',fontWeight:'600'}}>Value out of range!</div>}
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label">Gauge Length Lo <span style={{color:'var(--color-text-secondary)', fontWeight:400}}>(mm)</span></label>
-                      <input type="text" name="gaugeLengthMm" value={formData.gaugeLengthMm} onChange={handleChange} className="form-control" placeholder="e.g. 25" />
+                {activeLocations.length === 0 && (
+                  <div className="form-section">
+                    <div className="form-section-title">Specimen Data</div>
+                    <div className="form-row form-row-3">
+                      <div className="form-group">
+                        <label className="form-label">Bar Dia <span style={{color: errors.barDiaMm ? '#ef4444' : 'var(--color-text-secondary)', fontWeight:400}}>
+                          (mm, 5±0.06) {thresholds && (thresholds.barDiaMin || thresholds.barDiaMax) ? renderThreshold(thresholds.barDiaMin, thresholds.barDiaMax) : ''}
+                        </span></label>
+                        <input type="text" name="barDiaMm" value={formData.barDiaMm} onChange={handleChange} className="form-control"
+                          style={errors.barDiaMm ? { borderColor:'#ef4444', backgroundColor:'#fef2f2', color:'#ef4444' } : {}} placeholder="e.g. 5.00" />
+                        {errors.barDiaMm && <div style={{color:'#ef4444',fontSize:'10px',marginTop:'2px',fontWeight:'600'}}>Value out of range!</div>}
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Gauge Length Lo <span style={{color:'var(--color-text-secondary)', fontWeight:400}}>(mm)</span></label>
+                        <input type="text" name="gaugeLengthMm" value={formData.gaugeLengthMm} onChange={handleChange} className="form-control" placeholder="e.g. 25" />
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
 
                 {activeLocations.length > 0 ? (
                   <div className="form-section">
-                    <div className="form-section-title">Test Results — Per Location</div>
-                    {activeLocations.map(loc => (
-                      <div key={loc} style={{ border: '1px solid #cbd5e1', borderRadius: '10px', padding: '1rem 1.25rem', marginBottom: '1.25rem', background: '#f8fafc' }}>
-                        <div style={{ fontWeight: 700, fontSize: '13px', color: '#0f172a', marginBottom: '0.75rem', paddingBottom: '0.5rem', borderBottom: '1px solid #e2e8f0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                          📍 {loc}
+                    <div className="form-section-title">Test Results &amp; Specimen Data — Per Location</div>
+                    {activeLocations.map(loc => {
+                      const barDiaErr = errors[`${loc}_barDiaMm`];
+                      return (
+                        <div key={loc} style={{ border: '1px solid #cbd5e1', borderRadius: '10px', padding: '1rem 1.25rem', marginBottom: '1.25rem', background: '#f8fafc' }}>
+                          <div style={{ fontWeight: 700, fontSize: '13px', color: '#0f172a', marginBottom: '0.75rem', paddingBottom: '0.5rem', borderBottom: '1px solid #e2e8f0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                            📍 {loc}
+                          </div>
+                          
+                          {/* Specimen Dimensions Per Location */}
+                          <div className="form-row form-row-2" style={{ marginBottom: '0.75rem' }}>
+                            <div className="form-group" style={{ marginBottom: 0 }}>
+                              <label className="form-label" style={{ fontSize: '12px' }}>
+                                Bar Dia (mm)
+                                <span style={{ color: barDiaErr ? '#ef4444' : 'var(--color-text-secondary)', fontWeight: 400, marginLeft: '4px' }}>
+                                  (5±0.06) {thresholds && (thresholds.barDiaMin || thresholds.barDiaMax) ? renderThreshold(thresholds.barDiaMin, thresholds.barDiaMax) : ''}
+                                </span>
+                              </label>
+                              <input type="text" name={`${loc}_barDiaMm`} value={formData[`${loc}_barDiaMm`] || ''} onChange={handleChange} className="form-control" placeholder="e.g. 5.00" style={barDiaErr ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
+                              {barDiaErr && <div style={{ color: '#ef4444', fontSize: '10px', marginTop: '2px', fontWeight: '600' }}>Value out of range!</div>}
+                            </div>
+                            <div className="form-group" style={{ marginBottom: 0 }}>
+                              <label className="form-label" style={{ fontSize: '12px' }}>
+                                Gauge Length Lo <span style={{ color: 'var(--color-text-secondary)', fontWeight: 400 }}>(mm)</span>
+                              </label>
+                              <input type="text" name={`${loc}_gaugeLengthMm`} value={formData[`${loc}_gaugeLengthMm`] || ''} onChange={handleChange} className="form-control" placeholder="e.g. 25" />
+                            </div>
+                          </div>
+
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+                            {TENSILE_FIELDS.map(f => {
+                              const errKey = `${loc}_${f.name}`;
+                              const hasErr = errors[errKey];
+                              const thHint = f.thMin && thresholds ? renderThreshold(thresholds[f.thMin], thresholds[f.thMax]) : '';
+                              return (
+                                <div className="form-group" key={f.name} style={{ marginBottom: 0 }}>
+                                  <label className="form-label" style={{ fontSize: '12px' }}>
+                                    {f.label}
+                                    {thHint && <span style={{ color: hasErr ? '#ef4444' : 'var(--color-text-secondary)', fontWeight: 400, marginLeft: '4px' }}>{thHint}</span>}
+                                  </label>
+                                  <input type={f.type} name={`${loc}_${f.name}`} value={formData[`${loc}_${f.name}`] || ''} onChange={handleChange} className="form-control" placeholder={f.placeholder} style={hasErr ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
+                                  {hasErr && <div style={{ color: '#ef4444', fontSize: '10px', marginTop: '2px', fontWeight: '600' }}>Value out of range!</div>}
+                                </div>
+                              );
+                            })}
+                          </div>
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
-                          {TENSILE_FIELDS.map(f => {
-                            const errKey = `${loc}_${f.name}`;
-                            const hasErr = errors[errKey];
-                            const thHint = f.thMin && thresholds ? renderThreshold(thresholds[f.thMin], thresholds[f.thMax]) : '';
-                            return (
-                              <div className="form-group" key={f.name} style={{ marginBottom: 0 }}>
-                                <label className="form-label" style={{ fontSize: '12px' }}>
-                                  {f.label}
-                                  {thHint && <span style={{ color: hasErr ? '#ef4444' : 'var(--color-text-secondary)', fontWeight: 400, marginLeft: '4px' }}>{thHint}</span>}
-                                </label>
-                                <input type={f.type} name={`${loc}_${f.name}`} value={formData[`${loc}_${f.name}`] || ''} onChange={handleChange} className="form-control" placeholder={f.placeholder} style={hasErr ? { borderColor: '#ef4444', backgroundColor: '#fef2f2', color: '#ef4444' } : {}} />
-                                {hasErr && <div style={{ color: '#ef4444', fontSize: '10px', marginTop: '2px', fontWeight: '600' }}>Value out of range!</div>}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 ) : (
                   <div className="form-section">
