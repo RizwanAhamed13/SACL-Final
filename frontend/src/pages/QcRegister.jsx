@@ -183,14 +183,23 @@ const QcRegister = () => {
   };
 
   const openEdit = (record) => {
-    setFormData({
+    let startMoulds = '';
+    let endMoulds = '';
+    if (record.qtyMoulds && String(record.qtyMoulds).includes('-')) {
+      const parts = String(record.qtyMoulds).split('-').map(s => s.trim());
+      startMoulds = parts[0] || '';
+      endMoulds = parts[1] || '';
+    } else if (record.qtyMoulds) {
+      startMoulds = String(record.qtyMoulds);
+    }
+    const editData = {
       ...record,
+      qtyMouldsStart: startMoulds,
+      qtyMouldsEnd: endMoulds,
       date: record.date ? record.date.split('T')[0] : ''
-    });
-    fetchThresholds(record.partName, {
-      ...record,
-      date: record.date ? record.date.split('T')[0] : ''
-    });
+    };
+    setFormData(editData);
+    fetchThresholds(record.partName, editData);
     setShowForm(true);
   };
 
@@ -243,21 +252,30 @@ const QcRegister = () => {
     if (Object.keys(errors).length > 0) {
       return toast.error("Please correct values out of engineering range!");
     }
+    let formattedQtyMoulds = formData.qtyMoulds || '';
+    if (formData.qtyMouldsStart || formData.qtyMouldsEnd) {
+      if (formData.qtyMouldsStart && formData.qtyMouldsEnd) {
+        formattedQtyMoulds = `${formData.qtyMouldsStart} - ${formData.qtyMouldsEnd}`;
+      } else {
+        formattedQtyMoulds = formData.qtyMouldsStart || formData.qtyMouldsEnd;
+      }
+    }
+    const finalData = { ...formData, qtyMoulds: formattedQtyMoulds };
     try {
-      if (formData.id) {
-        let payload = formData;
-        if (user?.role?.toUpperCase()?.includes('HOD') && formData.status === 'HOF_APPROVED') {
-          payload = { ...formData, status: 'HOD_APPROVED', hodApprovedBy: user.employeeId || user.fullName };
+      if (finalData.id) {
+        let payload = finalData;
+        if (user?.role?.toUpperCase()?.includes('HOD') && finalData.status === 'HOF_APPROVED') {
+          payload = { ...finalData, status: 'HOD_APPROVED', hodApprovedBy: user.employeeId || user.fullName };
         }
-        await axios.put(`/api/qc-register/${formData.id}`, payload);
+        await axios.put(`/api/qc-register/${finalData.id}`, payload);
         toast.success('Updated successfully');
       } else {
-        await axios.post('/api/qc-register', { ...formData, createdBy: user.employeeId || user.fullName });
+        await axios.post('/api/qc-register', { ...finalData, createdBy: user.employeeId || user.fullName });
         toast.success('Added successfully');
       }
       setShowForm(false);
       setFormData({
-        disa: '', date: '', partName: '', dateCode: '', heatCode: '', qtyMoulds: '',
+        disa: '', date: '', partName: '', dateCode: '', heatCode: '', qtyMoulds: '', qtyMouldsStart: '', qtyMouldsEnd: '',
         compositionC: '', compositionSi: '', compositionMn: '', compositionP: '', compositionS: '', compositionMgFirst: '', compositionMgLast: '', compositionCu: '', compositionCr: '', compositionSn: '',
         timeOfPouringStart: '', timeOfPouringEnd: '', pouringTemp: '', pouringTempStart: '', pouringTempEnd: '', ppCode: '', treatmentNo: '', fcNoHeatNo: '', conNo: '', tappingTime: '',
         correctiveC: '', correctiveSi: '', correctiveMn: '', correctiveS: '', correctiveCr: '', correctiveCu: '', correctiveSn: '',
@@ -381,7 +399,11 @@ const QcRegister = () => {
                     </div>
                     <div className="form-group">
                       <label className="form-label">Qty Moulds</label>
-                      <input type="number" name="qtyMoulds" value={formData.qtyMoulds} onChange={handleChange} className="form-control" placeholder="0" />
+                      <div style={{display:'flex', gap:'0.5rem', alignItems:'center'}}>
+                        <input type="text" name="qtyMouldsStart" value={formData.qtyMouldsStart || ''} onChange={handleChange} className="form-control" placeholder="From" />
+                        <span style={{color:'#94a3b8', fontWeight:600}}>—</span>
+                        <input type="text" name="qtyMouldsEnd" value={formData.qtyMouldsEnd || ''} onChange={handleChange} className="form-control" placeholder="To" />
+                      </div>
                     </div>
                   </div>
                 </div>

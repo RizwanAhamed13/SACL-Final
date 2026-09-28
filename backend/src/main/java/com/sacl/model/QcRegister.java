@@ -32,7 +32,9 @@ public class QcRegister {
 
     private String dateCode;
     private String heatCode;
-    private Integer qtyMoulds;
+
+    @Column(name = "qty_moulds")
+    private String qtyMoulds;
 
     // Metal Composition (%)
     @Column(name = "composition_c")
