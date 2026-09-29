@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import logo from '../assets/image.png';
@@ -9,6 +10,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -18,8 +20,7 @@ const Login = () => {
     try {
       const response = await axios.post('/api/auth/login', { employeeId, password });
       login(response.data.user, response.data.token);
-      // User is redirected in context or via protected routes automatically when auth state updates
-      window.location.href = '/'; 
+      navigate('/'); 
     } catch (err) {
       setError(err.response?.data?.message || 'Invalid username or password');
     } finally {

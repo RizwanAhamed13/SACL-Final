@@ -331,7 +331,7 @@ const MaterialTestReport = () => {
           <h3 className="card-title">MTR Value Verification &amp; Overrides</h3>
           <p className="text-muted" style={{ fontSize: '12px' }}>Verify and overwrite the values fetched from the database before generating the landscape layout.</p>
 
-          <form>
+          <form onSubmit={(e) => e.preventDefault()}>
             {/* Header section */}
             <div className="mtr-editor-title">Header Details</div>
             <div className="row g-3">
