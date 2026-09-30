@@ -108,7 +108,7 @@ const MicroStructure = () => {
     ? formData.microLocation.split(',').filter(Boolean)
     : (thresholds?.microLocations ? thresholds.microLocations.split(',').filter(Boolean) : []);
 
-  const fetchRecords = async (query = '') => {
+  const fetchRecords = async (query = searchTerm) => {
     try {
       const res = await axios.get('/api/micro-structure/search', { params: { q: query } });
       const data = res.data.content ?? res.data;
@@ -252,7 +252,8 @@ const MicroStructure = () => {
         [approvalField]: user.employeeId || user.fullName
       };
       await axios.put(`/api/micro-structure/${record.id}`, payload);
-      fetchRecords();
+      fetchRecords(searchTerm);
+      setSelectedIds(prev => prev.filter(id => id !== record.id));
       toast.success('Record approved');
     } catch (err) {
       if (err.response && err.response.status === 409) {
@@ -899,8 +900,8 @@ const MicroStructure = () => {
                 : await axios.post('/api/micro-structure/approve-all');
               toast.success(`${res.data.approved ?? idsToApprove.length} Micro Structure records approved by HOD!`);
             }
-            fetchRecords();
-            setSelectedIds([]);
+            fetchRecords(searchTerm);
+            setSelectedIds(prev => prev.filter(id => !idsToApprove.includes(id)));
           } catch (err) {
             toast.error(err.response?.data?.message || 'Failed to approve records');
           } finally {

@@ -98,7 +98,7 @@ const ImpactTest = () => {
 
   const useCombos = activeLocations.length > 0 && activeNotches.length > 0;
 
-  const fetchRecords = async (query = '') => {
+  const fetchRecords = async (query = searchTerm) => {
     try {
       const res = await axios.get('/api/impact-test/search', { params: { q: query } });
       const data = res.data.content ?? res.data;
@@ -280,7 +280,8 @@ const ImpactTest = () => {
         [approvalField]: user.employeeId || user.fullName
       };
       await axios.put(`/api/impact-test/${record.id}`, payload);
-      fetchRecords();
+      fetchRecords(searchTerm);
+      setSelectedIds(prev => prev.filter(id => id !== record.id));
       toast.success('Record approved');
     } catch (err) {
       if (err.response && err.response.status === 409) {
@@ -852,8 +853,8 @@ const ImpactTest = () => {
                 : await axios.post('/api/impact-test/approve-all');
               toast.success(`${res.data.approved ?? idsToApprove.length} Impact Test records approved by HOD!`);
             }
-            fetchRecords();
-            setSelectedIds([]);
+            fetchRecords(searchTerm);
+            setSelectedIds(prev => prev.filter(id => !idsToApprove.includes(id)));
           } catch (err) {
             toast.error(err.response?.data?.message || 'Failed to approve records');
           } finally {

@@ -214,7 +214,8 @@ const QcRegister = () => {
         [approvalField]: user.employeeId || user.fullName
       };
       await axios.put(`/api/qc-register/${record.id}`, payload);
-      fetchRecords();
+      fetchRecords(searchTerm);
+      setSelectedIds(prev => prev.filter(id => id !== record.id));
       toast.success('Record approved');
     } catch (err) {
       if (err.response && err.response.status === 409) {
@@ -869,8 +870,8 @@ const QcRegister = () => {
                 : await axios.post('/api/qc-register/approve-all');
               toast.success(`${res.data.approved ?? idsToApprove.length} QC records approved by HOD!`);
             }
-            fetchRecords();
-            setSelectedIds([]);
+            fetchRecords(searchTerm);
+            setSelectedIds(prev => prev.filter(id => !idsToApprove.includes(id)));
           } catch (err) {
             toast.error(err.response?.data?.message || 'Failed to approve records');
           } finally {
