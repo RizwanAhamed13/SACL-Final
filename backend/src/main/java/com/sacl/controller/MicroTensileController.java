@@ -33,7 +33,7 @@ public class MicroTensileController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size) {
         Page<MicroTensileTest> result = service.findAll(
-                PageRequest.of(page, size, Sort.by("createdAt").descending()));
+                PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdAt"), Sort.Order.desc("id"))));
         return ResponseEntity.ok(PageResponse.of(result));
     }
 
@@ -44,7 +44,7 @@ public class MicroTensileController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size) {
         Page<MicroTensileTest> result = service.search(
-                q, createdBy, PageRequest.of(page, size, Sort.by("createdAt").descending()));
+                q, createdBy, PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdAt"), Sort.Order.desc("id"))));
         return ResponseEntity.ok(PageResponse.of(result));
     }
 

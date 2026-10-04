@@ -91,6 +91,40 @@ public class ReportController {
                          (!hasValue(dateCode) || matchesAny(r.getDateCode(), dateCode)))
             .collect(Collectors.toList());
 
+        // Sort all lists by createdAt descending (latest entry first)
+        qc.sort((a, b) -> {
+            if (a.getCreatedAt() != null && b.getCreatedAt() != null) {
+                int cmp = b.getCreatedAt().compareTo(a.getCreatedAt());
+                if (cmp != 0) return cmp;
+            } else if (a.getCreatedAt() != null) return -1;
+            else if (b.getCreatedAt() != null) return 1;
+            return Long.compare(b.getId() != null ? b.getId() : 0, a.getId() != null ? a.getId() : 0);
+        });
+        micro.sort((a, b) -> {
+            if (a.getCreatedAt() != null && b.getCreatedAt() != null) {
+                int cmp = b.getCreatedAt().compareTo(a.getCreatedAt());
+                if (cmp != 0) return cmp;
+            } else if (a.getCreatedAt() != null) return -1;
+            else if (b.getCreatedAt() != null) return 1;
+            return Long.compare(b.getId() != null ? b.getId() : 0, a.getId() != null ? a.getId() : 0);
+        });
+        tensile.sort((a, b) -> {
+            if (a.getCreatedAt() != null && b.getCreatedAt() != null) {
+                int cmp = b.getCreatedAt().compareTo(a.getCreatedAt());
+                if (cmp != 0) return cmp;
+            } else if (a.getCreatedAt() != null) return -1;
+            else if (b.getCreatedAt() != null) return 1;
+            return Long.compare(b.getId() != null ? b.getId() : 0, a.getId() != null ? a.getId() : 0);
+        });
+        impact.sort((a, b) -> {
+            if (a.getCreatedAt() != null && b.getCreatedAt() != null) {
+                int cmp = b.getCreatedAt().compareTo(a.getCreatedAt());
+                if (cmp != 0) return cmp;
+            } else if (a.getCreatedAt() != null) return -1;
+            else if (b.getCreatedAt() != null) return 1;
+            return Long.compare(b.getId() != null ? b.getId() : 0, a.getId() != null ? a.getId() : 0);
+        });
+
         Map<String, Object> results = new HashMap<>();
         results.put("qcRegister", qc);
         results.put("microStructure", micro);

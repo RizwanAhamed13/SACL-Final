@@ -98,12 +98,22 @@ const ImpactTest = () => {
 
   const useCombos = activeLocations.length > 0 && activeNotches.length > 0;
 
+  const sortByCreatedAtDesc = (list) => {
+    if (!Array.isArray(list)) return [];
+    return [...list].sort((a, b) => {
+      const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      if (timeA !== timeB) return timeB - timeA;
+      return (b.id || 0) - (a.id || 0);
+    });
+  };
+
   const fetchRecords = async (query = searchTerm) => {
     try {
       const res = await axios.get('/api/impact-test/search', { params: { q: query } });
       const data = res.data.content ?? res.data;
-      setRecords(data);
-      setHofPendingCount(data.filter(r => r.status === 'HOF_APPROVED').length);
+      setRecords(sortByCreatedAtDesc(data));
+      setHofPendingCount((data || []).filter(r => r.status === 'HOF_APPROVED').length);
     } catch (err) {
       console.warn("Could not fetch records", err);
     } finally {
