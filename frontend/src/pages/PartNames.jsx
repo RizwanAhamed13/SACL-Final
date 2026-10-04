@@ -266,7 +266,7 @@ const PartNames = () => {
                 {/* Part Micro Locations */}
                 <div className="form-section-title">Part Micro Locations</div>
                 <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', marginBottom: '1.5rem', background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                  {['TRA', 'SBA', 'LBJ', 'BORE', 'SBA.CA', 'LBJ.CA'].map(loc => {
+                  {['TRA', 'SBA', 'LBJ', 'BORE', 'SBA.CA', 'LBJ.CA', 'THIN', 'THICK', 'BRAKESHOE'].map(loc => {
                     const isChecked = formData.microLocations ? formData.microLocations.split(',').includes(loc) : false;
                     return (
                       <label key={loc} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontWeight: 600, color: '#334155' }}>

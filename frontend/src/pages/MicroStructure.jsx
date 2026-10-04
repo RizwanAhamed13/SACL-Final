@@ -9,6 +9,8 @@ import Skeleton from '../components/Skeleton';
 
 const locKey = (loc) => loc.replace(/[^a-zA-Z0-9]/g, '_');
 
+const AVAILABLE_MICRO_LOCATIONS = ['TRA', 'SBA', 'LBJ', 'BORE', 'SBA.CA', 'LBJ.CA', 'THIN', 'THICK', 'BRAKESHOE'];
+
 const MICRO_SINGLE_FIELDS = [
   { name: 'nodularityPercent', label: 'Nodularity/Graphite Type %', type: 'text', thMin: 'microMinNodularity', thMax: 'microMaxNodularity', placeholder: 'e.g. 90 or 85-95' },
   { name: 'graphiteType', label: 'Graphite Type', type: 'text', placeholder: 'e.g. VI' },
@@ -161,7 +163,7 @@ const MicroStructure = () => {
     const singleFields = [
       { key: 'nodularityPercent', min: ts.microMinNodularity, max: ts.microMaxNodularity },
     ];
-    if (!data.id && locs && locs.length > 0) {
+    if (locs && locs.length > 0) {
       locs.forEach(loc => {
         const lk = locKey(loc);
         singleFields.forEach(({ key, min, max }) => {
@@ -198,7 +200,13 @@ const MicroStructure = () => {
       const res = await axios.get(`/api/part-names/name/${encodeURIComponent(partName)}`);
       setThresholds(res.data);
       if (res.data) {
-        const locs = currentData.id && currentData.microLocation ? currentData.microLocation.split(',').filter(Boolean) : (res.data.microLocations ? res.data.microLocations.split(',').filter(Boolean) : []);
+        let partLocs = res.data.microLocations ? res.data.microLocations.split(',').filter(Boolean) : [];
+        if (!currentData.id && partLocs.length > 0 && !currentData.microLocation) {
+          setFormData(prev => ({ ...prev, microLocation: partLocs.join(',') }));
+        }
+        const locs = currentData.microLocation 
+          ? currentData.microLocation.split(',').filter(Boolean) 
+          : partLocs;
         validateAll(currentData, res.data, locs);
       }
     } catch (err) {
@@ -465,10 +473,52 @@ const MicroStructure = () => {
                     </div>
                     {formData.id && (
                       <div className="form-group">
-                        <label className="form-label">Location</label>
+                        <label className="form-label">Saved Location</label>
                         <input type="text" value={formData.microLocation || '—'} readOnly className="form-control" style={{ background: '#f8fafc', color: '#64748b' }} />
                       </div>
                     )}
+                  </div>
+                </div>
+
+                {/* Micro Testing Locations Selector */}
+                <div className="form-section">
+                  <div className="form-section-title">Testing Locations</div>
+                  <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', background: '#f8fafc', padding: '0.85rem 1.25rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                    {AVAILABLE_MICRO_LOCATIONS.map(loc => {
+                      const isChecked = activeLocations.includes(loc);
+                      return (
+                        <label
+                          key={loc}
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            cursor: 'pointer',
+                            fontWeight: 600,
+                            fontSize: '13px',
+                            color: isChecked ? '#0284c7' : '#475569',
+                            background: isChecked ? '#e0f2fe' : '#ffffff',
+                            padding: '6px 12px',
+                            borderRadius: '6px',
+                            border: isChecked ? '1px solid #0284c7' : '1px solid #cbd5e1',
+                            boxShadow: isChecked ? '0 1px 2px rgba(2,132,199,0.1)' : 'none',
+                            transition: 'all 0.15s ease'
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            onChange={(e) => {
+                              const current = activeLocations;
+                              const next = e.target.checked ? [...current, loc] : current.filter(x => x !== loc);
+                              setFormData(prev => ({ ...prev, microLocation: next.join(',') }));
+                              if (thresholds) validateAll(formData, thresholds, next);
+                            }}
+                          />
+                          {loc}
+                        </label>
+                      );
+                    })}
                   </div>
                 </div>
 
