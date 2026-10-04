@@ -16,6 +16,7 @@ const QcRegister = () => {
   const [records, setRecords] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedDisa, setSelectedDisa] = useState('');
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
   const [formData, setFormData] = useState({
     id: null, // for editing
@@ -90,10 +91,10 @@ const QcRegister = () => {
     });
   };
 
-  const fetchRecords = async (query = searchTerm) => {
+  const fetchRecords = async (query = searchTerm, disa = selectedDisa) => {
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      const res = await axios.get('/api/qc-register/search', { params: { q: query } });
+      await new Promise(resolve => setTimeout(resolve, 500));
+      const res = await axios.get('/api/qc-register/search', { params: { q: query, disa: disa || undefined } });
       const data = res.data.content ?? res.data;
       setRecords(sortByCreatedAtDesc(data));
       setHofPendingCount((data || []).filter(r => r.status === 'HOF_APPROVED').length);
@@ -106,10 +107,10 @@ const QcRegister = () => {
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
-      fetchRecords(searchTerm);
+      fetchRecords(searchTerm, selectedDisa);
     }, 500);
     return () => clearTimeout(delayDebounceFn);
-  }, [searchTerm]);
+  }, [searchTerm, selectedDisa]);
 
   const fetchThresholds = async (partName, currentData = formData) => {
     if (!partName) {
@@ -344,6 +345,18 @@ const QcRegister = () => {
               style={{ paddingLeft: '32px', width: '200px' }}
             />
           </div>
+          <select
+            value={selectedDisa}
+            onChange={(e) => setSelectedDisa(e.target.value)}
+            className="form-control"
+            style={{ width: '130px', height: '38px', fontSize: '13px' }}
+          >
+            <option value="">All DISA</option>
+            <option value="DISA I">DISA I</option>
+            <option value="DISA II">DISA II</option>
+            <option value="DISA III">DISA III</option>
+            <option value="DISA IV">DISA IV</option>
+          </select>
           {(user?.role?.toUpperCase()?.includes('QC') || user?.role?.toUpperCase()?.includes('ADMIN') || user?.role?.toUpperCase()?.includes('USER')) && (
             <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

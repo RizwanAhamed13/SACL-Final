@@ -40,11 +40,12 @@ public class MicroTensileController {
     @GetMapping("/search")
     public ResponseEntity<PageResponse<MicroTensileTest>> search(
             @RequestParam(required = false) String q,
+            @RequestParam(required = false) String disa,
             @RequestParam(required = false) String createdBy,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size) {
         Page<MicroTensileTest> result = service.search(
-                q, createdBy, PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdAt"), Sort.Order.desc("id"))));
+                q, disa, createdBy, PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdAt"), Sort.Order.desc("id"))));
         return ResponseEntity.ok(PageResponse.of(result));
     }
 

@@ -43,9 +43,10 @@ public class ImpactTestService {
         return repository.findAll(pageable);
     }
 
-    public Page<ImpactTest> search(String keyword, String createdBy, Pageable pageable) {
+    public Page<ImpactTest> search(String keyword, String disa, String createdBy, Pageable pageable) {
         String searchParam = (keyword == null) ? "" : keyword;
-        return repository.searchByKeyword(searchParam, createdBy, pageable);
+        String disaParam = (disa == null || disa.isBlank()) ? null : disa;
+        return repository.searchByKeyword(searchParam, disaParam, createdBy, pageable);
     }
 
     @Transactional
