@@ -7,10 +7,20 @@ const TimePicker = ({ value, onChange, name, className = '' }) => {
 
   useEffect(() => {
     if (value) {
-      const match = value.match(/^(\d{1,2}):(\d{2})$/);
-      if (match) {
-        let h = parseInt(match[1], 10);
-        let m = match[2];
+      const trimmed = value.trim();
+      const match12 = trimmed.match(/^(\d{1,2}):(\d{2})(?::\d{2})?\s*(AM|PM)$/i);
+      if (match12) {
+        let h = parseInt(match12[1], 10);
+        setHour(h.toString().padStart(2, '0'));
+        setMinute(match12[2]);
+        setAmpm(match12[3].toUpperCase());
+        return;
+      }
+
+      const match24 = trimmed.match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/);
+      if (match24) {
+        let h = parseInt(match24[1], 10);
+        let m = match24[2];
         let ap = 'AM';
         
         if (h >= 12) {
@@ -23,6 +33,7 @@ const TimePicker = ({ value, onChange, name, className = '' }) => {
         setHour(h.toString().padStart(2, '0'));
         setMinute(m);
         setAmpm(ap);
+        return;
       }
     } else {
       setHour('');

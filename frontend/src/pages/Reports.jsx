@@ -81,6 +81,32 @@ const styleTitleRow = (ws, rowIdx, colCount, bgHex) => {
   }
 };
 
+export const formatTimeWithAmPm = (timeStr) => {
+  if (!timeStr || typeof timeStr !== 'string') return timeStr || '—';
+  const trimmed = timeStr.trim();
+  if (!trimmed || trimmed === '—') return '—';
+
+  const matchAmPm = trimmed.match(/^(\d{1,2}):(\d{2})(?::\d{2})?\s*(AM|PM)$/i);
+  if (matchAmPm) {
+    let h = parseInt(matchAmPm[1], 10);
+    const m = matchAmPm[2];
+    const ap = matchAmPm[3].toUpperCase();
+    return `${h.toString().padStart(2, '0')}:${m} ${ap}`;
+  }
+
+  const match = trimmed.match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/);
+  if (match) {
+    let hour = parseInt(match[1], 10);
+    const minute = match[2];
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    hour = hour % 12;
+    if (hour === 0) hour = 12;
+    return `${hour.toString().padStart(2, '0')}:${minute} ${ampm}`;
+  }
+
+  return trimmed;
+};
+
 // ─────────────────────────────────────────────────────────────
 // Section definitions — full column names, keys, theme colours
 // ─────────────────────────────────────────────────────────────
@@ -120,8 +146,12 @@ const QC_KEYS = [
   'id', 'partName', 'date', 'dateCode', 'heatCode', 'disa', 'qtyMoulds',
   'compositionC', 'compositionSi', 'compositionMn', 'compositionP', 'compositionS',
   'compositionMgFirst', 'compositionMgLast', 'compositionCu', 'compositionCr', 'compositionSn',
-  'timeOfPouringStart', 'timeOfPouringEnd', (r) => (r.pouringTempStart || r.pouringTempEnd) ? `${r.pouringTempStart || '-'} - ${r.pouringTempEnd || '-'}` : r.pouringTemp, 'ppCode', 'treatmentNo', 'fcNoHeatNo', 'conNo',
-  'tappingTime', 'tappingWtKgs',
+  (r) => formatTimeWithAmPm(r.timeOfPouringStart),
+  (r) => formatTimeWithAmPm(r.timeOfPouringEnd),
+  (r) => (r.pouringTempStart || r.pouringTempEnd) ? `${r.pouringTempStart || '-'} - ${r.pouringTempEnd || '-'}` : r.pouringTemp,
+  'ppCode', 'treatmentNo', 'fcNoHeatNo', 'conNo',
+  (r) => formatTimeWithAmPm(r.tappingTime),
+  'tappingWtKgs',
   'correctiveC', 'correctiveSi', 'correctiveMn', 'correctiveS',
   'correctiveCr', 'correctiveCu', 'correctiveSn',
   'mgKgs', 'resMgConvertorPercent', 'recMgPercent', 'streamInnoculant', (r) => (r.pTimeSecStart || r.pTimeSecEnd) ? `${r.pTimeSecStart || '-'} - ${r.pTimeSecEnd || '-'}` : (r.pTimeSec ?? r.ptimeSec),
@@ -666,10 +696,10 @@ const Reports = () => {
                       <td>{dash(r.compositionP)}</td><td>{dash(r.compositionS)}</td>
                       <td>{dash(r.compositionMgFirst)}</td><td>{dash(r.compositionMgLast)}</td>
                       <td>{dash(r.compositionCu)}</td><td>{dash(r.compositionCr)}</td><td>{dash(r.compositionSn)}</td>
-                      <td>{dash(r.timeOfPouringStart)}</td><td>{dash(r.timeOfPouringEnd)}</td><td>{r.pouringTempStart || r.pouringTempEnd ? `${dash(r.pouringTempStart)} - ${dash(r.pouringTempEnd)}` : dash(r.pouringTemp)}</td>
+                      <td>{formatTimeWithAmPm(r.timeOfPouringStart)}</td><td>{formatTimeWithAmPm(r.timeOfPouringEnd)}</td><td>{r.pouringTempStart || r.pouringTempEnd ? `${dash(r.pouringTempStart)} - ${dash(r.pouringTempEnd)}` : dash(r.pouringTemp)}</td>
                       <td>{dash(r.ppCode)}</td><td>{dash(r.treatmentNo)}</td>
                       <td>{dash(r.fcNoHeatNo)}</td><td>{dash(r.conNo)}</td>
-                      <td>{dash(r.tappingTime)}</td><td>{dash(r.tappingWtKgs)}</td>
+                      <td>{formatTimeWithAmPm(r.tappingTime)}</td><td>{dash(r.tappingWtKgs)}</td>
                       <td>{dash(r.correctiveC)}</td><td>{dash(r.correctiveSi)}</td><td>{dash(r.correctiveMn)}</td>
                       <td>{dash(r.correctiveS)}</td><td>{dash(r.correctiveCr)}</td><td>{dash(r.correctiveCu)}</td>
                       <td>{dash(r.correctiveSn)}</td>

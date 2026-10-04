@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import ConfirmModal from '../components/ConfirmModal';
 import Skeleton from '../components/Skeleton';
 import TimePicker from '../components/TimePicker';
+import { formatTimeWithAmPm } from './Reports';
 
 const QcRegister = () => {
   const { user } = useAuth();
@@ -736,14 +737,14 @@ const QcRegister = () => {
                     <td style={{ fontSize: '12px' }}>{dash(r.compositionCr)}</td>
                     <td style={{ fontSize: '12px' }}>{dash(r.compositionSn)}</td>
 
-                    <td>{dash(r.timeOfPouringStart)}</td>
-                    <td>{dash(r.timeOfPouringEnd)}</td>
+                    <td>{formatTimeWithAmPm(r.timeOfPouringStart)}</td>
+                    <td>{formatTimeWithAmPm(r.timeOfPouringEnd)}</td>
                     <td>{r.pouringTempStart || r.pouringTempEnd ? `${dash(r.pouringTempStart)} - ${dash(r.pouringTempEnd)}` : dash(r.pouringTemp)}</td>
                     <td>{dash(r.ppCode)}</td>
                     <td>{dash(r.treatmentNo)}</td>
                     <td>{dash(r.fcNoHeatNo)}</td>
                     <td>{dash(r.conNo)}</td>
-                    <td>{dash(r.tappingTime)}</td>
+                    <td>{formatTimeWithAmPm(r.tappingTime)}</td>
 
                     {/* Corrective Addition */}
                     <td style={{ fontSize: '12px' }}>{dash(r.correctiveC)}</td>

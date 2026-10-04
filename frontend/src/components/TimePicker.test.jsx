@@ -39,4 +39,13 @@ describe('TimePicker Component', () => {
       target: { name: 'testTime', value: '14:45' }
     });
   });
+
+  it('renders correctly with a 12-hour formatted time with AM/PM', () => {
+    render(<TimePicker name="testTime" value="09:15 AM" onChange={() => {}} />);
+    
+    const selects = screen.getAllByRole('combobox');
+    expect(selects[0].value).toBe('09');
+    expect(selects[1].value).toBe('15');
+    expect(selects[2].value).toBe('AM');
+  });
 });
