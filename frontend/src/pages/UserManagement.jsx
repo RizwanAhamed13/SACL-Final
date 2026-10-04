@@ -18,7 +18,7 @@ const UserManagement = () => {
   });
 
   // Record Search State
-  const [recSearch, setRecSearch] = useState({ partName: '', dateCode: '', heatCode: '' });
+  const [recSearch, setRecSearch] = useState({ partName: '', dateCode: '', heatCode: '', disa: '' });
   const [recResults, setRecResults] = useState(null);
   const [recLoading, setRecLoading] = useState(false);
   const [editRecord, setEditRecord] = useState(null); // { type, data }
@@ -253,6 +253,16 @@ const UserManagement = () => {
           <div className="rec-search-field">
             <label className="rec-field-label">Heat Code</label>
             <input type="text" className="rec-input" placeholder="e.g. H123" value={recSearch.heatCode} onChange={e => setRecSearch({...recSearch, heatCode: e.target.value})} />
+          </div>
+          <div className="rec-search-field">
+            <label className="rec-field-label">DISA Line</label>
+            <select className="rec-input" value={recSearch.disa} onChange={e => setRecSearch({...recSearch, disa: e.target.value})}>
+              <option value="">All Lines</option>
+              <option value="DISA I">DISA I</option>
+              <option value="DISA II">DISA II</option>
+              <option value="DISA III">DISA III</option>
+              <option value="DISA IV">DISA IV</option>
+            </select>
           </div>
           <button type="submit" className="btn btn-primary" style={{ height: '40px', padding: '0 24px' }} disabled={recLoading}>
             {recLoading ? 'Searching...' : 'Search'}

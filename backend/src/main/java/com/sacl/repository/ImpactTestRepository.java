@@ -24,7 +24,8 @@ public interface ImpactTestRepository extends JpaRepository<ImpactTest, Long> {
 
     @Query("SELECT r FROM ImpactTest r WHERE " +
            "(:search = '' OR LOWER(r.partName) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-           " LOWER(r.dateCode) LIKE LOWER(CONCAT('%', :search, '%'))) AND " +
+           " LOWER(r.dateCode) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           " LOWER(r.disa) LIKE LOWER(CONCAT('%', :search, '%'))) AND " +
            "(:createdBy IS NULL OR r.createdBy = :createdBy)")
     Page<ImpactTest> searchByKeyword(@Param("search") String search, @Param("createdBy") String createdBy, Pageable pageable);
 }

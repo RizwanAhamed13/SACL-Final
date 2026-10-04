@@ -25,7 +25,8 @@ public interface MicroTensileRepository extends JpaRepository<MicroTensileTest, 
     @Query("SELECT r FROM MicroTensileTest r WHERE " +
            "(:search = '' OR LOWER(r.item) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            " LOWER(r.heatCode) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-           " LOWER(r.dateCode) LIKE LOWER(CONCAT('%', :search, '%'))) AND " +
+           " LOWER(r.dateCode) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           " LOWER(r.disa) LIKE LOWER(CONCAT('%', :search, '%'))) AND " +
            "(:createdBy IS NULL OR r.createdBy = :createdBy)")
     Page<MicroTensileTest> searchByKeyword(@Param("search") String search, @Param("createdBy") String createdBy, Pageable pageable);
 }

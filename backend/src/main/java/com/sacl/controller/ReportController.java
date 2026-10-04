@@ -60,35 +60,40 @@ public class ReportController {
     public ResponseEntity<Map<String, Object>> search(
             @RequestParam(required = false) String partName,
             @RequestParam(required = false) String dateCode,
-            @RequestParam(required = false) String heatCode) {
+            @RequestParam(required = false) String heatCode,
+            @RequestParam(required = false) String disa) {
 
-        boolean anyFilter = hasValue(partName) || hasValue(dateCode) || hasValue(heatCode);
+        boolean anyFilter = hasValue(partName) || hasValue(dateCode) || hasValue(heatCode) || hasValue(disa);
 
         // QC Register
         List<QcRegister> qc = qcRepo.findAll().stream()
             .filter(r -> (!hasValue(partName) || matchesAny(r.getPartName(), partName)) &&
                          (!hasValue(dateCode) || matchesAny(r.getDateCode(), dateCode)) &&
-                         (!hasValue(heatCode) || matchesAny(r.getHeatCode(), heatCode)))
+                         (!hasValue(heatCode) || matchesAny(r.getHeatCode(), heatCode)) &&
+                         (!hasValue(disa) || matchesAny(r.getDisa(), disa)))
             .collect(Collectors.toList());
 
         // Micro Structure
         List<MicroStructureAnalysis> micro = microRepo.findAll().stream()
             .filter(r -> (!hasValue(partName) || matchesAny(r.getPartName(), partName)) &&
                          (!hasValue(dateCode) || matchesAny(r.getDateCode(), dateCode)) &&
-                         (!hasValue(heatCode) || matchesAny(r.getHeatCode(), heatCode)))
+                         (!hasValue(heatCode) || matchesAny(r.getHeatCode(), heatCode)) &&
+                         (!hasValue(disa) || matchesAny(r.getDisa(), disa)))
             .collect(Collectors.toList());
 
         // Tensile Test
         List<MicroTensileTest> tensile = tensileRepo.findAll().stream()
             .filter(r -> (!hasValue(partName) || matchesAny(r.getItem(), partName)) &&
                          (!hasValue(dateCode) || matchesAny(r.getDateCode(), dateCode)) &&
-                         (!hasValue(heatCode) || matchesAny(r.getHeatCode(), heatCode)))
+                         (!hasValue(heatCode) || matchesAny(r.getHeatCode(), heatCode)) &&
+                         (!hasValue(disa) || matchesAny(r.getDisa(), disa)))
             .collect(Collectors.toList());
 
-        // Impact Test (no heatCode field)
+        // Impact Test
         List<ImpactTest> impact = impactRepo.findAll().stream()
             .filter(r -> (!hasValue(partName) || matchesAny(r.getPartName(), partName)) &&
-                         (!hasValue(dateCode) || matchesAny(r.getDateCode(), dateCode)))
+                         (!hasValue(dateCode) || matchesAny(r.getDateCode(), dateCode)) &&
+                         (!hasValue(disa) || matchesAny(r.getDisa(), disa)))
             .collect(Collectors.toList());
 
         // Sort all lists by createdAt descending (latest entry first)

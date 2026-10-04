@@ -25,7 +25,8 @@ public interface QcRegisterRepository extends JpaRepository<QcRegister, Long> {
     @Query("SELECT r FROM QcRegister r WHERE " +
            "(:search = '' OR LOWER(r.partName) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            " LOWER(r.heatCode) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-           " LOWER(r.dateCode) LIKE LOWER(CONCAT('%', :search, '%'))) AND " +
+           " LOWER(r.dateCode) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           " LOWER(r.disa) LIKE LOWER(CONCAT('%', :search, '%'))) AND " +
            "(:createdBy IS NULL OR r.createdBy = :createdBy)")
     Page<QcRegister> searchByKeyword(@Param("search") String search, @Param("createdBy") String createdBy, Pageable pageable);
 }

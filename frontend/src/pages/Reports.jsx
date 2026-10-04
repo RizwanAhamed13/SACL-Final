@@ -455,7 +455,7 @@ const DlIcon = () => (
 );
 
 const Reports = () => {
-  const [searchParams, setSearchParams] = useState({ partName: '', dateCode: '', heatCode: '' });
+  const [searchParams, setSearchParams] = useState({ partName: '', dateCode: '', heatCode: '', disa: '' });
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -485,7 +485,7 @@ const Reports = () => {
     // Check if at least one search parameter is populated
     const hasFilters = Object.values(searchParams).some(val => val && val.trim() !== '');
     if (!hasFilters) {
-      toast.error('Please enter at least one search criteria (Part Name, Date Code, or Heat Code) before exporting to prevent server overload.', { duration: 5000 });
+      toast.error('Please enter at least one search criteria (Part Name, Date Code, Heat Code, or DISA Line) before exporting to prevent server overload.', { duration: 5000 });
       return;
     }
     
@@ -644,6 +644,20 @@ const Reports = () => {
               <input type="text" className="rpt-input" value={searchParams.heatCode}
                 onChange={(e) => setSearchParams({ ...searchParams, heatCode: e.target.value })}
                 placeholder="e.g. H240130" />
+            </div>
+            <div className="search-field search-field-sm">
+              <span className="rpt-field-label">DISA Line</span>
+              <select
+                className="rpt-input"
+                value={searchParams.disa}
+                onChange={(e) => setSearchParams({ ...searchParams, disa: e.target.value })}
+              >
+                <option value="">All Lines</option>
+                <option value="DISA I">DISA I</option>
+                <option value="DISA II">DISA II</option>
+                <option value="DISA III">DISA III</option>
+                <option value="DISA IV">DISA IV</option>
+              </select>
             </div>
             <div className="search-actions">
               <button type="submit" className="btn-search" disabled={loading}>
